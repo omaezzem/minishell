@@ -6,7 +6,7 @@
 #    By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/03/14 02:29:51 by omaezzem          #+#    #+#              #
-#    Updated: 2025/04/20 15:23:28 by omaezzem         ###   ########.fr        #
+#    Updated: 2025/04/20 19:45:24 by omaezzem         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@ NAME = minishell
 
 CC = cc
 
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -lreadline
 
 MAIN_SOURCES = execution/builtins/builtin_echo.c\
 			   execution/builtins/builtin_pwd.c\

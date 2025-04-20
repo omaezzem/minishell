@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 11:03:16 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/20 15:45:35 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/04/20 17:08:11 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,11 +37,5 @@ void ft_create_env(char **env, t_env **ev)
 		ft_lstadd_back(ev, new_node);
 		free_split(eqsplit);
 		i++;
-	}
-	t_env *tmp = *ev;
-	while (tmp)
-	{
-		printf("%s = %s\n", tmp->var, tmp->val);
-		tmp = tmp->next;
 	}
 }
