@@ -1,22 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strcmp.c                                        :+:      :+:    :+:   */
+/*   builtin_pwd.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/14 02:10:50 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/20 14:57:28 by omaezzem         ###   ########.fr       */
+/*   Created: 2025/03/14 02:14:59 by omaezzem          #+#    #+#             */
+/*   Updated: 2025/04/20 14:38:53 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-int ft_strcmp(char *s1, char *s2)
+void pwd() 
 {
-	int i = 0;
+	char cwd[1024];
 
-	while((s1[i] == s2[i]) && s1[i] && s2[i])
-		i++;
-	return (s1[i]-s2[i]);
+	if (getcwd(cwd, sizeof(cwd)) != NULL)
+		printf("%s\n", cwd);
+	else
+	{
+		perror("pwd");
+		exit(EXIT_FAILURE);
+	}
 }

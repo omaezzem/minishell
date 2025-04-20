@@ -1,22 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strcmp.c                                        :+:      :+:    :+:   */
+/*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/14 02:10:50 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/20 14:57:28 by omaezzem         ###   ########.fr       */
+/*   Created: 2025/04/20 11:17:45 by omaezzem          #+#    #+#             */
+/*   Updated: 2025/04/20 15:27:51 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/minishell.h"
+#include "include/minishell.h"
 
-int ft_strcmp(char *s1, char *s2)
+int main(int ac, char **av, char **env)
 {
-	int i = 0;
+    t_env   *ev;
 
-	while((s1[i] == s2[i]) && s1[i] && s2[i])
-		i++;
-	return (s1[i]-s2[i]);
+    ev = NULL;
+    (void)ac;
+    (void)av;
+    ft_create_env(env, &ev);
 }

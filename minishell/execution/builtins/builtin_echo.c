@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   echo.c                                             :+:      :+:    :+:   */
+/*   builtin_echo.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 23:14:24 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/03/14 06:05:17 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/04/20 14:53:42 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
 int	check_mins_n(char **args)
 {
@@ -29,10 +29,8 @@ int	check_mins_n(char **args)
 int    options_echo_pos(char **args)
 {
 	int	i;
-	int	j;
 
 	i = 1;
-	j = 0;
 	while (args[i] && !ft_strcmp(args[i], "-n"))
 	{
 		i++;

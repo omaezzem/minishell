@@ -1,22 +1,39 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strcmp.c                                        :+:      :+:    :+:   */
+/*   ft_lstnew.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/14 02:10:50 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/20 14:57:28 by omaezzem         ###   ########.fr       */
+/*   Created: 2025/04/20 13:46:02 by omaezzem          #+#    #+#             */
+/*   Updated: 2025/04/20 13:48:17 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-int ft_strcmp(char *s1, char *s2)
+t_env	*ft_lstnew_val(char *val)
 {
-	int i = 0;
+	t_env	*nodedyali;
 
-	while((s1[i] == s2[i]) && s1[i] && s2[i])
-		i++;
-	return (s1[i]-s2[i]);
+	nodedyali = malloc(sizeof(t_env));
+	if (!nodedyali)
+		return (NULL);
+	nodedyali->val = val;
+	nodedyali->next = NULL;
+	return (nodedyali);
+	return NULL;
+}
+
+t_env	*ft_lstnew_var(char *var)
+{
+	t_env	*nodedyali;
+
+	nodedyali = malloc(sizeof(t_env));
+	if (!nodedyali)
+		return (NULL);
+	nodedyali->val = var;
+	nodedyali->next = NULL;
+	return (nodedyali);
+	return NULL;
 }
