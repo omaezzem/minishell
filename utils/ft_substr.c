@@ -1,31 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strdup.c                                        :+:      :+:    :+:   */
+/*   ft_substr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/20 15:21:54 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/20 15:22:15 by omaezzem         ###   ########.fr       */
+/*   Created: 2025/04/17 11:18:31 by mel-badd          #+#    #+#             */
+/*   Updated: 2025/04/22 11:47:16 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/minishell.h"
+#include "../include/minishell.h"
 
-char	*ft_strdup(const char *s)
+char	*ft_substr(char const *s, unsigned int start, size_t len)
 {
-	int		i;
-	char	*d;
+	size_t	i;
+	char	*sub;
 
+	if (!s)
+		return (NULL);
+	if (start >= ft_strlen(s))
+		return (ft_strdup(""));
+	if (len > ft_strlen(s) - start)
+		len = ft_strlen(s) - start;
+	sub = (char *)malloc (sizeof(char) * (len + 1));
+	if (!sub)
+		return (NULL);
 	i = 0;
-	d = malloc((ft_strlen(s) + 1) * sizeof(char));
-	if (d == NULL)
-		return (0);
-	while (s[i] != '\0')
+	while (i < len)
 	{
-		d[i] = s[i];
+		sub[i] = s[start + i];
 		i++;
 	}
-	d[i] = '\0';
-	return (d);
+	sub[i] = '\0';
+	return (sub);
 }

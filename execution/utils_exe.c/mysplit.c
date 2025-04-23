@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_split.c                                         :+:      :+:    :+:   */
+/*   mysplit.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 14:05:02 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/20 14:59:54 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/04/22 11:20:36 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ static char	**freememory(char **s, int i)
 	return (NULL);
 }
 
-char	**ft_split(char *s, char c)
+char	**mysplit(char *s, char c)
 {
 	size_t	len;
 	size_t	index;

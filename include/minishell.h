@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 23:17:48 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/20 19:52:18 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/04/22 15:39:08 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,17 +18,16 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <ctype.h>
-
-
+#include <limits.h>
+#include <signal.h>
+#include <sys/stat.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <dirent.h>
 
-#define GRN   "\033[0;32m"
-#define RED   "\033[0;31m"
-#define BLU   "\033[0;34m"
-
-# define FAILURE 0
-# define SUCCESS 1
+# define FAILURE	0
+# define SUCCESS	1
+# define PATH_MAX	4096
 
 typedef  enum
 {
@@ -62,6 +61,8 @@ typedef struct s_cmd
 	char			**cmd;
 	char			**option;
 	t_type			type;
+	t_env			env;
+	char			*workdir;
 	char			**redirection;
 	int				ex_status;
 	struct s_cmd	*next;
@@ -85,10 +86,56 @@ char	**ft_split(char *s, char c);
 void	free_split(char **arr);
 size_t	ft_strlen(const char *str);
 char	*ft_strdup(const char *s);
+void    print_exe(char *str);
+int		mini_atoi(char *str);
+void	ft_freeptr(void *ptr);
+int		ft_isspace(char *str);
 
 /*---------------------------------------------builtin---------------------------------------------*/
+
 void	ft_echo(char **args);
 void	ft_create_env(char **env, t_env **ev);
 int		builtin_env(t_env *ev, char **args);
+int		ft_exit(t_cmd *data, char **args);
+char	*find_env(char **env, char *var);
 
+/*---------------------------------------------parsing--------------------------------------*/
+
+#define MAX_ENV 50
+
+#define ENOBRACE 1
+#define ENOROOM 2
+
+extern int    cmdline_shift;
+extern int    cmdline_argc;
+extern char **cmdline_argv;
+
+void	append_token(t_token **head, t_token *new_token);
+t_token	*create_token(char *value, t_type type);
+void	print_type(t_type type);
+t_type	get_token_type(char *str);
+int		error(t_token *tokens);
+char	*ft_substr(char const *s, unsigned int start, size_t len);
+char	*ft_strdup(const char *src);
+int		error_pipe(t_token *tokens);
+size_t	ft_strlen(const char *s);
+int		ft_strcmp(char *s1, char *s2);
+void	sigint_handler(int sig);
+char	*ft_strchr(const char *s, int c);
+t_token	*tokenize(char *input);
+char	*read_input(char *prompt);
+int		parse(void);
+char	*ft_strjoin(char const *s1, char const *s2);
+void	joining(t_token *tokens);
+int		expand(t_token *token);
+int		expand_env(char **oldp, char **newp, int space_left, int brace_flag);
+int		expand_pid(char **newp, int space_left);
+int		expand_argv(char **oldp, char **newp, int space_left);
+int		expand_status(char **newp, int space_left);
+char	*gitenv(const char* name);
+int		expand_argc(char **newp, int space_left);
+int		is_match(char *str, char *ptrn);
+int		expand_wildcard(char **oldp, char **newp, int space_left);
+
+ 
 #endif

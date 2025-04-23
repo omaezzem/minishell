@@ -1,25 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strlen.c                                        :+:      :+:    :+:   */
+/*   create_token.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/20 15:00:26 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/20 15:00:57 by omaezzem         ###   ########.fr       */
+/*   Created: 2025/04/22 11:22:10 by omaezzem          #+#    #+#             */
+/*   Updated: 2025/04/22 11:22:45 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-size_t	ft_strlen(const char *str)
+t_token *create_token(char *value, t_type type)
 {
-	size_t	i;
-
-	i = 0;
-	while (str[i])
-	{
-		i++;
-	}
-	return (i);
+	t_token *token = malloc(sizeof(t_token));
+	if (!token)
+		return NULL;
+	token->value = strdup(value);
+	token->type = type;
+	token->next = NULL;
+	return token;
 }

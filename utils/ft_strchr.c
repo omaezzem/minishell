@@ -1,27 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minishell.c                                        :+:      :+:    :+:   */
+/*   ft_strchr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/20 11:17:45 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/20 19:54:08 by omaezzem         ###   ########.fr       */
+/*   Created: 2025/04/21 16:09:01 by omaezzem          #+#    #+#             */
+/*   Updated: 2025/04/22 11:46:56 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "include/minishell.h"
+#include "../include/minishell.h"
 
-int main(int ac, char **av, char **env)
+char	*ft_strchr(const char *s, int c)
 {
-    (void)ac;
-    (void)av;
-    (void)env;
-    char *input;
-    while (1)
-    {
-        input = readline("minishell~~>$ ");
-        if (!input)
-            break;
-    }
+	size_t	i;
+
+	i = 0;
+	while (s[i])
+	{
+		if (s[i] == (char)c)
+		{
+			return ((char *)(s + i));
+		}
+		i++;
+	}
+	if (s[i] == (char)c)
+		return ((char *)s + i);
+	return (NULL);
 }
