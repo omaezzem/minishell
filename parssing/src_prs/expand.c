@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expand.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-badd <mel-badd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/18 20:00:24 by mel-badd          #+#    #+#             */
-/*   Updated: 2025/04/22 11:50:01 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/04/23 16:27:20 by mel-badd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,13 +48,10 @@ int expand_argc(char **newp, int space_left)
 	return n;
 }
 
-char* gitenv(const char* name) {
-	return getenv(name);
-}
-
-int expand_env(char **oldp, char **newp, int space_left, int brace_flag)
+int expand_env(char **oldp, char **newp, int brace_flag)
 {
 	int i = 0, n = 0;
+	int space_left = 0;
 	char env_buffer[MAX_ENV], *env_val;
 	char *old = *oldp;
 	char *new = *newp;
@@ -82,7 +79,7 @@ int expand_env(char **oldp, char **newp, int space_left, int brace_flag)
 
 	// Fetch environment variable
 	env_val = getenv(env_buffer);
-
+	space_left = ft_strlen(env_val);
 	// Copy env_val to new string if exists
 	if (env_val != NULL)
 	{
@@ -98,7 +95,6 @@ int expand_env(char **oldp, char **newp, int space_left, int brace_flag)
 	*newp = new;
 	return n;
 }
-
 
 int expand_argv(char **oldp, char **newp, int space_left)
 {
@@ -144,15 +140,18 @@ int expand_pid(char **newp, int space_left)
 int expand(t_token *token)
 {
 	char *old = token->value;
-	t_env *env = malloc(sizeof(t_env)); // Allocate memory for the env variable
+	t_env *env = malloc(sizeof(t_env));
 	int oldlen = strlen(old);
 	int newsize = oldlen * 2;
-	char *new = malloc(newsize);
+	char *new = malloc(newsize * 2 + 1);
 	if (!new) return -1;
 
 	char *newp = new;
 	int rv;
 
+	// while (*old && *old != '$') {
+	// 	*old = *old + 1;
+	// }
 	while (*old != '\0') {
 		if (*old == '$') {
 			old++;
@@ -184,7 +183,8 @@ int expand(t_token *token)
 			}
 			else {
 				int brace_flag = (*old == '{');
-				rv = expand_env(&old, &newp, newsize - (newp - new), brace_flag);
+				printf("%d\n", newsize);
+				rv = expand_env(&old, &newp, brace_flag);
 				if (rv < 0)
 					return 0;
 				old++; // advance past the variable name / closing brace

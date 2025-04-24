@@ -6,11 +6,12 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/17 11:14:49 by mel-badd          #+#    #+#             */
-/*   Updated: 2025/04/22 11:47:28 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/04/24 09:18:21 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
+
 t_type get_token_type(char *str)
 {
 	if (ft_strcmp(str, "|") == 0)
@@ -61,7 +62,7 @@ void print_type(t_type type)
 	// else
 	// 	printf("UNKNOWN TOKEN\n");
 }
-int		ft_isspace(int c)
+int		issspace(int c)
 {
 	c = (unsigned char)c;
 	if (c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r'
@@ -93,7 +94,7 @@ t_token *tokenize(char *input)
 
 	while (input[i])
 	{
-		if (ft_isspace(input[i]))
+		if (issspace(input[i]))
 		{
 			i++;
 			continue;
@@ -125,7 +126,7 @@ t_token *tokenize(char *input)
 			continue;
 		}
 		int start = i;
-		while (input[i] && !ft_isspace(input[i]) && !ft_strchr("><|()\"\'", input[i]))
+		while (input[i] && !issspace(input[i]) && !ft_strchr("><|()\"\'", input[i]))
 			i++;
 		char *word = ft_substr(input, start, i - start);
 		append_token(&tokens, create_token(word, get_token_type(word)));
@@ -135,7 +136,7 @@ t_token *tokenize(char *input)
 	return tokens;
 }
 
-int parse()
+int parse(void)
 {
 	t_token *tokens;
 	char	*input;

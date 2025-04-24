@@ -6,13 +6,13 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 16:50:59 by mel-badd          #+#    #+#             */
-/*   Updated: 2025/04/22 11:46:53 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/04/24 09:06:58 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-static int	ft_countwords(const char *s, char c)
+static int	ft_countwords(char *s, char c)
 {
 	int	i;
 	int	count;
@@ -32,7 +32,7 @@ static int	ft_countwords(const char *s, char c)
 	return (count);
 }
 
-static char	*ft_put_words(const char *s, char c)
+static char	*ft_put_words(char *s, char c)
 {
 	char	*str;
 	size_t	i;
@@ -67,7 +67,7 @@ static void	ft_free(char **str)
 	free(str);
 }
 
-static char	**ft_fill_array(const char *s, char **str, int len, char c)
+static char	**ft_fill_array(char *s, char **str, int len, char c)
 {
 	int	i;
 
@@ -91,7 +91,7 @@ static char	**ft_fill_array(const char *s, char **str, int len, char c)
 	return (str);
 }
 
-char	**ft_split(char const *s, char c)
+char	**ft_split(char *s, char c)
 {
 	int		len;
 	char	**str;

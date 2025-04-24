@@ -6,16 +6,14 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:50:42 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/23 09:43:31 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/04/24 11:18:53 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-int changedir(t_cmd *data, char *path)
+int changedir(char *path)
 {
-    char cwd[PATH_MAX];
-
     if (chdir(path) != 0)
     {
         perror("cd");
@@ -36,11 +34,10 @@ int len_args(char **args)
 
 void	update_old(t_env *ev, char *oldpath)
 {
-	int		i;
+
 	t_env	*add;
 
 	add = ev;
-	i = 0;
 	while (ev->next != NULL)
 	{
 		if (ft_strcmp(ev->var, "OLDPWD") == 0)
@@ -56,11 +53,9 @@ void	update_old(t_env *ev, char *oldpath)
 }
 void	update_new(t_env *ev, char *newpath)
 {
-	int		i;
 	t_env	*add;
 
 	add = ev;
-	i = 0;
 	while (ev->next != NULL)
 	{
 		if (ft_strcmp(ev->var, "PWD") == 0)
@@ -77,15 +72,13 @@ void	update_new(t_env *ev, char *newpath)
 
 int	ft_cd(t_cmd *data, char **args)
 {
-	int	res;
-	int	old;
 	char	newpath[PATH_MAX];
 	char	oldpath[PATH_MAX];
 	char	*path;
 	int		len;
 
 	len = len_args(args);
-	if (len > 2)
+	if (len <= 2)
 	{
 		if (!getcwd(oldpath, PATH_MAX))
 		{
@@ -113,15 +106,15 @@ int	ft_cd(t_cmd *data, char **args)
 		}
 		else
 			path = data->option[1];
-		if (!changedir(data, path))
+		if (!changedir(path))
 			return (0);
 		if (!getcwd(newpath, PATH_MAX))
 		{
 			perror("cd: error retrieving current directory");
 			return (0);
 		}
-		update_old(data, old);
-		update_new(data, newpath);
+		update_old(&data->env, oldpath);
+		update_new(&data->env, newpath);
 	}
 	else 
 	{

@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 05:58:14 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/21 15:33:29 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/04/24 09:02:28 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ int	len_arg(char **args)
 	return i;
 }
 
-int	ft_exit(t_cmd *data, char **args)
+void	ft_exit(t_cmd *data, char **args)
 {
 	int largs;
 	int	modulo;

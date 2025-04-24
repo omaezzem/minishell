@@ -6,44 +6,42 @@
 #    By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/03/14 02:29:51 by omaezzem          #+#    #+#              #
-#    Updated: 2025/04/22 11:45:52 by omaezzem         ###   ########.fr        #
+#    Updated: 2025/04/24 10:19:19 by omaezzem         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 
 #------------------------------Source Files------------------------------------#
-SRC = 	execution/builtins/builtin_cd.c\
-		execution/builtins/builtin_pwd.c\
-		execution/builtins/builtin_echo.c\
-		execution/builtins/builtin_env.c\
-		execution/builtins/builtin_exit.c\
+SRC = 	execution/builtins/builtin_cd.c \
+		execution/builtins/builtin_pwd.c \
+		execution/builtins/builtin_echo.c \
+		execution/builtins/builtin_env.c \
+		execution/builtins/builtin_exit.c \
+		execution/env/env.c \
+		execution/utils_exe.c/free_ptr.c \
+		execution/utils_exe.c/free_split.c \
+		execution/utils_exe.c/ft_lstadd_back.c \
+		execution/utils_exe.c/ft_lstnew.c \
+		execution/utils_exe.c/mysplit.c \
+		execution/src/ft_execute.c \
+		parssing/utils_prs/append_token.c \
+		parssing/utils_prs/create_token.c \
+		parssing/src_prs/expand.c \
+		parssing/src_prs/joining.c \
+		parssing/src_prs/syntax_error.c \
+		parssing/src_prs/tokenization.c \
+		utils/atoi_mini.c \
+		utils/ft_isspace.c \
+		utils/ft_split.c \
+		utils/ft_strchr.c \
+		utils/ft_strcmp.c \
+		utils/ft_strjoin.c \
+		utils/ft_strdup.c \
+		utils/ft_strlen.c \
+		utils/ft_strncmp.c \
+		utils/ft_substr.c \
+		minishell.c
 
-		execution/env/env.c\
-		execution/utils_exe/free_ptr.c\
-		execution/utils_exe/free_split.c\
-		execution/utils_exe/ft_lstadd_back.c\
-		execution/utils_exe/ft_lstnew.c\
-		execution/utils_exe/mysplit.c\
-
-		parsing/utils_prs/append_token.c\
-		parsing/utils_prs/create_token.c\
-
-		parsing/src_prs/expand.c\
-		parsing/src_prs/joining.c\
-		parsing/src_prs/syntax_error.c\
-		parsing/src_prs/tokenization.c\
-
-		utils/atoi_mini.c\
-		utils/ft_isspace.c\
-		utils/ft_split.c\
-		utils/ft_strchr.c\
-		utils/ft_strcmp.c\
-		utils/ft_strjoin.c\
-		utils/ft_strlen.c\
-		utils/ft_strncmp.c\
-		utils/ft_substr.c\
-		minishell.c\
-	
 
 #------------------------------Object Files------------------------------------#
 OBJ = $(SRC:.c=.o)
@@ -66,13 +64,11 @@ $(NAME): $(OBJ)
 
 %.o: %.c include/minishell.h
 	@$(CC) $(CFLAGS) $(READLINE_COMPILE) -c $< -o $@
-	@echo █▀▄▀█ ░▀░ █▀▀▄ ░▀░ █░░█ █▀▀ █░░ █░░
-	@echo █░▀░█ ▀█▀ █░░█ ▀█▀ █▀▀█ █▀▀ █░░ █░░
-	@echo ▀░░░▀ ▀▀▀ ▀░░▀ ▀▀▀ ▀░░▀ ▀▀▀ ▀▀▀ ▀▀▀
+	# @echo █▀▄▀█ ░▀░ █▀▀▄ ░▀░ █░░█ █▀▀ █░░ █░░
+	# @echo █░▀░█ ▀█▀ █░░█ ▀█▀ █▀▀█ █▀▀ █░░ █░░
+	# @echo ▀░░░▀ ▀▀▀ ▀░░▀ ▀▀▀ ▀░░▀ ▀▀▀ ▀▀▀ ▀▀▀
 
-#---------------------	@echo █▀▄▀█ ░▀░ █▀▀▄ ░▀░ █░░█ █▀▀ █░░ █░░
-	@echo █░▀░█ ▀█▀ █░░█ ▀█▀ █▀▀█ █▀▀ █░░ █░░
-	@echo ▀░░░▀ ▀▀▀ ▀░░▀ ▀▀▀ ▀░░▀ ▀▀▀ ▀▀▀ ▀▀▀---------Clean-------------------------------------------#
+#------------Clean-------------------------------------------#
 clean:
 	rm -f $(OBJ)
 
