@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 23:17:48 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/24 16:48:18 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/04/25 18:15:23 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,9 +48,10 @@ typedef  enum
 	TOKEN_OPTION,
 }	t_type;
 
+
 typedef struct s_env
 {
-	char			*var;
+    char			*var;
 	char			*val;
 	struct  s_env	*next;
 }				t_env;
@@ -58,7 +59,7 @@ typedef struct s_env
 
 typedef struct s_cmd
 {
-	char			**cmd;
+    char			**cmd;
 	char			**option;
 	t_type			type;
 	t_env			env;
@@ -67,6 +68,13 @@ typedef struct s_cmd
 	int				ex_status;
 	struct s_cmd	*next;
 }				t_cmd;
+
+typedef struct s_exp
+{
+    char			*vr;
+    char			*vl;
+    struct  s_exp	*next;
+}				t_exp;
 
 typedef struct s_token
 {
@@ -80,12 +88,14 @@ typedef struct s_token
 
 t_env	*ft_lstnew_val(char *val);
 t_env	*ft_lstnew_var(char *var);
-void	ft_lstadd_back(t_env **lst, t_env *new);
+void	ft_lstadd_back_env(t_env **lst, t_env *new);
+void	ft_lstadd_back_exp(t_exp **lst, t_exp *new);
 int		ft_strcmp(char *s1, char *s2);
 char	**mysplit(char *s, char c);
 void	free_split(char **arr);
 size_t	ft_strlen(char *str);
 char	*ft_strdup(char *s);
+int     ft_isalnum(int c);
 char	*ft_strjoin(char *s1, char *s2);
 void    print_exe(char *str);
 int		mini_atoi(char *str);
@@ -96,7 +106,7 @@ char	*ft_strchr(char *s, int c);
 int		len_arg(char **args);
 char	**ft_split(char *s, char c);
 char	*ft_strchr_add_one(char *s, int c);
-
+int	ft_isnum(int c);
 /*---------------------------------------------builtin---------------------------------------------*/
 
 void	ft_echo(char **args);
@@ -105,8 +115,9 @@ t_env	*ft_create_env(char **env, t_env **ev);
 int		builtin_env(t_env *ev, char **args);
 void	ft_exit(t_cmd *data, char **args);
 char	*find_env(t_env *env, char *var);
-int		ft_execute(t_cmd *data, char **env, char **args);
-void	ft_pwd();
+int     ft_execute(t_cmd *data, char **args, char **env);
+void    ft_pwd();
+int     ft_export(t_env *env, char **args, char **envp);
 
 /*---------------------------------------------parsing--------------------------------------*/
 

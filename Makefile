@@ -6,7 +6,7 @@
 #    By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/03/14 02:29:51 by omaezzem          #+#    #+#              #
-#    Updated: 2025/04/24 10:19:19 by omaezzem         ###   ########.fr        #
+#    Updated: 2025/04/25 18:27:15 by omaezzem         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,6 +17,7 @@ SRC = 	execution/builtins/builtin_cd.c \
 		execution/builtins/builtin_echo.c \
 		execution/builtins/builtin_env.c \
 		execution/builtins/builtin_exit.c \
+		execution/builtins/builtin_export.c \
 		execution/env/env.c \
 		execution/utils_exe.c/free_ptr.c \
 		execution/utils_exe.c/free_split.c \
@@ -40,7 +41,10 @@ SRC = 	execution/builtins/builtin_cd.c \
 		utils/ft_strlen.c \
 		utils/ft_strncmp.c \
 		utils/ft_substr.c \
-		minishell.c
+		utils/ft_isalnum.c\
+		utils/ft_isnum.c\
+		utils/ft_strchr_add_one.c\
+		minishell.c\
 
 
 #------------------------------Object Files------------------------------------#

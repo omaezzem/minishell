@@ -1,26 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   builtin_pwd.c                                      :+:      :+:    :+:   */
+/*   ft_isnum.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/14 02:14:59 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/25 16:04:29 by omaezzem         ###   ########.fr       */
+/*   Created: 2025/04/25 11:03:21 by omaezzem          #+#    #+#             */
+/*   Updated: 2025/04/25 11:05:20 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/minishell.h"
+#include "../include/minishell.h"
 
-void ft_pwd()
+int	ft_isnum(int c)
 {
-	char	cwd[PATH_MAX];
-
-	if (getcwd(cwd, sizeof(cwd)) != NULL)
-		printf("%s\n", cwd);
-	else
+	if ((c >= '0' && c <= '9'))
 	{
-		perror("pwd");
-		exit(EXIT_FAILURE);
+		return (1);
 	}
+	return (0);
 }

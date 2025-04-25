@@ -6,31 +6,36 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 10:05:28 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/24 10:36:30 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/04/25 18:25:14 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-// int ft_execute(t_cmd *data, char **env, char **args)
-// {
-//     t_env   *list;
-
-//     if (!args || !args[0])  // Check if args is NULL or empty
-//         return 0;
-        
-//     list = NULL;
-//     ft_create_env(env, &list);
-//     if (ft_strcmp(args[0], "cd") == 0)
-//     {
-//         if (!ft_cd(data, args))
-//             return 0;
-//     }
-// 	if (ft_strcmp(args[0], "env") == 0)
-//     {
-// 		printf("21\n");
-//         if (!builtin_env(&data->env, args))
-//             return 0;
-//     }
-//     return 1;
-// }
+int ft_execute(t_cmd *data, char **args, char **env)
+{
+	if (!args || !args[0])
+		return (0);
+	
+	if (strcmp(args[0], "echo") == 0)
+    {
+		ft_echo(args);
+        return (0);
+    }
+	else if (strcmp(args[0], "cd") == 0)
+		return (ft_cd(data, args));
+	else if (strcmp(args[0], "pwd") == 0)
+    {
+		ft_pwd();
+        return (0);
+    }
+	else if (strcmp(args[0], "export") == 0)
+		return (ft_export(&data->env, args, env));
+	else if (strcmp(args[0], "env") == 0)
+		return (builtin_env(&data->env, args));
+	else if (strcmp(args[0], "exit") == 0)
+		ft_exit(data, args);
+	else
+		return (0);
+	return (1);
+}

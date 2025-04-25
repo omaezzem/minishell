@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 11:17:45 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/24 12:40:16 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/04/25 16:23:32 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,9 @@ int prev_status;
 
 int main(int ac, char **av, char **env)
 {
-
-    (void)env;
+    t_cmd   *mini = {0};
+    
+    // (void)env;
     cmdline_argc = ac;
     cmdline_argv = av;
     cmdline_shift = 0;
@@ -59,6 +60,7 @@ int main(int ac, char **av, char **env)
     {
         if (!parse())
             continue;
+        ft_execute(mini, mini->cmd, env);
     }
     return 0;
 }
