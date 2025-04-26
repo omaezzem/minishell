@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/17 11:14:49 by mel-badd          #+#    #+#             */
-/*   Updated: 2025/04/24 09:18:21 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/04/26 13:24:57 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,4 +175,5 @@ int parse(void)
 	}
 	// free_token_list(tokens);
 	return 1;
-}
+} 
+

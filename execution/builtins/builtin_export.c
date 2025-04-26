@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 11:23:25 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/25 18:53:22 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/04/26 18:01:39 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,20 @@ int	find_equal(char *str)
 	return (0);
 }
 
+int len_at_first_equal(char *str)
+{
+	int i;
+
+	i = 0;
+	while (str[i])
+	{
+		if (str[i] == '=')
+			break;
+		i++;
+	}
+	return i;
+}
+
 int	len_equal(char *str)
 {
 	int i;
@@ -107,7 +121,7 @@ t_exp **ft_create_env_export(char **env, t_exp **list)
 			free_split(eqsplit);
 			continue;
 		}
-		new_node = malloc(sizeof(t_env));
+		new_node = malloc(sizeof(t_exp));
 		if (!new_node)
 		{
 			free_split(eqsplit);
@@ -171,8 +185,8 @@ void    add_to_export_list(t_exp **exp, char *args)
     if (len_equal(args) == 1)
     {
         if (search_var_in_exp(*exp, splitargs[0]))
-        update_val_exp(*exp, splitargs[0],splitargs[1]);
-        add = malloc(sizeof(t_env));
+        	update_val_exp(*exp, splitargs[0],splitargs[1]);
+        add = malloc(sizeof(t_exp));
         if (!add)
         {
             free_split(splitargs);
@@ -199,7 +213,7 @@ void    add_to_export_list(t_exp **exp, char *args)
         join[a] = '\0';
         if (search_var_in_exp(*exp, splitargs[0]))
             update_val_exp(*exp, splitargs[0], add->vl);
-        add = malloc(sizeof(t_env));
+        add = malloc(sizeof(t_exp));
         if (!add)
             return ;
         add->vr = ft_strdup(splitargs[0]);
@@ -207,20 +221,6 @@ void    add_to_export_list(t_exp **exp, char *args)
         ft_lstadd_back_exp(exp, add);
     }
     
-}
-
-int len_at_first_equal(char *str)
-{
-	int i;
-
-	i = 0;
-	while (str[i])
-	{
-		if (str[i] == '=')
-			break;
-		i++;
-	}
-	return i;
 }
 
 int ft_export(t_env *env, char **args, char **envp)
@@ -236,28 +236,32 @@ int ft_export(t_env *env, char **args, char **envp)
     t_env   *nnode;
     t_exp   **exp;
 
-	exp = NULL;
+	// exp = NULL;
     exp = ft_create_env_export(envp, exp);
-    if (ft_isnum(args[1][0]))
-    {
-        printf("export: `%s': not a valid identifier", args[1]);
-        return (0);
-    }
-    while (args[i])
-    {
-        if (!parse_input(args[i]))
-		{
-			printf("export: `%s': not a valid identifier", args[i]);
-		}
-        else 
-			add_to_export_list(exp, args[i]);
-        i++;
-    }
-	curexp = *exp;
+	printf("%s\n", (*exp)->vr = (*exp)->vl);
 	len = len_arg(args);
-	if (len == 1 && (ft_strcmp(args[0], "export") == 0))
+	if (len > 1)
+	{	
+		if (ft_isnum(args[1][0]))
+		{
+			printf("export: `%s': not a valid identifier\n", args[1]);
+			return (0);
+		}
+		i = 1;
+		while (args[i])
+		{
+			if (!parse_input(args[i]))
+				printf("export: `%s': not a valid identifier", args[i]);
+			else 
+				add_to_export_list(exp, args[i]);
+			i++;
+		}
+	}
+	curexp = *exp;
+	if (len == 1 && (ft_strcmp(args[0], "./export") == 0))
 	{
-		while (curexp->next != NULL)
+		// printf("%s\n", args[0]);
+		while (curexp != NULL)
 		{
 			printf("declare -x ");
             printf("%s", curexp->vr);
@@ -309,5 +313,16 @@ int ft_export(t_env *env, char **args, char **envp)
             ft_lstadd_back_env(&env, nnode);
         }
 	}
-	return 0;
+	return (0);
+}
+int main(int ac, char **av, char **env)
+{
+    t_env    *list;
+
+	(void)ac;
+    list = NULL;
+    list = ft_create_env(env, &list);
+    
+	// printf("21\n");
+    ft_export(list, av, env);
 }

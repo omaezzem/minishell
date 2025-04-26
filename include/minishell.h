@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 23:17:48 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/25 18:15:23 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/04/26 10:42:47 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@
 
 # define FAILURE	0
 # define SUCCESS	1
-# define PATH_MAX	4096
+# define PMAX	4096
 
 typedef  enum
 {

@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 11:22:10 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/24 09:04:51 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/04/26 10:44:28 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ t_token *create_token(char *value, t_type type)
 	t_token *token = malloc(sizeof(t_token));
 	if (!token)
 		return NULL;
-	token->value = strdup(value);
+	token->value = ft_strdup(value);
 	token->type = type;
 	token->next = NULL;
 	return token;

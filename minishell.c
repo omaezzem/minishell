@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 11:17:45 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/25 16:23:32 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/04/26 13:16:23 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ char *read_input(char *prompt)
 void sigint_handler(int sig)
 {
     (void)sig;
-    rl_replace_line("", 0);
+    // rl_replace_line("", 0);s
     write(1, "\n", 1);
     rl_on_new_line();
     rl_redisplay();
@@ -44,7 +44,6 @@ int prev_status;
 
 int main(int ac, char **av, char **env)
 {
-    t_cmd   *mini = {0};
     
     // (void)env;
     cmdline_argc = ac;
@@ -54,12 +53,14 @@ int main(int ac, char **av, char **env)
 
     signal(SIGINT, sigint_handler);
     signal(SIGQUIT, SIG_IGN);
-    rl_catch_signals = 0;
+    // rl_catch_signals = 0;
+    t_cmd   *mini = NULL;
 
     while (1)
     {
         if (!parse())
             continue;
+        printf("args[0] = %s\n\n", mini->cmd[0]);
         ft_execute(mini, mini->cmd, env);
     }
     return 0;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expand.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-badd <mel-badd@student.42.fr>          +#+  +:+       +#+        */
+/*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/18 20:00:24 by mel-badd          #+#    #+#             */
-/*   Updated: 2025/04/23 16:27:20 by mel-badd         ###   ########.fr       */
+/*   Updated: 2025/04/26 10:45:04 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ int expand_env(char **oldp, char **newp, int brace_flag)
 	// Copy env_val to new string if exists
 	if (env_val != NULL)
 	{
-		n = strlen(env_val);
+		n = ft_strlen(env_val);
 		if (n > space_left)
 			return ENOROOM;
 
@@ -108,7 +108,7 @@ int expand_argv(char **oldp, char **newp, int space_left)
 	argn = atoi(arg_idx);
 	if ((argn + cmdline_shift) < (cmdline_argc))
 	{
-		n = strlen(cmdline_argv[argn + cmdline_shift]);
+		n = ft_strlen(cmdline_argv[argn + cmdline_shift]);
 		if (n > space_left)
 			return ENOROOM;
 		arg = cmdline_argv[argn + cmdline_shift];
@@ -128,7 +128,7 @@ int expand_pid(char **newp, int space_left)
 	char *new = *newp;
 	pid = getpid();
 	snprintf(pid_buffer, 10, "%d", pid);
-	if ((n = strlen(pid_buffer)) > space_left)
+	if ((n = ft_strlen(pid_buffer)) > space_left)
 		return ENOROOM;
 	i = 0;
 	while (pid_buffer[i] != '\0')
@@ -141,7 +141,7 @@ int expand(t_token *token)
 {
 	char *old = token->value;
 	t_env *env = malloc(sizeof(t_env));
-	int oldlen = strlen(old);
+	int oldlen = ft_strlen(old);
 	int newsize = oldlen * 2;
 	char *new = malloc(newsize * 2 + 1);
 	if (!new) return -1;

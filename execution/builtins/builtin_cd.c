@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:50:42 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/24 11:18:53 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/04/26 10:42:58 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,8 +72,8 @@ void	update_new(t_env *ev, char *newpath)
 
 int	ft_cd(t_cmd *data, char **args)
 {
-	char	newpath[PATH_MAX];
-	char	oldpath[PATH_MAX];
+	char	newpath[PMAX];
+	char	oldpath[PMAX];
 	char	*path;
 	int		len;
 
