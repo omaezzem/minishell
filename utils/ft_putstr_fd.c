@@ -1,22 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strcmp.c                                        :+:      :+:    :+:   */
+/*   ft_putstr_fd.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/14 02:10:50 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/29 10:50:09 by omaezzem         ###   ########.fr       */
+/*   Created: 2025/04/29 11:07:46 by omaezzem          #+#    #+#             */
+/*   Updated: 2025/04/29 11:19:14 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-int ft_strcmp(char *s1, char *s2)
+void    ft_putchar_fd(char c, int fd)
 {
-	int i = 0;
+    write (fd, &c, 1);    
+}
 
-	while((s1[i] == s2[i]) && s1[i] && s2[i])
+void	ft_putstr_fd(char *s, int fd)
+{
+	int	i;
+
+	i = 0;
+	if (!s)
+		return ;
+	while (s[i])
+	{
+		ft_putchar_fd(s[i], fd);
 		i++;
-	return (s1[i]-s2[i]);
+	}
 }

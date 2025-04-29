@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 23:17:48 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/26 10:42:47 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/04/29 11:09:26 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,9 @@ char	*ft_strchr(char *s, int c);
 int		len_arg(char **args);
 char	**ft_split(char *s, char c);
 char	*ft_strchr_add_one(char *s, int c);
-int	ft_isnum(int c);
+int		ft_isnum(int c);
+void	ft_putstr_fd(char *s, int fd);
+
 /*---------------------------------------------builtin---------------------------------------------*/
 
 void	ft_echo(char **args);

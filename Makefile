@@ -6,10 +6,9 @@
 #    By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/03/14 02:29:51 by omaezzem          #+#    #+#              #
-#    Updated: 2025/04/25 18:27:15 by omaezzem         ###   ########.fr        #
+#    Updated: 2025/04/29 16:45:13 by omaezzem         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
-
 
 #------------------------------Source Files------------------------------------#
 SRC = 	execution/builtins/builtin_cd.c \
@@ -41,6 +40,7 @@ SRC = 	execution/builtins/builtin_cd.c \
 		utils/ft_strlen.c \
 		utils/ft_strncmp.c \
 		utils/ft_substr.c \
+		utils/ft_putstr_fd.c\
 		utils/ft_isalnum.c\
 		utils/ft_isnum.c\
 		utils/ft_strchr_add_one.c\

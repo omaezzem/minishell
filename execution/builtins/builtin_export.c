@@ -6,12 +6,18 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 11:23:25 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/28 12:57:28 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/04/29 16:06:02 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
+void	minishell_invalid(char *invalid_str)
+{
+	ft_putstr_fd("minishell: export: `", 2);
+	ft_putstr_fd(invalid_str, 2);
+	ft_putstr_fd("': not a valid identifier\n", 2);
+}
 int search_var_in_env(t_env *env, char *var)
 {
     if (!env || !var)
@@ -39,6 +45,7 @@ int	search_var_in_exp(t_exp *exp, char *var)
 	}
 	return 0;
 }
+
 int	len_alnum_var(char *var)
 {
 	int i;
@@ -54,6 +61,37 @@ int	len_alnum_var(char *var)
 	}
 	return n;
 }
+
+void	sort_exp_list(t_exp **exp)
+{
+	t_exp	*current;
+	t_exp	*next_node;
+	char	*temp_vr;
+	char	*temp_vl;
+
+	if (!exp || !*exp)
+		return ;
+	current = *exp;
+	while (current != NULL)
+	{
+		next_node = current->next;
+		while (next_node != NULL)
+		{
+			if (ft_strcmp(current->vr, next_node->vr) > 0)
+			{
+				temp_vr = current->vr;
+				current->vr = next_node->vr;
+				next_node->vr = temp_vr;
+				temp_vl = current->vl;
+				current->vl = next_node->vl;
+				next_node->vl = temp_vl;
+			}
+			next_node = next_node->next;
+		}
+		current = current->next;
+	}
+}
+
 char	*check_var(char *var)
 {
 	int i;
@@ -65,25 +103,19 @@ char	*check_var(char *var)
 	if (!parsvar)
 		return NULL;
 	if (ft_isnum(var[0]))
-	{
-		printf("export: `%s': not a valid identifier\n", var);
-		return NULL;
-	}
+		return (minishell_invalid(var), NULL);
 	i = 0;
 	while (var[i])
 	{
 		if (var[i] == '+' &&  var[i+1] != '\0')
 		{
-			printf("export: `%s': not a valid identifier\n", var);
-			return NULL;
+			return (minishell_invalid(var), NULL);
 		}
 		if (!ft_isalnum(var[i]))
 		{
-			if (var[i] == '+' &&  var[i+1] == '\0')
+			if (ft_isalnum(var[i-1]) && var[i] == '+' &&  var[i+1] == '\0')
 				break ;
-			printf("export: `%s': not a valid identifier\n", var);
-			free(parsvar);
-			return NULL;
+			return (minishell_invalid(var), free(parsvar), NULL);
 		}
 		parsvar[i] = var[i];
 		i++;
@@ -100,10 +132,7 @@ int	find_equal(char *str)
 	if (!str || !str[i])
 		return (0);
 	if (str[i] == '=')
-	{
-		printf("minishell : export '%s': not a valid identifier\n", str);
-		return 0;
-	}
+		return (minishell_invalid(str), 0);
 	while (str[i])
 	{
 		if (str[i] == '=')
@@ -148,8 +177,10 @@ t_exp **ft_create_env_export(char **env, t_exp **list)
 	int		i;
 	char	**eqsplit;
 	t_exp	*new_node;
-	
+	int		k;
+
 	i = -1;
+	k = 0;
 	if (!env)
 		return NULL;
 	while (env[++i])
@@ -159,6 +190,15 @@ t_exp **ft_create_env_export(char **env, t_exp **list)
 		{
 			free_split(eqsplit);
 			continue;
+		}
+		if (k == 0)
+		{
+			new_node = malloc(sizeof(t_exp));
+			new_node->vr = ft_strdup("OLDPWD");
+			new_node->vl = NULL;
+			new_node->next = NULL;
+			ft_lstadd_back_exp(list, new_node);
+			k = 1;
 		}
 		new_node = malloc(sizeof(t_exp));
 		if (!new_node)
@@ -317,7 +357,6 @@ void	add_to_env_list(t_env *env, char *args, char *avzero, char *avone)
 	t_env	*nnode;
 	if (!env  || !args || !avzero || !avone) 
 		return;
-
 	if ((find_equal(args) == 1) && (len_equal(args) == 1))
 	{
 		if (search_var_in_env(env, avzero))
@@ -358,15 +397,21 @@ int ft_export(t_env *env, char **args, char **envp)
             if (find_equal(args[i]))
 			{
                 avzero = check_var(args_zero(args[i]));
+				printf("%s\n", avzero);
+				if (!avzero)
+					return 0;
                 avone = args_one(args[i]);
                 if (!avone)
 					avone = ft_strdup("");
                 add_to_export_list_vl(exp, avzero, avone);
                 add_to_env_list(env, args[i], avzero, avone);
+				free(avzero);
             }
 			else
 			{
 				avzero = check_var(args_zero(args[i]));
+				if (!avzero)
+					return 0;
 				if (avzero)
 					add_to_export_list_v(exp, avzero);
 			}
@@ -374,30 +419,23 @@ int ft_export(t_env *env, char **args, char **envp)
 		}
 	}
 	if_double_var(exp);
-	curexp = *exp;
-	while (curexp != NULL)
-	{
-		if (curexp->vr && !curexp->vl)
-			printf("declare -x %s\n", curexp->vr);
-		else
+	sort_exp_list(exp);
+		curexp = *exp;
+		while (curexp != NULL)
 		{
-			printf("declare -x ");
-			printf("%s=", curexp->vr);
-			if (curexp->vl)
-				printf("\"%s\"\n", curexp->vl);
+			if (curexp->vr && !curexp->vl && (!(ft_strcmp(curexp->vr, "_") == 0)))
+				printf("declare -x %s\n", curexp->vr);
+			else
+			{
+				if (!(ft_strcmp(curexp->vr, "_") == 0))
+				{
+					printf("declare -x ");
+					printf("%s=", curexp->vr);
+					if (curexp->vl)
+						printf("\"%s\"\n", curexp->vl);
+				}
+			}
+			curexp = curexp->next;
 		}
-		curexp = curexp->next;
-	}
 	return 0;
-}
-
-int main(int ac, char **av, char **env)
-{
-    t_env    *list;
-
-	(void)ac;
-    list = NULL;
-    list = ft_create_env(env, &list);
-	// printf("21\n");
-    ft_export(list, av, env);
 }

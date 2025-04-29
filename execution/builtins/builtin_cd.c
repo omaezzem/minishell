@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:50:42 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/26 10:42:58 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/04/29 16:48:38 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,10 +82,10 @@ int	ft_cd(t_cmd *data, char **args)
 	{
 		if (!getcwd(oldpath, PATH_MAX))
 		{
-			perror("cd: error retrieving current directory");
+			ft_putstr_fd("cd: error retrieving current directory", 2);
 			return (0);
 		}
-		if (ft_strcmp(data->option[0], "~") || data->option[0] == NULL)
+		if ((ft_strcmp(data->option[0], "~") == 0) || data->option[0] == NULL)
 		{
 			path = find_env(&data->env, "HOME");
 			if (!path)
@@ -94,12 +94,12 @@ int	ft_cd(t_cmd *data, char **args)
 				return (0);
 			}
 		}
-		else if (ft_strcmp(data->option[0], "-"))
+		else if (ft_strcmp(data->option[0], "-") == 0)
 		{
 			path = find_env(&data->env, "OLDPWD");
 			if (!path)
 			{
-				perror("cd: OLDPWD not set");
+				ft_putstr_fd("cd: OLDPWD not set", 2);
 				return (0);
 			}
 			printf("%s\n", path);
@@ -110,16 +110,44 @@ int	ft_cd(t_cmd *data, char **args)
 			return (0);
 		if (!getcwd(newpath, PATH_MAX))
 		{
-			perror("cd: error retrieving current directory");
+			ft_putstr_fd("cd: error retrieving current directory", 2);
 			return (0);
 		}
 		update_old(&data->env, oldpath);
 		update_new(&data->env, newpath);
 	}
-	else 
+	else
 	{
-		perror("cd: too many arguments");
+		ft_putstr_fd("cd: too many arguments", 2);
 		return 0;
 	}
 	return 1;
 }
+
+// int main(int ac, char **av, char **env)
+// {
+//     t_env    *list;
+// 	t_cmd	*cmd;
+
+// 	cmd = NULL;
+//     list = NULL;
+//     char *input;
+//     list = ft_create_env(env, &list);
+
+//     while (1)
+//     {
+//         input = readline("minishell-0.0$ ");
+//         if (input == NULL)
+//             return (1);
+//         if(*input == '\0')
+//             break;
+
+//         char **args = ft_split(input, ' ');
+
+//         ft_cd(cmd ,args);
+
+//         char *pwd =find_env(list, "PWD");
+
+//         printf("\nCurrent directory: %s\n\n", pwd);
+//     }
+// }
