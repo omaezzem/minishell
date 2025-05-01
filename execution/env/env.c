@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 11:03:16 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/25 17:43:04 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/01 17:35:48 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,27 +43,19 @@ t_env *ft_create_env(char **env, t_env **ev)
 	}
 	return *ev;
 }
-// for cd !!!!!!!!!!!!!!!
+
 char	*find_env(t_env *env, char *var)
 {
 	int		i;
-	char	*tmp;
 
-	tmp = ft_strjoin(var, "=");
-	if (!tmp)
-		return (NULL);
 	i = 0;
-	while (env->next != NULL)
+	while (env != NULL)
 	{
-		if (ft_strncmp(tmp, env->var, ft_strlen(tmp)) == 0)
+		if (!ft_strcmp(env->var, var))
 		{
-			ft_freeptr(tmp);
-			return (env->val + 1);
+			return (env->val);
 		}
-		i++;
+		env = env->next;
 	}
-	ft_freeptr(tmp);
 	return (NULL);
 }
-
-

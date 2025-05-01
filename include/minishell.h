@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 23:17:48 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/30 16:45:53 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/01 15:55:15 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ typedef struct s_cmd
     char			**cmd;
 	char			**option;
 	t_type			type;
-	t_env			env;
+	t_env			*env;
 	char			*workdir;
 	char			**redirection;
 	int				ex_status;

@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:50:42 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/29 16:48:38 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/01 17:45:41 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@ int len_args(char **args)
 		i++;
 	return i;
 }
-
 void	update_old(t_env *ev, char *oldpath)
 {
 
@@ -75,6 +74,7 @@ int	ft_cd(t_cmd *data, char **args)
 	char	newpath[PMAX];
 	char	oldpath[PMAX];
 	char	*path;
+	path = NULL;
 	int		len;
 
 	len = len_args(args);
@@ -85,27 +85,46 @@ int	ft_cd(t_cmd *data, char **args)
 			ft_putstr_fd("cd: error retrieving current directory", 2);
 			return (0);
 		}
-		if ((ft_strcmp(data->option[0], "~") == 0) || data->option[0] == NULL)
+		if (data->cmd[0] && (!data->cmd[1] || !data->option[0]))
 		{
-			path = find_env(&data->env, "HOME");
-			if (!path)
+			if (!ft_strcmp(data->cmd[0], "cd"))
 			{
-				perror("cd: HOME not set");
-				return (0);
+				path = find_env(data->env, "HOME");
+				printf("%s\n", path);
+				if (!path)
+				{
+					perror("cd: HOME not set");
+					return (0);
+				}
 			}
 		}
-		else if (ft_strcmp(data->option[0], "-") == 0)
+		else if (data->cmd[1] && data->cmd[0] && !data->cmd[2])
 		{
-			path = find_env(&data->env, "OLDPWD");
-			if (!path)
+			if (!ft_strcmp(data->option[0], "~") && (!ft_strcmp(data->cmd[0], "cd")))
 			{
-				ft_putstr_fd("cd: OLDPWD not set", 2);
-				return (0);
+				path = find_env(data->env, "HOME");
+				if (!path)
+				{
+					perror("cd: HOME not set");
+					return (0);
+				}
 			}
-			printf("%s\n", path);
+		}
+		else if (data->option[0] && data->cmd[0] && !data->cmd[2])
+		{
+			if (!ft_strcmp(data->option[0], "-") && (!ft_strcmp(data->cmd[0], "cd")))
+			{
+				path = find_env(data->env, "OLDPWD");
+				if (!path)
+				{
+					ft_putstr_fd("cd: OLDPWD not set\n", 2);
+					return (0);
+				}
+				printf("%s\n", path);
+			}
 		}
 		else
-			path = data->option[1];
+			path = data->cmd[1];
 		if (!changedir(path))
 			return (0);
 		if (!getcwd(newpath, PATH_MAX))
@@ -113,8 +132,8 @@ int	ft_cd(t_cmd *data, char **args)
 			ft_putstr_fd("cd: error retrieving current directory", 2);
 			return (0);
 		}
-		update_old(&data->env, oldpath);
-		update_new(&data->env, newpath);
+		update_old(data->env, oldpath);
+		update_new(data->env, newpath);
 	}
 	else
 	{
@@ -123,31 +142,3 @@ int	ft_cd(t_cmd *data, char **args)
 	}
 	return 1;
 }
-
-// int main(int ac, char **av, char **env)
-// {
-//     t_env    *list;
-// 	t_cmd	*cmd;
-
-// 	cmd = NULL;
-//     list = NULL;
-//     char *input;
-//     list = ft_create_env(env, &list);
-
-//     while (1)
-//     {
-//         input = readline("minishell-0.0$ ");
-//         if (input == NULL)
-//             return (1);
-//         if(*input == '\0')
-//             break;
-
-//         char **args = ft_split(input, ' ');
-
-//         ft_cd(cmd ,args);
-
-//         char *pwd =find_env(list, "PWD");
-
-//         printf("\nCurrent directory: %s\n\n", pwd);
-//     }
-// }
