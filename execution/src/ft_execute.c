@@ -6,17 +6,31 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 10:05:28 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/26 13:05:14 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/04/30 17:03:39 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
+
+int	len_cmd(char **args)
+{
+	int	i;
+
+	i = 0;
+	while (args[i])
+	{
+		if (args[i][0] = '|')
+			break;
+		i++;
+	}
+	return i;
+}
 int ft_execute(t_cmd *data, char **args, char **env)
 {
+	if () 	
 	if (!args || !args[0])
 		return (0);
-	// printf("shjs\n");
 	if (ft_strcmp(args[0], "echo") == 0)
     {
 		ft_echo(args);

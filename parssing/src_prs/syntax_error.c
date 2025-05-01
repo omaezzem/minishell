@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   syntax_error.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-badd <mel-badd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/17 11:19:36 by mel-badd          #+#    #+#             */
-/*   Updated: 2025/04/22 11:46:23 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/04/24 10:25:31 by mel-badd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,20 @@ int	error_pipe(t_token *tokens)
 	}
 	return 1;
 }
-
+int error2(t_token *cur)
+{
+	if (cur->type == TOKEN_REDIRECT_OUT && cur->next->type == TOKEN_PIPE)
+	{
+		printf("minishell: syntax error near unexpected token '%s'\n", cur->value);
+		return 0;
+	}
+	if (cur->type == TOKEN_REDIRECT_IN && cur->next->type == TOKEN_REDIRECT_IN)
+	{
+		printf("minishell: syntax error near unexpected token '%s'\n", cur->value);
+		return 0;
+	}
+	return 1;
+}
 int error(t_token *tokens)
 {
     t_token *cur = tokens;
@@ -50,11 +63,13 @@ int error(t_token *tokens)
 			(cur->type == TOKEN_REDIRECT_OUT && cur->next->type == TOKEN_HEREDOC) ||
 			(cur->type == TOKEN_HEREDOC && cur->next->type == TOKEN_REDIRECT_OUT) ||
 			(cur->type == TOKEN_REDIRECT_OUT && cur->next->type == TOKEN_REDIRECT_OUT) ||
-			(cur->type == TOKEN_REDIRECT_IN && cur->next->type == TOKEN_REDIRECT_IN))
+			(cur->type == TOKEN_REDIRECT_IN && cur->next->type == TOKEN_REDIRECT_IN) ||
+			(cur->type == TOKEN_REDIRECT_OUT && cur->next->type == TOKEN_PIPE))
         {
             printf("minishell: syntax error near unexpected token '%s'\n", cur->value);
             return 0;
         }
+		error2(cur);
         cur = cur->next;
     }
 	return 1;

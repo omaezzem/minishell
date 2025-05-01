@@ -6,7 +6,7 @@
 /*   By: mel-badd <mel-badd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/17 11:33:09 by mel-badd          #+#    #+#             */
-/*   Updated: 2025/04/23 15:49:12 by mel-badd         ###   ########.fr       */
+/*   Updated: 2025/04/26 16:08:00 by mel-badd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,9 +103,10 @@ void print_command_blocks(t_cmd *head)
 	}
 }
 
-void joining(t_token *tokens)
+t_cmd *joining(t_token *tokens)
 {
 	t_cmd *head = NULL, *last = NULL;
+	// t_env *env_list = tokens->env; // Initialize env_list here
 	while (tokens)
 	{
 		char *cmd = NULL, *opt = NULL, *redir = NULL;
@@ -129,4 +130,6 @@ void joining(t_token *tokens)
 			tokens = tokens->next;
 	}
 	print_command_blocks(head);
+	return head;
+	// expand(tokens);
 }

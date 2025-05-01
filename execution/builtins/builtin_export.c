@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 11:23:25 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/29 16:06:02 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/04/30 16:40:45 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -420,22 +420,34 @@ int ft_export(t_env *env, char **args, char **envp)
 	}
 	if_double_var(exp);
 	sort_exp_list(exp);
-		curexp = *exp;
-		while (curexp != NULL)
+	curexp = *exp;
+	while (curexp != NULL)
+	{
+		if (curexp->vr && !curexp->vl && (!(ft_strcmp(curexp->vr, "_") == 0)))
+			printf("declare -x %s\n", curexp->vr);
+		else
 		{
-			if (curexp->vr && !curexp->vl && (!(ft_strcmp(curexp->vr, "_") == 0)))
-				printf("declare -x %s\n", curexp->vr);
-			else
+			if (!(ft_strcmp(curexp->vr, "_") == 0))
 			{
-				if (!(ft_strcmp(curexp->vr, "_") == 0))
-				{
-					printf("declare -x ");
-					printf("%s=", curexp->vr);
-					if (curexp->vl)
-						printf("\"%s\"\n", curexp->vl);
-				}
+				printf("declare -x ");
+				printf("%s=", curexp->vr);
+				if (curexp->vl)
+					printf("\"%s\"\n", curexp->vl);
 			}
-			curexp = curexp->next;
 		}
+		curexp = curexp->next;
+	}
 	return 0;
 }
+// }
+// int main(int ac, char **av, char **env)
+// {
+//     t_env    *list;
+
+//     list = NULL;
+//     list = ft_create_env(env, &list);
+    
+//     ft_export(list, av , env);
+// }
+
+ 

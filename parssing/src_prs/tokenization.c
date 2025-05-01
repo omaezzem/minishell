@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/17 11:14:49 by mel-badd          #+#    #+#             */
-/*   Updated: 2025/04/26 13:24:57 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/01 12:02:32 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@ t_type get_token_type(char *str)
 		return TOKEN_HEREDOC;
 	if (ft_strcmp(str, "<") == 0)
 		return TOKEN_REDIRECT_IN;
+	// if (ft_strcmp(str, '"') == 0)
+	// 	return TOKEN_DQUOTE;
 	if (ft_strcmp(str, ">") == 0)
 		return TOKEN_REDIRECT_OUT;
 	if (ft_strcmp(str, "(") == 0)
@@ -51,6 +53,8 @@ void print_type(t_type type)
 		printf("TOKEN_APPEND\n");
 	else if (type == TOKEN_HEREDOC)
 		printf("TOKEN_HEREDOC\n");
+	// else if (type == TOKEN_DQUOTE)
+	// 	printf("TOKEN_DQUOTE\n");
 	else if (type == TOKEN_OPEN_PAREN)
 		printf("TOKEN_OPEN_PAREN\n");
 	else if (type == TOKEN_CLOSE_PAREN)
@@ -101,9 +105,9 @@ t_token *tokenize(char *input)
 		}
 		if (input[i] == '"' || input[i] == '\'')
 		{
-			char quote = input[i++];
+			char quote = input[i];
 			int start = i;
-			while ((input[i] && input[i] != quote))
+			while ((input[i] && input[i] != ' '))
 				i++;
 			char *quoted = ft_substr(input, start, i - start);
 			append_token(&tokens, create_token(quoted, get_token_type(input)));
@@ -136,9 +140,10 @@ t_token *tokenize(char *input)
 	return tokens;
 }
 
-int parse(void)
+t_cmd *parse(void)
 {
 	t_token *tokens;
+	t_cmd *cmd = NULL;
 	char	*input;
 
 	input = read_input("minishell$ ");
@@ -147,7 +152,7 @@ int parse(void)
 	if (!tokens)
 	{
 		free(input);
-		return 0;
+		return NULL;
 	}
 	mark_file_tokens(tokens);
 	free(input);
@@ -161,19 +166,18 @@ int parse(void)
 	if (tokens->type == TOKEN_PIPE)
 	{
 		printf("minishell: syntax error near unexpected token '%s'\n", tokens->value);
-		return 0;
+		return NULL;
 	}
 	if (!error(tokens))
-		return 0;
+		return NULL;
 	if (!error_pipe(tokens))
-		return 0;
-	joining(tokens);
+		return NULL;
+	cmd = joining(tokens);
 	if (!expand(tokens))
 	{
 		printf("Expansion error\n");
-		return 0;
+		return NULL;
 	}
 	// free_token_list(tokens);
-	return 1;
-} 
-
+	return cmd;
+}

@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/18 20:00:24 by mel-badd          #+#    #+#             */
-/*   Updated: 2025/04/26 10:45:04 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/04/30 16:44:21 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,12 @@ int expand_env(char **oldp, char **newp, int brace_flag)
 	// Fetch environment variable
 	env_val = getenv(env_buffer);
 	space_left = ft_strlen(env_val);
+	if (!space_left)
+	{
+		// No such variable, return empty string
+		env_val = "";
+		space_left = 1;
+	}
 	// Copy env_val to new string if exists
 	if (env_val != NULL)
 	{
@@ -139,66 +145,85 @@ int expand_pid(char **newp, int space_left)
 
 int expand(t_token *token)
 {
-	char *old = token->value;
+	char *old = NULL;
+	int oldlen = 0;
+	int newsize = 0;
+	char *new = NULL;
 	t_env *env = malloc(sizeof(t_env));
-	int oldlen = ft_strlen(old);
-	int newsize = oldlen * 2;
-	char *new = malloc(newsize * 2 + 1);
-	if (!new) return -1;
-
-	char *newp = new;
+	t_token *tmp_token = token;
+	char *newp;
 	int rv;
 
 	// while (*old && *old != '$') {
 	// 	*old = *old + 1;
 	// }
-	while (*old != '\0') {
-		if (*old == '$') {
-			old++;
-			if (*old == '\0')
-				return 0; // No variable name after $
-			if (*old == '$') {
+	while (tmp_token)
+	{
+		old = tmp_token->value;
+		env->var = old;
+		oldlen = ft_strlen(old);
+		newsize = oldlen * 2;
+		new = malloc(newsize * 2 + 1);
+		newp = new;
+		if (!new)
+			return 0; // Memory allocation failed
+		while (*old != '\0')
+		{
+			if (*old == '"')
 				old++;
-				rv = expand_pid(&newp, newsize - (newp - new));
-				if (rv < 0)
-					return 0;
-			}
-			else if (*old == '?') {
+			if (*old == '$')
+			{
 				old++;
-				rv = expand_status(&newp, newsize - (newp - new));
-				if (rv < 0)
-					return 0;
+				if (*old == '\0')
+					return 0; // No variable name after $
+				if (*old == '$') {
+					old++;
+					rv = expand_pid(&newp, newsize - (newp - new));
+					if (rv < 0)
+						return 0;
+				}
+				else if (*old == '?') {
+					old++;
+					rv = expand_status(&newp, newsize - (newp - new));
+					if (rv < 0)
+						return 0;
+				}
+				else if (*old == '#') {
+					old++;
+					rv = expand_argc(&newp, newsize - (newp - new));
+					if (rv < 0)
+						return 0;
+				}
+				else if (isdigit(*old)) {
+					rv = expand_argv(&old, &newp, newsize - (newp - new));
+					if (rv < 0)
+						return 0;
+					old++; // move past the digit(s) already handled
+				}
+				else
+				{
+					int brace_flag = (*old == '{');
+					printf("%d\n", newsize);
+					rv = expand_env(&old, &newp, brace_flag);
+					if (rv < 0)
+						return 0;
+					old++; // advance past the variable name / closing brace
+				}
 			}
-			else if (*old == '#') {
-				old++;
-				rv = expand_argc(&newp, newsize - (newp - new));
-				if (rv < 0)
-					return 0;
-			}
-			else if (isdigit(*old)) {
-				rv = expand_argv(&old, &newp, newsize - (newp - new));
-				if (rv < 0)
-					return 0;
-				old++; // move past the digit(s) already handled
-			}
-			else {
-				int brace_flag = (*old == '{');
-				printf("%d\n", newsize);
-				rv = expand_env(&old, &newp, brace_flag);
-				if (rv < 0)
-					return 0;
-				old++; // advance past the variable name / closing brace
+			else
+			{
+				*newp++ = *old++;
 			}
 		}
-		else {
-			*newp++ = *old++;
-		}
+	tmp_token = tmp_token->next;
 	}
+
 
 	*newp = '\0';
 
 	free(token->value);
 	env->val = new;
 	printf("Expanded value: %s\n", env->val); // Print the expanded value
+	printf("Expanded var: %s\n", env->var); // Print the expanded value
 	return 1;
 }

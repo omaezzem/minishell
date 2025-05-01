@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 23:17:48 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/29 11:09:26 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/04/30 16:45:53 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,8 +143,8 @@ int		error_pipe(t_token *tokens);
 void	sigint_handler(int sig);
 t_token	*tokenize(char *input);
 char	*read_input(char *prompt);
-int		parse(void);
-void	joining(t_token *tokens);
+t_cmd *parse(void);
+t_cmd *joining(t_token *tokens);
 int		expand(t_token *token);
 int expand_env(char **oldp, char **newp, int brace_flag);
 int		expand_pid(char **newp, int space_left);
