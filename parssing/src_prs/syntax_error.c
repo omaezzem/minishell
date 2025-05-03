@@ -6,11 +6,12 @@
 /*   By: mel-badd <mel-badd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/17 11:19:36 by mel-badd          #+#    #+#             */
-/*   Updated: 2025/04/24 10:25:31 by mel-badd         ###   ########.fr       */
+/*   Updated: 2025/05/01 14:15:52 by mel-badd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
+
 
 int	error_pipe(t_token *tokens)
 {

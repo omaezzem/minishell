@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 10:05:28 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/03 13:32:03 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/03 17:29:08 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,10 @@ int	len_cmd(char **args)
 }
 int ft_execute(t_exp *exp, t_env *env, t_cmd *data, char **args)
 {
-	if (len_cmd(args) == 0)
+    if (args)
     {
+        if (len_cmd(args) == 0)
+        {
         if (ft_strcmp(args[0], "echo") == 0)
         {
             ft_echo(args);
@@ -53,6 +55,7 @@ int ft_execute(t_exp *exp, t_env *env, t_cmd *data, char **args)
             ft_unset(&exp, &env, args);
         else
             return (0);
-    } 	
+            } 
+    }
 	return (1);
 }

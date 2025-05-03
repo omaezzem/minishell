@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 11:23:25 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/02 16:02:56 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/03 18:03:33 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -223,7 +223,7 @@ void if_double_var(t_exp **exp)
     if (!exp || !*exp)
 		return;
     current = *exp;
-    while (current != NULL && current->vr != NULL)
+    while (current != NULL)
     {
         prev = current;
         compare = current->next;

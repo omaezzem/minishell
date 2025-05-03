@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 05:58:14 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/24 09:02:28 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/03 18:16:05 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,24 +43,35 @@ void	ft_exit(t_cmd *data, char **args)
 
 	modulo = 0;
 	largs = len_arg(args);
-	if (!is_num(args[1]))
-		printf("exit\nexit: %s: numeric argument required\n", args[1]);
-	if (is_num(args[1]) && largs > 2)
+	if (args)
 	{
-		data->ex_status = 1;
-		printf("exit\nexit: too many argumants\n");
-	}
-	else if(is_num(args[1]))
-	{
-		if (mini_atoi(args[1]) > 256)
+		if (len_arg(args) == 2)
 		{
-			modulo = mini_atoi(args[1]) % 256;
-			data->ex_status = modulo;
-			printf("exit\n");
-			exit(data->ex_status);
+			if (!is_num(args[1]))
+				printf("exit\nexit: %s: numeric argument required\n", args[1]);
+			else if (is_num(args[1]) && largs > 2)
+			{
+				data->ex_status = 1;
+				printf("exit\nexit: too many argumants\n");
+			}
+			else if(is_num(args[1]))
+			{
+				if (mini_atoi(args[1]) > 256)
+				{
+					modulo = mini_atoi(args[1]) % 256;
+					data->ex_status = modulo;
+					printf("exit\n");
+					exit(data->ex_status);
+				}
+				data->ex_status = mini_atoi(args[1]);
+				printf("exit\n");
+				exit(data->ex_status);
+			}
 		}
-		data->ex_status = mini_atoi(args[1]);
-		printf("exit\n");
-		exit(data->ex_status);
+		else if (len_arg(args) == 1)
+		{
+			printf("exit\n");
+			exit(0);
+		}
 	}
 }

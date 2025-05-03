@@ -6,7 +6,7 @@
 #    By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/03/14 02:29:51 by omaezzem          #+#    #+#              #
-#    Updated: 2025/05/02 15:42:33 by omaezzem         ###   ########.fr        #
+#    Updated: 2025/05/03 17:28:26 by omaezzem         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -53,7 +53,7 @@ OBJ = $(SRC:.c=.o)
 
 #------------------------------Compiler and Flags------------------------------#
 CC = cc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -g -fsanitize=address
 
 #------------------------------Includes and Executables------------------------#
 NAME = minishell

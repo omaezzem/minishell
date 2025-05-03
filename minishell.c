@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 11:17:45 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/02 12:55:02 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/03 16:14:36 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@ char *read_input(char *prompt)
 void sigint_handler(int sig)
 {
     (void)sig;
-    // rl_replace_line("", 0);s
     write(1, "\n", 1);
     rl_on_new_line();
     rl_redisplay();
@@ -60,7 +59,7 @@ int main(int ac, char **av, char **envp)
     signal(SIGQUIT, SIG_IGN);
     while (1)
     {
-        cmd = parse();
+        cmd = parse(env);
         if (!cmd)
             continue;
         ft_execute(*exp, env, cmd, cmd->cmd);

@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 23:17:48 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/03 13:31:35 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/03 16:07:03 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,7 @@ void	ft_putstr_fd(char *s, int fd);
 /*---------------------------------------------builtin---------------------------------------------*/
 
 void	ft_echo(char **args);
-int	ft_cd(t_env *env, char **args, char **options);
+int		ft_cd(t_env *env, char **args, char **options);
 t_env	*ft_create_env(char **env, t_env **ev);
 int		builtin_env(t_env *ev, char **args);
 void	ft_exit(t_cmd *data, char **args);
@@ -145,10 +145,10 @@ int		error_pipe(t_token *tokens);
 void	sigint_handler(int sig);
 t_token	*tokenize(char *input);
 char	*read_input(char *prompt);
-t_cmd *parse(void);
+t_cmd *parse(t_env *env);
 t_cmd *joining(t_token *tokens);
-int		expand(t_token *token);
-int expand_env(char **oldp, char **newp, int brace_flag);
+int expand(t_token *token, t_env *env);
+int expand_env(char **oldp, char **newp, int brace_flag, char *var, t_env *env);
 int		expand_pid(char **newp, int space_left);
 int		expand_argv(char **oldp, char **newp, int space_left);
 int		expand_status(char **newp, int space_left);
