@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 23:17:48 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/01 15:55:15 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/03 13:31:35 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,14 +112,16 @@ void	ft_putstr_fd(char *s, int fd);
 /*---------------------------------------------builtin---------------------------------------------*/
 
 void	ft_echo(char **args);
-int		ft_cd(t_cmd *data, char **args);
+int	ft_cd(t_env *env, char **args, char **options);
 t_env	*ft_create_env(char **env, t_env **ev);
 int		builtin_env(t_env *ev, char **args);
 void	ft_exit(t_cmd *data, char **args);
 char	*find_env(t_env *env, char *var);
-int     ft_execute(t_cmd *data, char **args, char **env);
-void    ft_pwd();
-int     ft_export(t_env *env, char **args, char **envp);
+int		ft_execute(t_exp *exp, t_env *env, t_cmd *data, char **args);
+void	ft_pwd();
+int		ft_export(t_exp *exp,t_env *env, char **args);
+t_exp	**ft_create_env_export(char **env, t_exp **list);
+void	ft_unset(t_exp **exp, t_env **env, char **args);
 
 /*---------------------------------------------parsing--------------------------------------*/
 

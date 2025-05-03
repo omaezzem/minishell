@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:50:42 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/01 17:45:41 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/03 13:37:57 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,13 +31,14 @@ int len_args(char **args)
 		i++;
 	return i;
 }
+
 void	update_old(t_env *ev, char *oldpath)
 {
 
 	t_env	*add;
 
 	add = ev;
-	while (ev->next != NULL)
+	while (ev != NULL)
 	{
 		if (ft_strcmp(ev->var, "OLDPWD") == 0)
 		{
@@ -50,12 +51,13 @@ void	update_old(t_env *ev, char *oldpath)
 	}
 	ev = add;
 }
+
 void	update_new(t_env *ev, char *newpath)
 {
 	t_env	*add;
 
 	add = ev;
-	while (ev->next != NULL)
+	while (ev != NULL)
 	{
 		if (ft_strcmp(ev->var, "PWD") == 0)
 		{
@@ -69,76 +71,71 @@ void	update_new(t_env *ev, char *newpath)
 	ev = add;
 }
 
-int	ft_cd(t_cmd *data, char **args)
+int	ft_cd(t_env *env, char **args, char **options)
 {
-	char	newpath[PMAX];
-	char	oldpath[PMAX];
+	char	newpath[PATH_MAX];
+	char	oldpath[PATH_MAX];
 	char	*path;
-	path = NULL;
-	int		len;
+	int		lenargs;
+	int		lenopt;
 
-	len = len_args(args);
-	if (len <= 2)
+	lenargs = len_args(args);
+	printf("%s\n", args[0]);
+	if (options)
+		lenopt = len_args(options);
+	if (!getcwd(oldpath, PATH_MAX))
 	{
-		if (!getcwd(oldpath, PATH_MAX))
+		ft_putstr_fd("cd: error retrieving current directory", 2);
+		return (0);
+	}
+	if (lenargs == 1 && lenopt == 0)
+	{
+		path = find_env(env, "HOME");
+		if (!path)
 		{
-			ft_putstr_fd("cd: error retrieving current directory", 2);
+			ft_putstr_fd("cd: HOME not set\n", 2);
 			return (0);
 		}
-		if (data->cmd[0] && (!data->cmd[1] || !data->option[0]))
+	}
+	else if (lenargs == 2 && lenopt == 0)
+	{
+		if (ft_strcmp(args[1], "~") == 0 || ft_strcmp(args[1], "~/") == 0)
 		{
-			if (!ft_strcmp(data->cmd[0], "cd"))
+			path = find_env(env, "HOME");
+			if (!path)
 			{
-				path = find_env(data->env, "HOME");
-				printf("%s\n", path);
-				if (!path)
-				{
-					perror("cd: HOME not set");
-					return (0);
-				}
-			}
-		}
-		else if (data->cmd[1] && data->cmd[0] && !data->cmd[2])
-		{
-			if (!ft_strcmp(data->option[0], "~") && (!ft_strcmp(data->cmd[0], "cd")))
-			{
-				path = find_env(data->env, "HOME");
-				if (!path)
-				{
-					perror("cd: HOME not set");
-					return (0);
-				}
-			}
-		}
-		else if (data->option[0] && data->cmd[0] && !data->cmd[2])
-		{
-			if (!ft_strcmp(data->option[0], "-") && (!ft_strcmp(data->cmd[0], "cd")))
-			{
-				path = find_env(data->env, "OLDPWD");
-				if (!path)
-				{
-					ft_putstr_fd("cd: OLDPWD not set\n", 2);
-					return (0);
-				}
-				printf("%s\n", path);
+				ft_putstr_fd("cd: HOME not set\n", 2);
+				return (0);
 			}
 		}
 		else
-			path = data->cmd[1];
-		if (!changedir(path))
-			return (0);
-		if (!getcwd(newpath, PATH_MAX))
 		{
-			ft_putstr_fd("cd: error retrieving current directory", 2);
+			path = args[1];
+		}
+	}
+	else if (lenargs == 1 && lenopt == 1 && ft_strcmp(options[0], "-") == 0)
+	{
+		path = find_env(env, "OLDPWD");
+		if (!path)
+		{
+			ft_putstr_fd("cd: OLDPWD not set\n", 2);
 			return (0);
 		}
-		update_old(data->env, oldpath);
-		update_new(data->env, newpath);
+		printf("%s\n", path);
 	}
 	else
 	{
-		ft_putstr_fd("cd: too many arguments", 2);
-		return 0;
+		ft_putstr_fd("cd: too many arguments\n", 2);
+		return (0);
 	}
-	return 1;
+	if (!changedir(path))
+		return (0);
+	if (!getcwd(newpath, PATH_MAX))
+	{
+		ft_putstr_fd("cd: error retrieving current directory", 2);
+		return (0);
+	}
+	update_old(env, oldpath);
+	update_new(env, newpath);
+	return (1);
 }

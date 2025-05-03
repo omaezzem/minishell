@@ -6,7 +6,7 @@
 #    By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/03/14 02:29:51 by omaezzem          #+#    #+#              #
-#    Updated: 2025/04/29 16:45:13 by omaezzem         ###   ########.fr        #
+#    Updated: 2025/05/02 15:42:33 by omaezzem         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,6 +17,7 @@ SRC = 	execution/builtins/builtin_cd.c \
 		execution/builtins/builtin_env.c \
 		execution/builtins/builtin_exit.c \
 		execution/builtins/builtin_export.c \
+		execution/builtins/builtin_unset.c \
 		execution/env/env.c \
 		execution/utils_exe.c/free_ptr.c \
 		execution/utils_exe.c/free_split.c \

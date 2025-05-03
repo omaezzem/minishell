@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 11:17:45 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/01 17:52:51 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/02 12:55:02 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,49 +44,26 @@ int prev_status;
 
 int main(int ac, char **av, char **envp)
 {
-    // t_env *env_list = NULL;
-
-    // t_cmd *cmd;
     cmdline_argc = ac;
     cmdline_argv = av;
     cmdline_shift = 0;
     prev_status = 0;
-    // (void)envp;
     t_cmd *cmd = NULL;
-    // t_env *env_list = NULL;
+    t_exp *head;
     t_env *env = ft_create_env(envp, &env);
-    
-    // while (env)
-    // {
-    //     printf("var: %s\n", env->var);
-    //     printf("val: %s\n", env->val);
-    //     env = env->next;
-    // }
-
-
-    // Create env list from envp
-        // t_env *env_list = getenv(envp[0]);
-        // printf("var1: %s\n", env_list->var);
-        // printf("env_buffer1: %s\n", env_list->val);
+    t_exp **exp;
+    head = NULL;
+    exp = &head;
+    exp = ft_create_env_export(envp, exp);
 
     signal(SIGINT, sigint_handler);
     signal(SIGQUIT, SIG_IGN);
-    // rl_catch_signals = 0;
-    // init(cmd, envp);
     while (1)
     {
         cmd = parse();
         if (!cmd)
             continue;
-    //     // if (!parse())
-    //         // continue;
-    // if (cmd->env)
-    // {
-    //     printf("cmd[0] = %s\n", cmd->cmd[0]);
-    //     printf("cmd->env->val = %s\n", cmd->env->val); // Accessing the value of the environment variable
-    // }
-        ft_execute(cmd, cmd->cmd, envp);
+        ft_execute(*exp, env, cmd, cmd->cmd);
     }
-
     return 0;
 }

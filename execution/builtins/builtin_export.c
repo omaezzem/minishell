@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 11:23:25 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/01 15:35:29 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/02 16:02:56 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -373,19 +373,14 @@ void	add_to_env_list(t_env *env, char *args, char *avzero, char *avone)
 		ft_lstadd_back_env(&env, nnode);
 	}
 }
-int ft_export(t_env *env, char **args, char **envp)
+int		ft_export(t_exp *exp, t_env *env, char **args)
 {
 	int		len;
 	t_exp	*curexp;
 	int		i;
-	t_exp	*head;
-    t_exp   **exp;
 	char	*avzero;
 	char	*avone;
 
-	head = NULL;
-	exp = &head;
-    exp = ft_create_env_export(envp, exp);
 	len = len_arg(args);
     if (len > 1)
 	{
@@ -397,13 +392,12 @@ int ft_export(t_env *env, char **args, char **envp)
             if (find_equal(args[i]))
 			{
                 avzero = check_var(args_zero(args[i]));
-				printf("%s\n", avzero);
 				if (!avzero)
 					return 0;
                 avone = args_one(args[i]);
                 if (!avone)
 					avone = ft_strdup("");
-                add_to_export_list_vl(exp, avzero, avone);
+                add_to_export_list_vl(&exp, avzero, avone);
                 add_to_env_list(env, args[i], avzero, avone);
 				free(avzero);
             }
@@ -413,41 +407,33 @@ int ft_export(t_env *env, char **args, char **envp)
 				if (!avzero)
 					return 0;
 				if (avzero)
-					add_to_export_list_v(exp, avzero);
+					add_to_export_list_v(&exp, avzero);
 			}
 			i++;
 		}
 	}
-	if_double_var(exp);
-	sort_exp_list(exp);
-	curexp = *exp;
-	while (curexp != NULL)
+	if_double_var(&exp);
+	sort_exp_list(&exp);
+	if (len_arg(args) == 1 && !ft_strcmp(args[0], "export"))
 	{
-		if (curexp->vr && !curexp->vl && (!(ft_strcmp(curexp->vr, "_") == 0)))
-			printf("declare -x %s\n", curexp->vr);
-		else
+		curexp = exp;
+		while (curexp != NULL)
 		{
-			if (!(ft_strcmp(curexp->vr, "_") == 0))
+			if (curexp->vr && !curexp->vl && (!(ft_strcmp(curexp->vr, "_") == 0)))
+				printf("declare -x %s\n", curexp->vr);
+			else
 			{
-				printf("declare -x ");
-				printf("%s=", curexp->vr);
-				if (curexp->vl)
-					printf("\"%s\"\n", curexp->vl);
+				if (!(ft_strcmp(curexp->vr, "_") == 0))
+				{
+					printf("declare -x ");
+					printf("%s=", curexp->vr);
+					if (curexp->vl)
+						printf("\"%s\"\n", curexp->vl);
+				}
 			}
-		}
-		curexp = curexp->next;
+			curexp = curexp->next;
+		}	
 	}
 	return 0;
 }
-// }
-// int main(int ac, char **av, char **env)
-// {
-//     t_env    *list;
 
-//     list = NULL;
-//     list = ft_create_env(env, &list);
-    
-//     ft_export(list, av , env);
-// }
-
- 

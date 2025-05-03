@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 10:05:28 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/01 18:01:09 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/03 13:32:03 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ int	len_cmd(char **args)
 	}
 	return n;
 }
-int ft_execute(t_cmd *data, char **args, char **env)
+int ft_execute(t_exp *exp, t_env *env, t_cmd *data, char **args)
 {
 	if (len_cmd(args) == 0)
     {
@@ -37,19 +37,20 @@ int ft_execute(t_cmd *data, char **args, char **env)
             return (0);
         }
         else if (ft_strcmp(args[0], "cd") == 0)
-            return (ft_cd(data, args));
+            return (ft_cd(env, args, data->option));
         else if (ft_strcmp(args[0], "pwd") == 0)
         {
             ft_pwd();
             return (0);
         }
         else if (ft_strcmp(args[0], "export") == 0)
-            return (ft_export(data->env, args, env));
+            return (ft_export(exp, env, args));
         else if (ft_strcmp(args[0], "env") == 0)
-            return (builtin_env(data->env, args));
-        else if (ft_strcmp(args[0], "exit") == 0)s
-        
+            return (builtin_env(env, args));
+        else if (ft_strcmp(args[0], "exit") == 0)
             ft_exit(data, args);
+        else if (ft_strcmp(args[0], "unset") == 0)
+            ft_unset(&exp, &env, args);
         else
             return (0);
     } 	
