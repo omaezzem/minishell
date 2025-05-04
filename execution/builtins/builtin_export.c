@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 11:23:25 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/03 18:03:33 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/04 15:49:18 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -191,15 +191,6 @@ t_exp **ft_create_env_export(char **env, t_exp **list)
 			free_split(eqsplit);
 			continue;
 		}
-		if (k == 0)
-		{
-			new_node = malloc(sizeof(t_exp));
-			new_node->vr = ft_strdup("OLDPWD");
-			new_node->vl = NULL;
-			new_node->next = NULL;
-			ft_lstadd_back_exp(list, new_node);
-			k = 1;
-		}
 		new_node = malloc(sizeof(t_exp));
 		if (!new_node)
 		{
@@ -221,14 +212,15 @@ void if_double_var(t_exp **exp)
     t_exp *prev;
 
     if (!exp || !*exp)
-		return;
+        return;
+    
     current = *exp;
-    while (current != NULL)
+    while (current != NULL && current->vr)
     {
         prev = current;
         compare = current->next;
-        
-        while (compare != NULL && compare->vr != NULL)
+
+        while (compare != NULL && compare->vr)
         {
             if (ft_strcmp(current->vr, compare->vr) == 0)
             {

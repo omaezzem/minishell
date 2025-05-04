@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 13:59:21 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/03 18:29:45 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/04 15:47:15 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,20 +70,3 @@ void ft_unset(t_exp **exp, t_env **env, char **args)
 	}
 }
 
-// int main(int ac, char **av, char env)
-// {
-// 	int i;
-// 	t_env *ev;
-// 	t_exp *exp;
-
-// 	env = NULL;
-// 	exp = NULL;
-// 	exp = ft_create_env_export(env, &exp);
-// 	ev = ft_create_env(env, &ev);
-// 	ft_unset(&exp, &ev, av);
-// 	while (env)
-// 	{
-// 		printf("%s=%s\n", ev->var, ev->val);
-		
-// 	}
-// }
