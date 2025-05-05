@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 10:05:28 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/04 17:27:47 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/05 11:09:32 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ int ft_builtins(char **args, t_env *env, t_exp *exp, t_cmd *data)
         return (1);
     }
     else if (ft_strcmp(args[0], "export") == 0)
-        return (ft_export(exp, env, args), 1);
+        return (ft_export(exp, env, args, data->option), 1);
     else if (ft_strcmp(args[0], "env") == 0)
         return (builtin_env(env, args), 1);
     else if (ft_strcmp(args[0], "exit") == 0)

@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 05:58:14 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/03 18:16:05 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/05 11:15:09 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,11 @@ int	len_arg(char **args)
 	int i;
 
 	i = 0;
-	while (args[i])
-		i++;
+	if (args)
+	{
+		while (args[i])
+			i++;
+	}
 	return i;
 }
 

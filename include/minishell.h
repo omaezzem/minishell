@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 23:17:48 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/03 16:07:03 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/05 13:04:56 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,6 +108,7 @@ char	**ft_split(char *s, char c);
 char	*ft_strchr_add_one(char *s, int c);
 int		ft_isnum(int c);
 void	ft_putstr_fd(char *s, int fd);
+int		ft_isalpha(int c);
 
 /*---------------------------------------------builtin---------------------------------------------*/
 
@@ -119,9 +120,10 @@ void	ft_exit(t_cmd *data, char **args);
 char	*find_env(t_env *env, char *var);
 int		ft_execute(t_exp *exp, t_env *env, t_cmd *data, char **args);
 void	ft_pwd();
-int		ft_export(t_exp *exp,t_env *env, char **args);
+int		ft_export(t_exp *exp, t_env *env, char **args, char **opt);
 t_exp	**ft_create_env_export(char **env, t_exp **list);
 void	ft_unset(t_exp **exp, t_env **env, char **args);
+
 
 /*---------------------------------------------parsing--------------------------------------*/
 

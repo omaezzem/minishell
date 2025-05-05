@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 13:59:21 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/04 15:47:15 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/05 10:28:27 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,4 +69,3 @@ void ft_unset(t_exp **exp, t_env **env, char **args)
 		i++;
 	}
 }
-

@@ -6,7 +6,7 @@
 #    By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/03/14 02:29:51 by omaezzem          #+#    #+#              #
-#    Updated: 2025/05/03 17:28:26 by omaezzem         ###   ########.fr        #
+#    Updated: 2025/05/05 11:46:11 by omaezzem         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -44,6 +44,7 @@ SRC = 	execution/builtins/builtin_cd.c \
 		utils/ft_putstr_fd.c\
 		utils/ft_isalnum.c\
 		utils/ft_isnum.c\
+		utils/ft_isalpha.c\
 		utils/ft_strchr_add_one.c\
 		minishell.c\
 

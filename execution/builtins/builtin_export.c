@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 11:23:25 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/04 15:49:18 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/05 14:41:15 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,12 +92,35 @@ void	sort_exp_list(t_exp **exp)
 	}
 }
 
+int find_plus(char *var)
+{
+    int i = 0;
+
+    if (!var || !var[0])
+        return 0;
+
+    if (!ft_isalpha(var[0]) && var[0] != '_')
+        return (minishell_invalid(var), 0);
+
+    while (var[i] && var[i] != '=' && var[i] != '+')
+    {
+        if (!ft_isalnum(var[i]) && var[i] != '_')
+            return (minishell_invalid(var), 0);
+        i++;
+    }
+    if (var[i] == '+' && var[i+1] == '=')
+        return 1;
+    return 0;
+}
+
 char	*check_var(char *var)
 {
 	int i;
 	int	lenvar;
 	char *parsvar;
 
+	if (!var)
+		return NULL;
 	lenvar = len_alnum_var(var);
 	parsvar = malloc(sizeof(char) * lenvar + 1);
 	if (!parsvar)
@@ -113,8 +136,11 @@ char	*check_var(char *var)
 		}
 		if (!ft_isalnum(var[i]))
 		{
-			if (ft_isalnum(var[i-1]) && var[i] == '+' &&  var[i+1] == '\0')
-				break ;
+			if (var[i-1])
+			{
+				if (ft_isalnum(var[i-1]) && var[i] == '+' &&  var[i+1] == '\0')
+					break ;
+			}
 			return (minishell_invalid(var), free(parsvar), NULL);
 		}
 		parsvar[i] = var[i];
@@ -147,6 +173,8 @@ int len_at_first_equal(char *str)
 	int i;
 
 	i = 0;
+	if(!str)
+		return 0;
 	while (str[i])
 	{
 		if (str[i] == '=')
@@ -244,7 +272,7 @@ void	update_val_env(t_env *env, char *var, char *val)
 	t_env	*add;
 
 	add = env;
-	while (env->next != NULL)
+	while (env != NULL)
 	{
 		if (ft_strcmp(env->var, var) == 0)
 		{
@@ -261,7 +289,7 @@ void	update_val_exp(t_exp *exp, char *var, char *val)
 {
 	t_exp	*add = exp;
 
-	while (exp->next != NULL)
+	while (exp != NULL)
 	{
 		if (ft_strcmp(exp->vr, var) == 0)
 		{
@@ -273,6 +301,39 @@ void	update_val_exp(t_exp *exp, char *var, char *val)
 		exp = exp->next;
 	}
 	exp = add;
+}
+void update_join_env(t_env *env, char *var, char *val)
+{
+    t_env *current = env;
+
+    while (current != NULL)
+    {
+        if (ft_strcmp(current->var, var) == 0)
+        {
+            char *new_val = ft_strjoin(current->val, val);
+            free(current->val);
+            current->val = new_val;
+            return;
+        }
+        current = current->next;
+    }
+}
+
+void update_join_exp(t_exp *exp, char *var, char *val)
+{
+    t_exp *current = exp;
+
+    while (current != NULL)
+    {
+        if (ft_strcmp(current->vr, var) == 0)
+        {
+            char *new_val = ft_strjoin(current->vl, val);
+            free(current->vl);
+            current->vl = new_val;
+            return;
+        }
+        current = current->next;
+    }
 }
 
 void	add_to_export_list_vl(t_exp **exp, char *avzero, char *avone)
@@ -297,6 +358,8 @@ void	add_to_export_list_v(t_exp **exp, char *avzero)
 {
     t_exp   *add;
 
+	if (!exp || !avzero)
+		return ;
     if (search_var_in_exp(*exp, avzero))
 		return ;
 	add = malloc(sizeof(t_exp));
@@ -312,8 +375,14 @@ char	*args_zero(char *args)
 {
 	int i;
 	char	*zero;
+	int len;
 
-	zero = malloc(len_at_first_equal(args) + 1);
+	if (!args)
+		return NULL;
+	if (!ft_isalpha(args[0]))
+		return (minishell_invalid(args), NULL);
+	len = len_at_first_equal(args);
+	zero = malloc(len + 1);
 	if (!zero)
 		return NULL;
 	i = 0;
@@ -365,11 +434,13 @@ void	add_to_env_list(t_env *env, char *args, char *avzero, char *avone)
 		ft_lstadd_back_env(&env, nnode);
 	}
 }
-int		ft_export(t_exp *exp, t_env *env, char **args)
+
+int		ft_export(t_exp *exp, t_env *env, char **args, char **opt)
 {
 	int		len;
 	t_exp	*curexp;
 	int		i;
+	int		j = 0;
 	char	*avzero;
 	char	*avone;
 
@@ -377,11 +448,29 @@ int		ft_export(t_exp *exp, t_env *env, char **args)
     if (len > 1)
 	{
         i = 1;
-        while (args[i]) 
+        while (args[i])
 		{
             if (!args[i])
 				continue;
-            if (find_equal(args[i]))
+			if (!ft_isalpha(args[i][0]))
+				return (minishell_invalid(args[i]), 0);
+			if (find_plus(args[i]))
+        	{
+				avzero = check_var(args_zero(args[i]));
+				avone = args_one(args[i]);
+				if (!avzero || !avone)
+					return (free(avzero), 0);
+				if (search_var_in_exp(exp, avzero))
+					update_join_exp(exp, avzero, avone);
+				else
+					add_to_export_list_vl(&exp, avzero, avone);
+				if (search_var_in_env(env, avzero))
+					update_join_env(env, avzero, avone);
+				else
+					add_to_env_list(env, args[i], avzero, avone);
+				free(avzero);
+			}
+            else if (find_equal(args[i]))
 			{
                 avzero = check_var(args_zero(args[i]));
 				if (!avzero)
@@ -404,9 +493,18 @@ int		ft_export(t_exp *exp, t_env *env, char **args)
 			i++;
 		}
 	}
+	if (opt)
+	{
+		while(opt[j])
+		{
+			if (!ft_isalpha(opt[j][0]))
+				return (minishell_invalid(opt[j]), 0);
+			j++;
+		}
+	}
 	if_double_var(&exp);
 	sort_exp_list(&exp);
-	if (len_arg(args) == 1 && !ft_strcmp(args[0], "export"))
+	if ((len_arg(args) == 1) && (len_arg(opt) == 0) && !ft_strcmp(args[0], "export"))
 	{
 		curexp = exp;
 		while (curexp != NULL)
@@ -428,4 +526,3 @@ int		ft_export(t_exp *exp, t_env *env, char **args)
 	}
 	return 0;
 }
-
