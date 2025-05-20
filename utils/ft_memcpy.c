@@ -1,24 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   create_token.c                                     :+:      :+:    :+:   */
+/*   ft_memcpy.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mel-badd <mel-badd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/22 11:22:10 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/17 20:36:46 by mel-badd         ###   ########.fr       */
+/*   Created: 2025/05/07 15:53:48 by mel-badd          #+#    #+#             */
+/*   Updated: 2025/05/07 15:54:00 by mel-badd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/minishell.h"
+#include "../include/minishell.h"
 
-t_token *create_token(char *value, t_type type)
+void	*ft_memcpy(void *dst, const void *src, size_t n)
 {
-	t_token *token = malloc(sizeof(t_token));
-	if (!token)
-		return NULL;
-	token->value = ft_strdup(value);
-	token->type = type;
-	token->next = NULL;
-	return token;
+	size_t			i;
+	unsigned char	*dste;
+	unsigned char	*srce;
+
+	if (!dst && !src)
+		return (NULL);
+	i = 0;
+	dste = (unsigned char *) dst;
+	srce = (unsigned char *) src;
+	if (dste == srce)
+		return (dst);
+	while (i < n)
+	{
+		dste[i] = srce[i];
+		i++;
+	}
+	return (dst);
 }

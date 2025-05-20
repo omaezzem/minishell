@@ -6,15 +6,15 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/17 11:18:31 by mel-badd          #+#    #+#             */
-/*   Updated: 2025/04/24 09:09:20 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/16 17:00:15 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-char	*ft_substr(char *s, unsigned int start, size_t len)
+char	*ft_substr(char *s, int start, int len)
 {
-	size_t	i;
+	int		i;
 	char	*sub;
 
 	if (!s)

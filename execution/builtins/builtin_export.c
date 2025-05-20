@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 11:23:25 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/05 14:41:15 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/20 17:17:59 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -205,10 +205,8 @@ t_exp **ft_create_env_export(char **env, t_exp **list)
 	int		i;
 	char	**eqsplit;
 	t_exp	*new_node;
-	int		k;
 
 	i = -1;
-	k = 0;
 	if (!env)
 		return NULL;
 	while (env[++i])
@@ -271,11 +269,14 @@ void	update_val_env(t_env *env, char *var, char *val)
 {
 	t_env	*add;
 
+	if (!var || !val)
+		return ;
 	add = env;
 	while (env != NULL)
 	{
 		if (ft_strcmp(env->var, var) == 0)
 		{
+			printf("----------1\n");
 			free(env->val); 
 			env->val = ft_strdup(val);
 			env = add;
@@ -289,6 +290,8 @@ void	update_val_exp(t_exp *exp, char *var, char *val)
 {
 	t_exp	*add = exp;
 
+	if (!var || !val)
+		return ;
 	while (exp != NULL)
 	{
 		if (ft_strcmp(exp->vr, var) == 0)
@@ -305,12 +308,13 @@ void	update_val_exp(t_exp *exp, char *var, char *val)
 void update_join_env(t_env *env, char *var, char *val)
 {
     t_env *current = env;
+	char *new_val;
 
     while (current != NULL)
     {
         if (ft_strcmp(current->var, var) == 0)
         {
-            char *new_val = ft_strjoin(current->val, val);
+            new_val = ft_strjoin(current->val, val);
             free(current->val);
             current->val = new_val;
             return;
@@ -418,7 +422,7 @@ void	add_to_env_list(t_env *env, char *args, char *avzero, char *avone)
 	t_env	*nnode;
 	if (!env  || !args || !avzero || !avone) 
 		return;
-	if ((find_equal(args) == 1) && (len_equal(args) == 1))
+	if ((find_equal(args) == 1))
 	{
 		if (search_var_in_env(env, avzero))
 		{
@@ -435,12 +439,11 @@ void	add_to_env_list(t_env *env, char *args, char *avzero, char *avone)
 	}
 }
 
-int		ft_export(t_exp *exp, t_env *env, char **args, char **opt)
+int		ft_export(t_exp *exp, t_env *env, char **args)
 {
 	int		len;
 	t_exp	*curexp;
 	int		i;
-	int		j = 0;
 	char	*avzero;
 	char	*avone;
 
@@ -493,18 +496,9 @@ int		ft_export(t_exp *exp, t_env *env, char **args, char **opt)
 			i++;
 		}
 	}
-	if (opt)
-	{
-		while(opt[j])
-		{
-			if (!ft_isalpha(opt[j][0]))
-				return (minishell_invalid(opt[j]), 0);
-			j++;
-		}
-	}
 	if_double_var(&exp);
 	sort_exp_list(&exp);
-	if ((len_arg(args) == 1) && (len_arg(opt) == 0) && !ft_strcmp(args[0], "export"))
+	if ((len_arg(args) == 1) && !ft_strcmp(args[0], "export"))
 	{
 		curexp = exp;
 		while (curexp != NULL)

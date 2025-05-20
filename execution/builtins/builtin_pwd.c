@@ -6,21 +6,18 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 02:14:59 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/25 16:04:29 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/15 21:23:02 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-void ft_pwd()
+int	ft_pwd()
 {
 	char	cwd[PATH_MAX];
 
 	if (getcwd(cwd, sizeof(cwd)) != NULL)
-		printf("%s\n", cwd);
+		return(printf("%s\n", cwd), 1);
 	else
-	{
-		perror("pwd");
-		exit(EXIT_FAILURE);
-	}
+		return (perror("pwd"), exit(EXIT_FAILURE), 0);
 }

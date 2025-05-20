@@ -6,7 +6,7 @@
 /*   By: mel-badd <mel-badd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/17 11:19:36 by mel-badd          #+#    #+#             */
-/*   Updated: 2025/05/01 14:15:52 by mel-badd         ###   ########.fr       */
+/*   Updated: 2025/05/20 15:33:45 by mel-badd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,30 @@ int error2(t_token *cur)
 	}
 	return 1;
 }
+int handle_herdoc(char *delimiter)
+{
+	int fd;
+	char *line = NULL;
+	size_t len = 0;
+
+	fd = open(".heredoc_tmp", O_CREAT | O_WRONLY | O_TRUNC, 0600);
+	if (fd < 0)
+	{
+		perror("open");
+		exit(EXIT_FAILURE);
+	}
+	while (1)
+	{
+		printf("herdoc> ");
+		getline(&line, &len, stdin);
+		if (ft_strcmp(line, delimiter) == 0)
+			exit(0);
+		write(fd, line, ft_strlen(line));
+	}
+	free(line);
+	close(fd);
+	return 1;
+}
 int error(t_token *tokens)
 {
     t_token *cur = tokens;
@@ -70,6 +94,8 @@ int error(t_token *tokens)
             printf("minishell: syntax error near unexpected token '%s'\n", cur->value);
             return 0;
         }
+		else if (cur->type == TOKEN_HEREDOC && cur->next->type == TOKEN_WORD)
+			handle_herdoc(cur->next->value);
 		error2(cur);
         cur = cur->next;
     }

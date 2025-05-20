@@ -6,15 +6,15 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 15:00:26 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/22 17:38:28 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/16 16:57:51 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-size_t	ft_strlen(char *str)
+int	ft_strlen(char *str)
 {
-	size_t	i;
+	int	i;
 
 	i = 0;
 	while (str[i])

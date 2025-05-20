@@ -6,12 +6,32 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 13:59:21 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/05 10:28:27 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/15 21:09:05 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
+void	unset_invalid(char *invalid_str)
+{
+	ft_putstr_fd("minishell: unset: `", 2);
+	ft_putstr_fd(invalid_str, 2);
+	ft_putstr_fd("': not a valid identifier\n", 2);
+}
+
+int check_args(char *args)
+{
+	int i;
+
+	i = 0;
+	while (args[i])
+	{
+		if (!ft_isalnum(args[i]))
+			return 0;
+		i++;
+	}
+	return 1;
+}
 void ft_unset(t_exp **exp, t_env **env, char **args)
 {
 	int i;
@@ -25,6 +45,8 @@ void ft_unset(t_exp **exp, t_env **env, char **args)
 	i = 1;
 	while (args[i])
 	{
+		if (!check_args(args[i]))
+			unset_invalid(args[i]);
 		prev_env = NULL;
 		curr_env = *env;
 		while (curr_env != NULL)

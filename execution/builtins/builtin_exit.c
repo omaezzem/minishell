@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 05:58:14 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/05 11:15:09 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/16 20:32:59 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,10 @@ int	is_num(char *str)
 	int	i;
 
 	i = 0;
+	if (str[0] == '-' || str[0] == '+') 
+		i++;
+	if (!str[i])
+		return (FAILURE);
 	while (str[i])
 	{
 		if (!(str[i] >= '0' && str[i] <= '9'))
@@ -36,45 +40,46 @@ int	len_arg(char **args)
 		while (args[i])
 			i++;
 	}
-	return i;
+	return (i);
 }
 
 void	ft_exit(t_cmd *data, char **args)
 {
-	int largs;
+	int	largs;
+	int	exit_code;
 	int	modulo;
 
-	modulo = 0;
+	if (!args)
+		return ;
 	largs = len_arg(args);
-	if (args)
+	if (largs > 2)
 	{
-		if (len_arg(args) == 2)
-		{
-			if (!is_num(args[1]))
-				printf("exit\nexit: %s: numeric argument required\n", args[1]);
-			else if (is_num(args[1]) && largs > 2)
-			{
-				data->ex_status = 1;
-				printf("exit\nexit: too many argumants\n");
-			}
-			else if(is_num(args[1]))
-			{
-				if (mini_atoi(args[1]) > 256)
-				{
-					modulo = mini_atoi(args[1]) % 256;
-					data->ex_status = modulo;
-					printf("exit\n");
-					exit(data->ex_status);
-				}
-				data->ex_status = mini_atoi(args[1]);
-				printf("exit\n");
-				exit(data->ex_status);
-			}
-		}
-		else if (len_arg(args) == 1)
-		{
-			printf("exit\n");
-			exit(0);
-		}
+		ft_putstr_fd("minishell: exit: too many arguments\n", 2);
+		data->ex_status = 1;
+		return;
 	}
+	if (largs == 2)
+	{
+		if (!is_num(args[1]))
+		{
+			ft_putstr_fd("minishell: exit:", 2);
+			ft_putstr_fd(args[1], 2);
+			ft_putstr_fd(": numeric argument required\n", 2);
+			data->ex_status = 255;
+			printf("exit\n");
+			exit(255);
+		}
+		exit_code = mini_atoi(args[1]);
+		if (exit_code > 255)
+			modulo = exit_code % 256;
+		else if (exit_code < 0)
+			modulo = exit_code + 256;
+		else
+			modulo = exit_code;
+		data->ex_status = modulo;
+		printf("exit\n");
+		exit(modulo);
+	}
+	data->ex_status = 0;
+	exit(0);
 }

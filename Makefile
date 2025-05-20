@@ -6,7 +6,7 @@
 #    By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/03/14 02:29:51 by omaezzem          #+#    #+#              #
-#    Updated: 2025/05/05 11:46:11 by omaezzem         ###   ########.fr        #
+#    Updated: 2025/05/20 17:40:20 by omaezzem         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,11 +20,14 @@ SRC = 	execution/builtins/builtin_cd.c \
 		execution/builtins/builtin_unset.c \
 		execution/env/env.c \
 		execution/utils_exe.c/free_ptr.c \
+		execution/utils_exe.c/len_redirections.c\
 		execution/utils_exe.c/free_split.c \
 		execution/utils_exe.c/ft_lstadd_back.c \
 		execution/utils_exe.c/ft_lstnew.c \
 		execution/utils_exe.c/mysplit.c \
 		execution/src/ft_execute.c \
+		execution/src/single_redirect.c\
+		execution/src/redirections.c\
 		parssing/utils_prs/append_token.c \
 		parssing/utils_prs/create_token.c \
 		parssing/src_prs/expand.c \
@@ -36,9 +39,11 @@ SRC = 	execution/builtins/builtin_cd.c \
 		utils/ft_split.c \
 		utils/ft_strchr.c \
 		utils/ft_strcmp.c \
+		utils/ft_itoa.c \
 		utils/ft_strjoin.c \
 		utils/ft_strdup.c \
 		utils/ft_strlen.c \
+		utils/ft_memcpy.c \
 		utils/ft_strncmp.c \
 		utils/ft_substr.c \
 		utils/ft_putstr_fd.c\
@@ -64,22 +69,19 @@ READLINE_LINK = -lreadline -L$(shell brew --prefix readline)/lib
 
 #------------------------------Rules-------------------------------------------#
 all: $(NAME)
-
+	@echo "make ✅"
 $(NAME): $(OBJ)
-	@$(CC) $(CFLAGS) $(OBJ) -o $(NAME) $(READLINE_LINK)
+	@$(CC) $(CFLAGS) $(OBJ) $(READLINE_LINK)  -o $(NAME)
 
 %.o: %.c include/minishell.h
 	@$(CC) $(CFLAGS) $(READLINE_COMPILE) -c $< -o $@
-	# @echo █▀▄▀█ ░▀░ █▀▀▄ ░▀░ █░░█ █▀▀ █░░ █░░
-	# @echo █░▀░█ ▀█▀ █░░█ ▀█▀ █▀▀█ █▀▀ █░░ █░░
-	# @echo ▀░░░▀ ▀▀▀ ▀░░▀ ▀▀▀ ▀░░▀ ▀▀▀ ▀▀▀ ▀▀▀
 
 #------------Clean-------------------------------------------#
 clean:
-	rm -f $(OBJ)
+	@rm -f $(OBJ)
 
 fclean: clean
-	rm -f $(NAME)
+	@rm -f $(NAME)
 
 #------------------------------Rebuild-----------------------------------------#
 re: fclean all

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expand.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-badd <mel-badd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/18 20:00:24 by mel-badd          #+#    #+#             */
-/*   Updated: 2025/05/03 15:58:17 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/20 14:03:33 by mel-badd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,11 +55,14 @@ int expand_env(char **oldp, char **newp, int brace_flag, char *var, t_env *env)
     char *env_val;
     char *old = *oldp;
     char *new = *newp;
+    // printf("old: %s\n", old);
+    // var = ft_strcpy(var, old);
     // If it's an unbraced variable, process it accordingly
+
     if (!brace_flag)
     {
         // Parse valid var name characters (letters, digits, underscores)
-        while (isalnum(*old) || *old == '_')
+        while (ft_isalnum(*old) || *old == '_')
             var[i++] = *old++;
     }
     else
@@ -76,7 +79,16 @@ int expand_env(char **oldp, char **newp, int brace_flag, char *var, t_env *env)
         }
         old++;  // skip '}'
     }
-    var[i] = '\0';  // Null-terminate the variable name
+    var[i] = '\0';
+
+
+	// while (env)
+    // {
+    //     printf("--->%s=%s\n", env->var, env->val);
+    //     // printf("val: %s\n", env->val);
+    //     env = env->next;
+    // }
+    // printf("i: %d\n", i);
     // 		    while (env)
     // {
     //     printf("var: %s\n", env->var);
@@ -92,41 +104,29 @@ int expand_env(char **oldp, char **newp, int brace_flag, char *var, t_env *env)
     //     printf("val: %s\n", env->val);
     //     env = env->next;
     // }
+    // printf("USER: %s\n", getenv("USER"));
+
+
+    // printf("varjg: %s\n", var);
     env_val = find_env(env, var);
-    printf("Looking for var: %s, found value: %s\n", var, env_val);
-	// while (env)
-    // {
-    //     printf("var: %s\n", env->var);
-    //     printf("val: %s\n", env->val);
-    //     env = env->next;
-    // }
-	// 	printf("env_val: %s\n", env_val);
-    if (env_val == NULL)
-    {
-        // No such variable, return empty string
-        env_val = "";
-        space_left = 1;  // We can store an empty string
-    }
-    else
-    {
-        space_left = ft_strlen(env_val);
+    if (env_val == NULL) {
+        env_val = "";  // If not found, treat as empty string
+        space_left = 1;  // Only need space for an empty string
+    } else {
+        space_left = ft_strlen(env_val);  // Space required for the variable value
     }
 
-    // Check if there is enough space in the destination buffer
-    if (space_left < ft_strlen(env_val))
-    {
-        return ENOROOM;  // Error: Not enough space
+    // Copy the environment variable value into the new buffer
+    while (*env_val != '\0' && space_left-- > 0) {
+        *new++ = *env_val++;  // Copy each character from env_val to new
     }
 
-    // Copy the environment variable to the new string if it exists
-    while (*env_val != '\0')
-    {
-        *new++ = *env_val++;
-    }
+    // Null-terminate the string after copying
+    *new = '\0';
 
-    // Update the pointers
+    // Update the pointers to continue processing
     *oldp = old;  // Move old pointer to the next character after processed variable
-    *newp = new;
+    *newp = new;  // Update new pointer
 
     return n;
 }
@@ -141,7 +141,7 @@ int expand_argv(char **oldp, char **newp, int space_left)
 	while (isdigit(*old))
 		arg_idx[i++] = *old++;
 	arg_idx[i] = '\0';
-	argn = mini_atoi(arg_idx);
+	argn = atoi(arg_idx);
 	if ((argn + cmdline_shift) < (cmdline_argc))
 	{
 		n = ft_strlen(cmdline_argv[argn + cmdline_shift]);
@@ -172,195 +172,164 @@ int expand_pid(char **newp, int space_left)
 	*newp = new;
 	return n;
 }
+#include <stdlib.h>
+#include <string.h>
 
-int expand(t_token *token, t_env *env)
+char *append_to_result(char *final, char *part, size_t total_len, size_t part_len) {
+    // Allocate memory for the new string (current total length + part length + 1 for null-terminator)
+    char *temp = malloc(total_len + part_len + 1);
+    if (!temp) return NULL;  // Return NULL if memory allocation fails
+
+    // Copy the contents of the current final string into temp (if final is not NULL)
+    if (final) {
+        memcpy(temp, final, total_len);  // Copy the total_len bytes from final into temp
+        free(final);  // Free the old final string to avoid memory leak
+    }
+
+    // Copy the contents of the part string into temp, starting after the existing final string
+    memcpy(temp + total_len, part, part_len);  // Copy part_len bytes from part into temp
+
+    // Null-terminate the new string
+    temp[total_len + part_len] = '\0';
+
+    return temp;  // Return the newly concatenated string
+}
+
+// int handle_export(t_token )
+char *expand(t_token *token, t_env *env)
 {
-    char *old = NULL;
-    int oldlen = 0;
-    int newsize = 0;
+    char *old;
+    int oldlen;
+    int newsize;
     char *new = NULL;
-    t_token *tmp_token = token;
     char *newp;
     int rv;
-    t_cmd *cmd = malloc(sizeof(t_cmd));  // Ensure cmd is allocated
+
+    char *final_result = NULL;
+    size_t total_len = 0;
+
+    t_cmd *cmd = malloc(sizeof(t_cmd));
     if (!cmd) return 0;
 
-
-    cmd->env = malloc(sizeof(t_env));  // Ensure env in cmd is allocated
+    cmd->env = malloc(sizeof(t_env));
     if (!cmd->env) {
-        free(cmd);  // Free cmd if env allocation fails
+        free(cmd);
         return 0;
     }
-	// char 	*find;
-    // printf("env: %s\n", env->next->var);
-	// find = find_env(env, "USER");
-	// printf("%s\n", find);
-    // Initialize cmd->env to a safe state
-    // cmd->env->var = NULL;
-    // cmd->env->val = NULL;
-    // cmd->env->next = NULL;
-    // Iterate through all tokens and expand them
+
+    t_token *tmp_token = token;
+    // while (token)
+    // {
+    //     if (token->type == TOKEN_PIPE)
+    //         tmp_token = token->next;
+    //     token = token->next;
+    // }
+    // Skip command name if needed
+    // if (tmp_token && tmp_token->type == TOKEN_WORD)
+    //     tmp_token = tmp_token->next;
+
+    int i = 0;
+
     while (tmp_token)
     {
+        // printf("tmp_token->value number(%d): %s\n", i, tmp_token->value);
+        // printf("tmp_token->value number(%d): %s\n", i,tmp_token->value);
+        i++;
+
+        if (tmp_token->type == TOKEN_SPACE) {
+            // Avoid adding multiple spaces by checking the last added character
+            if (final_result && final_result[total_len - 1] != ' ') {
+                // Add a single space if there isn't already one
+                final_result = append_to_result(final_result, " ", total_len, 1);
+                total_len += 1;
+            }
+            tmp_token = tmp_token->next;
+            continue;
+        }
+
         old = tmp_token->value;
         oldlen = ft_strlen(old);
-        newsize = oldlen * 2;
-        new = malloc(newsize + 1);  // Allocate memory for the expanded string
+        newsize = oldlen * 2 + 1;
+        new = malloc(newsize);
         if (!new) {
-            free(cmd->env);
-            free(cmd);
-            return 0;  // Memory allocation failed
+            // perror("malloc failed");
+            // free(final_result);
+            // free(cmd->env);
+            // free(cmd);
+            return 0;
         }
+
         newp = new;
+        int in_single = 0;
+        int in_double = 0;
 
-        while (*old != '\0')
-        {
-            if (*old == '"') {
-                old++;  // Skip over quotes
-            }
-            else if (*old == '$') {
-                old++;  // Skip over the dollar sign
-                if (*old == '\0') return 0;  // No variable after $
+        while (*old != '\0') {
+            if (*old == '\'' && !in_double) {
+                in_single = !in_single;
+                *newp++ = *old++;
+                // old++;
+            } else if (*old == '"' && !in_single) {
+                in_double = !in_double;
+                *newp++ = *old++;
+                // old++;
+            } else if (*old == '$' && !in_single) {
+                old++;
+                if (*old == '\0') break;
 
-                // Handle variable expansion inside the quotes
                 if (*old == '$') {
                     old++;
-                    // rv = expand_pid(&newp, newsize - (newp - new));
-                    // if (rv < 0) return 0;
-                }
-                else if (*old == '?') {
+                    // Add PID logic if needed
+                } else if (*old == '?') {
                     old++;
                     rv = expand_status(&newp, newsize - (newp - new));
                     if (rv < 0) return 0;
-                }
-                else if (*old == '#') {
+                } else if (*old == '#') {
                     old++;
                     rv = expand_argc(&newp, newsize - (newp - new));
                     if (rv < 0) return 0;
-                }
-                else if (isdigit(*old)) {
+                } else if (isdigit(*old)) {
                     rv = expand_argv(&old, &newp, newsize - (newp - new));
                     if (rv < 0) return 0;
-                    old++; // move past the digit(s) already handled
-                }
-                else {
+                    old++;
+                } else {
                     int brace_flag = (*old == '{');
-                    // env = env->next;
-                    // printf("var: %s\n", env->var);
-                    rv = expand_env(&old, &newp, brace_flag, env->var, env);
-
+                    char var[256];
+                    rv = expand_env(&old, &newp, brace_flag, var, env);
                     if (rv < 0) return 0;
-					old++; // move past the variable name
                 }
-            }
-            else {
-                *newp++ = *old++;  // Copy normal character
+            } else {
+                *newp++ = *old++;
             }
         }
 
-        *newp = '\0';  // Null-terminate the expanded string
+        *newp = '\0';
 
-        // Assign the expanded value to cmd->env->val
-        // printf("Expanded value: %s\n", new);  // Print the expanded value
-        	    // cmd->env->val = ft_strdup(new);
-        	    // printf("cmd->env->val: %s\n", cmd->env->val);
-        	    // free(cmd->env->val);
-        	    //
-        cmd->env->val = new;  // Store the expanded string
-        	    // printf("here\n");
+        size_t part_len = ft_strlen(new);
+        char *temp = malloc(total_len + part_len + 1);
+        if (!temp) {
+            // free(new);
+            // free(final_result);
+            // free(cmd->env);
+            // free(cmd);
+            return 0;
+        }
 
+        if (final_result) {
+            ft_memcpy(temp, final_result, total_len);
+            free(final_result);
+        }
+
+        ft_memcpy(temp + total_len, new, part_len);
+        total_len += part_len;
+        temp[total_len] = '\0';
+        final_result = temp;
+
+        // free(new);
         tmp_token = tmp_token->next;
     }
-        printf("Expanded value: %s\n", cmd->env->val);  // Print the expanded value
 
-    return 1;
+    cmd->value_expand = final_result;
+    // printf("Expanded value: %s\n", cmd->value_expand);
+    // printf("Expanded value: %s\n", cmd->env->val);
+    return cmd->value_expand;
 }
-
-// int expand(t_token *token)
-// {
-//     char *old = NULL;
-//     int oldlen = 0;
-//     int newsize = 0;
-//     char *new = NULL;
-//     t_token *tmp_token = token;
-//     char *newp;
-//     int rv;
-//     t_cmd *cmd = malloc(sizeof(t_cmd));  // Ensure cmd is allocated
-//     if (!cmd) return 0;
-
-//     cmd->env = malloc(sizeof(t_env));  // Ensure env in cmd is allocated
-//     if (!cmd->env) {
-//         free(cmd);  // Free cmd if env allocation fails
-//         return 0;
-//     }
-
-//     // Initialize cmd->env to a safe state
-//     cmd->env->var = NULL;
-//     cmd->env->val = NULL;
-//     cmd->env->next = NULL;
-
-//     // Iterate through all tokens and expand them
-//     while (tmp_token)
-//     {
-//         old = tmp_token->value;
-//         oldlen = ft_strlen(old);
-//         newsize = oldlen * 2;
-//         new = malloc(newsize + 1);  // Allocate memory for the expanded string
-//         if (!new) {
-//             free(cmd->env);
-//             free(cmd);
-//             return 0;  // Memory allocation failed
-//         }
-//         newp = new;
-
-//         while (*old != '\0')
-//         {
-//             if (*old == '"') {
-//                 old++;  // Skip over quotes
-//             }
-//             else if (*old == '$') {
-//                 old++;  // Skip over the dollar sign
-//                 if (*old == '\0') return 0;  // No variable after $
-
-//                 // Handle different cases after $ symbol
-//                 if (*old == '$') {
-//                     old++;
-//                     rv = expand_pid(&newp, newsize - (newp - new));
-//                     if (rv < 0) return 0;
-//                 }
-//                 else if (*old == '?') {
-//                     old++;
-//                     rv = expand_status(&newp, newsize - (newp - new));
-//                     if (rv < 0) return 0;
-//                 }
-//                 else if (*old == '#') {
-//                     old++;
-//                     rv = expand_argc(&newp, newsize - (newp - new));
-//                     if (rv < 0) return 0;
-//                 }
-//                 else if (isdigit(*old)) {
-//                     rv = expand_argv(&old, &newp, newsize - (newp - new));
-//                     if (rv < 0) return 0;
-//                 }
-//                 else {
-//                     int brace_flag = (*old == '{');
-//                     rv = expand_env(&old, &newp, brace_flag);
-//                     if (rv < 0) return 0;
-//                 }
-//             }
-//             else {
-//                 *newp++ = *old++;  // Copy normal character
-//             }
-//         }
-
-//         *newp = '\0';  // Null-terminate the expanded string
-
-//         // Assign the expanded value to cmd->env->val
-//         cmd->env->val = new;  // Store the expanded string
-//         printf("Expanded value: %s\n", cmd->env->val);  // Print the expanded value
-
-//         tmp_token = tmp_token->next;
-//     }
-
-//     return 1;
-// }

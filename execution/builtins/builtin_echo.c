@@ -3,65 +3,73 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_echo.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-badd <mel-badd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 23:14:24 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/20 14:53:42 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/19 09:46:33 by mel-badd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+
 #include "../../include/minishell.h"
 
-int	check_mins_n(char **args)
+int  len_argsone(char *args)
 {
 	int i;
 
 	i = 1;
-	while (args[i])
-	{
-		if (!ft_strcmp(args[i], "-n"))
-			return 0;
-		i++;
-	}
-	return 1;
-}
-
-int    options_echo_pos(char **args)
-{
-	int	i;
-
-	i = 1;
-	while (args[i] && !ft_strcmp(args[i], "-n"))
+	if (args[0] == '-' && args[1] == 'n')
 	{
 		i++;
+		while (args[i] && args[i] == 'n')
+		{
+			if (args[i] != 'n')
+				return i;
+			i++;
+		}
 	}
 	return i;
 }
 
-void	ft_echo(char **args)
+int		ft_echo(char **args)
 {
 	int i;
+	int j;
+	int k;
 
-	i = options_echo_pos(args);
-	if (check_mins_n(args))
+	if (!args)
+		return 0;
+	j = 1;
+	k = 0;
+	while (args[j])
 	{
+		if (len_argsone(args[j]) != ft_strlen(args[j]))
+			break;
+		k++;
+		j++;
+	}
+	if (k == 0)
+	{
+		i = k + 1;
 		while (args[i])
 		{
-			printf("%s", args[i]);
+			ft_putstr_fd(args[i], 1);
 			if (args[i + 1] != NULL)
-				printf(" ");
+				ft_putstr_fd(" ", 1);
 			i++;
 		}
 		printf("\n");
 	}
-	else if (check_mins_n(args) == 0)
+	else if (k >= 1)
 	{
+		i = k + 1;
 		while (args[i])
 		{
-			printf("%s", args[i]);
+			ft_putstr_fd(args[i], 1);
 			if (args[i + 1] != NULL)
-				printf(" ");
+				ft_putstr_fd(" ", 1);
 			i++;
 		}
 	}
+	return 1;
 }
