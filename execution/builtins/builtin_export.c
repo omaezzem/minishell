@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 11:23:25 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/20 17:17:59 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/24 17:32:30 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,13 +127,11 @@ char	*check_var(char *var)
 		return NULL;
 	if (ft_isnum(var[0]))
 		return (minishell_invalid(var), NULL);
-	i = 0;
-	while (var[i])
+	i = -1;
+	while (var[++i])
 	{
 		if (var[i] == '+' &&  var[i+1] != '\0')
-		{
 			return (minishell_invalid(var), NULL);
-		}
 		if (!ft_isalnum(var[i]))
 		{
 			if (var[i-1])
@@ -144,7 +142,6 @@ char	*check_var(char *var)
 			return (minishell_invalid(var), free(parsvar), NULL);
 		}
 		parsvar[i] = var[i];
-		i++;
 	}
 	parsvar[i] = '\0';
 	return parsvar;
@@ -276,7 +273,6 @@ void	update_val_env(t_env *env, char *var, char *val)
 	{
 		if (ft_strcmp(env->var, var) == 0)
 		{
-			printf("----------1\n");
 			free(env->val); 
 			env->val = ft_strdup(val);
 			env = add;
@@ -496,7 +492,7 @@ int		ft_export(t_exp *exp, t_env *env, char **args)
 			i++;
 		}
 	}
-	if_double_var(&exp);
+	if_double_var(&exp); 
 	sort_exp_list(&exp);
 	if ((len_arg(args) == 1) && !ft_strcmp(args[0], "export"))
 	{

@@ -3,13 +3,12 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_echo.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-badd <mel-badd@student.42.fr>          +#+  +:+       +#+        */
+/*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 23:14:24 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/19 09:46:33 by mel-badd         ###   ########.fr       */
+/*   Updated: 2025/05/24 15:06:10 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 #include "../../include/minishell.h"
 

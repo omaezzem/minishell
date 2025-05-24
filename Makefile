@@ -6,11 +6,12 @@
 #    By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/03/14 02:29:51 by omaezzem          #+#    #+#              #
-#    Updated: 2025/05/20 17:40:20 by omaezzem         ###   ########.fr        #
+#    Updated: 2025/05/22 16:33:07 by omaezzem         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 #------------------------------Source Files------------------------------------#
+
 SRC = 	execution/builtins/builtin_cd.c \
 		execution/builtins/builtin_pwd.c \
 		execution/builtins/builtin_echo.c \
@@ -53,7 +54,6 @@ SRC = 	execution/builtins/builtin_cd.c \
 		utils/ft_strchr_add_one.c\
 		minishell.c\
 
-
 #------------------------------Object Files------------------------------------#
 OBJ = $(SRC:.c=.o)
 
@@ -69,12 +69,12 @@ READLINE_LINK = -lreadline -L$(shell brew --prefix readline)/lib
 
 #------------------------------Rules-------------------------------------------#
 all: $(NAME)
-	@echo "make ✅"
+
 $(NAME): $(OBJ)
-	@$(CC) $(CFLAGS) $(OBJ) $(READLINE_LINK)  -o $(NAME)
+	$(CC) $(CFLAGS) $(OBJ) $(READLINE_LINK)  -o $(NAME)
 
 %.o: %.c include/minishell.h
-	@$(CC) $(CFLAGS) $(READLINE_COMPILE) -c $< -o $@
+	$(CC) $(CFLAGS) $(READLINE_COMPILE) -c $< -o $@
 
 #------------Clean-------------------------------------------#
 clean:

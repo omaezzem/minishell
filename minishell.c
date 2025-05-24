@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 11:17:45 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/20 17:53:41 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/24 13:55:50 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ char *read_input(char *prompt)
 void sigint_handler(int sig)
 {
     (void)sig;
-    // rl_replace_line("", 0);
+    rl_replace_line("", 0);
     write(1, "\n", 1);
     rl_on_new_line();
     rl_redisplay();
@@ -50,41 +50,41 @@ void    f()
 }
 //handli SHLVL
 //
-void handle_heredoc(char *delimiter, int *fd) {
-    char *line = NULL;
-    size_t len = 0;
-    ssize_t read;
-    int tmp_fd = open(".heredoc_tmp", O_CREAT | O_WRONLY | O_TRUNC, 0600);
-    if (tmp_fd < 0) {
-        perror("open");
-        exit(EXIT_FAILURE);
-    }
+// void handle_heredoc(char *delimiter, int *fd) {
+//     char *line = NULL;
+//     size_t len = 0;
+//     ssize_t read;
+//     int tmp_fd = open(".heredoc_tmp", O_CREAT | O_WRONLY | O_TRUNC, 0600);
+//     if (tmp_fd < 0) {
+//         perror("open");
+//         exit(EXIT_FAILURE);
+//     }
 
-    while (1) {
-        write(STDOUT_FILENO, "> ", 2);
-        read = getline(&line, &len, stdin);
-        if (read == -1) {
-            perror("getline");
-            break;
-        }
-        // Remove newline character
-        if (line[read - 1] == '\n')
-            line[read - 1] = '\0';
-        if (ft_strcmp(line, delimiter) == 0)
-            break;
-        write(tmp_fd, line, ft_strlen(line));
-        write(tmp_fd, "\n", 1);
-    }
-    free(line);
-    close(tmp_fd);
+//     while (1) {
+//         write(STDOUT_FILENO, "> ", 2);
+//         read = getline(&line, &len, stdin);
+//         if (read == -1) {
+//             perror("getline");
+//             break;
+//         }
+//         // Remove newline character
+//         if (line[read - 1] == '\n')
+//             line[read - 1] = '\0';
+//         if (ft_strcmp(line, delimiter) == 0)
+//             break;
+//         write(tmp_fd, line, ft_strlen(line));
+//         write(tmp_fd, "\n", 1);
+//     }
+//     free(line);
+//     close(tmp_fd);
 
-    tmp_fd = open(".heredoc_tmp", O_RDONLY);
-    if (tmp_fd < 0) {
-        perror("open");
-        exit(EXIT_FAILURE);
-    }
-    *fd = tmp_fd;
-}
+//     tmp_fd = open(".heredoc_tmp", O_RDONLY);
+//     if (tmp_fd < 0) {
+//         perror("open");
+//         exit(EXIT_FAILURE);
+//     }
+//     *fd = tmp_fd;
+// }
 
 int main(int ac, char **av, char **envp)
 {
@@ -111,25 +111,13 @@ int main(int ac, char **av, char **envp)
         cmd = parse(env);
         if (!cmd)
             continue;
-        // handle_heredoc(cmd->files[0], &fd);
-        // int i;
-        // int j = 0;
-        // t_cmd *cmdd = cmd;
-        // while (cmdd->cmd)
+        // while (cmd)
         // {
-        //     i = 0;
-        //     while (cmdd->cmd[i] || cmdd->redirection[i] || cmdd->files[i])
-        //     {
-        //         printf("cmd[%d]>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>: %s\n", j,  cmdd->cmd[i]);
-        //         printf("cmd[%d]>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>: %s\n", j,  cmdd->redirection[i]);
-        //         printf("cmd[%d]>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>: %s\n", j,  cmdd->files[i]);
-        //         i++;
-        //     }
-        //     cmdd = cmdd->next;
-        //     j++;
+        //     for (i = 0; cmd->cmd && cmd->cmd[i]; i++)
+        //         printf("cmd->cmd[%d] = %s\n", i, cmd->cmd[i]);
+        //     cmd = cmd->next;
         // }
-        // printf("cmd----->%s\n", cmd->cmd[0]);
-        // printf("exp------>%s\n", cmd->value_expand);
+        // handle_heredoc(cmd->files[0], &fd)
         ft_execute(*exp, env, cmd, envp);
         dup2(STDERR_FILENO,STDOUT_FILENO);
     }

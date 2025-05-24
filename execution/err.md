@@ -51,3 +51,17 @@ int overflow in long 0
 == 999 -> ""
 > 999 -> 1
 > 0 -> 0
+
+
+
+
+==============================================================
+
+ls | /bin/cat
+
+for (i = 0; cmd->cmd && cmd->cmd[i]; i++)
+    printf("cmd->cmd[%d] = %s\n", i, cmd->cmd[i]);
+
+minishell$ ls | /bin/cat 
+cmd->cmd[0] = ls
+minishell$ 

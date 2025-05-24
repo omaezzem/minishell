@@ -6,11 +6,9 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 23:17:48 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/20 17:58:47 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/24 11:13:47 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-
 
 #ifndef MINISHELL_H
 #define MINISHELL_H
@@ -64,6 +62,7 @@ typedef  enum
 typedef struct s_env
 {
     char			*var;
+	int				fd;
 	char			*val;
 	struct  s_env	*next;
 }				t_env;
@@ -107,7 +106,7 @@ void	ft_lstadd_back_exp(t_exp **lst, t_exp *new);
 int		ft_strcmp(char *s1, char *s2);
 char	**mysplit(char *s, char c);
 void	free_split(char **arr);
-int	ft_strlen(char *str);
+int		ft_strlen(char *str);
 char	*ft_strdup(char *s);
 int		ft_isalnum(int c);
 char	*ft_strjoin(char *s1, char *s2);
@@ -152,6 +151,7 @@ void	minishell_invalid(char *invalid_str);
 int 	ft_do_redirections(char **files, char **redirections);
 void	update_val_env(t_env *env, char *var, char *val);
 void	update_val_exp(t_exp *exp, char *var, char *val);
+
 /*---------------------------------------------parsing--------------------------------------*/
 
 #define MAX_ENV 50
@@ -168,7 +168,7 @@ void	append_token(t_token **head, t_token *new_token);
 t_token	*create_token(char *value, t_type type);
 void	print_type(t_type type);
 t_type	get_token_type(char *str);
-int		error(t_token *tokens);
+int error(t_token *tokens, t_env *env);
 char	*ft_substr(char *s, int start, int len);
 int		error_pipe(t_token *tokens);
 void	sigint_handler(int sig);
@@ -186,6 +186,5 @@ char	*gitenv(const char* name);
 int		expand_argc(char **newp, int space_left);
 int		is_match(char *str, char *ptrn);
 int		expand_wildcard(char **oldp, char **newp, int space_left);
-
 
 #endif
