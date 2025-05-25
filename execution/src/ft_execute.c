@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 10:05:28 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/24 16:12:17 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/25 14:32:23 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,15 +88,31 @@ int is_builtin(char *args)
 	return 0;
 }
 
-int index_last_file(char **files)
+int index_last_outfile(char **files, char **redirections)
 {
 	int i = 0;
+	int s = 0;
 
-	while (files[i + 1] != NULL)
+	while (files[i] != NULL)
 	{
+		if(redirections[i][0] == '>')
+			s = i;
 		i++;
 	}
-	return i;
+	return s;
+}
+int index_last_infile(char **files, char **redirections)
+{
+	int i = 0;
+	int s = 0;
+
+	while (files[i] != NULL)
+	{
+		if(redirections[i][0] == '<')
+			s = i;
+		i++;
+	}
+	return s;
 }
 
 int len_cmd(t_cmd *data)
@@ -117,12 +133,16 @@ int len_cmd(t_cmd *data)
 int   ft_do_redirections(char **files, char **redirections)
 {
 	int fd;
-	int i_fl;
+	int i_outfl;
+	int i_infl;
 	int i;
-	int j;
 
 	if (files)
-		i_fl = index_last_file(files);
+	{
+		i_outfl = index_last_outfile(files, redirections);
+		i_infl = index_last_infile(files, redirections);
+	}
+		
 	if (files && redirections)
 	{
 		if (ft_len_redirections(redirections) == 1)
@@ -130,35 +150,41 @@ int   ft_do_redirections(char **files, char **redirections)
 		else
 		{
 			i = 0;
-			j = 0;
-			while (files[j] && j < i_fl)
+			while (files[i] && i < i_outfl)
 			{
 				if (ft_strcmp(redirections[i], ">") == 0
 					|| ft_strcmp(redirections[i], ">>") == 0)
 				{
 						ft_output_append(files, redirections, i);
 				}
-				else if (ft_strcmp(redirections[i], "<") == 0
+				i++;
+			}
+			i = 0;
+			while (files[i] && i < i_infl)
+			{
+				if (ft_strcmp(redirections[i], "<") == 0
 					|| ft_strcmp(redirections[i], "<<") == 0)
 				{
 					ft_inp_heredoc(files, redirections, i);
 				}
 				i++;
-				j++;
 			}
-			if (files[j] != NULL)
+			if (files[i_outfl] != NULL)
 			{
-				if (ft_strcmp(redirections[i], ">") == 0
-					|| ft_strcmp(redirections[i], ">>") == 0)
+				if (ft_strcmp(redirections[i_outfl], ">") == 0
+					|| ft_strcmp(redirections[i_outfl], ">>") == 0)
 				{
-					fd = ft_output_append(files, redirections, i);
+					fd = ft_output_append(files, redirections, i_outfl);
 					if (dup2(fd, STDOUT_FILENO) == -1)
 						return (close(fd), perror("minishell"), FAILURE);
 				}
-				else if (ft_strcmp(redirections[i], "<") == 0
-					|| ft_strcmp(redirections[i], "<<") == 0)
+			}
+			if (files[i_infl])
+			{
+				if (ft_strcmp(redirections[i_infl], "<") == 0
+					|| ft_strcmp(redirections[i_infl], "<<") == 0)
 				{
-					fd = ft_inp_heredoc(files, redirections, i);
+					fd = ft_inp_heredoc(files, redirections, i_infl);
 					if (dup2(fd, STDIN_FILENO) == -1)
 						return (close(fd), perror("minishell"), FAILURE);
 				}
@@ -193,7 +219,9 @@ int execute_multi_pipe(t_env *env, t_cmd *data, int numcmd, char **envp, t_exp *
 		i++;
 	}
 	i = 0;
-	while (i < numcmd)
+	if (!curr->cmd)
+		curr = curr->next, numcmd--;
+	while (i < numcmd && curr)
 	{
 		pids[i] = fork();
 		if (pids[i] == -1)
@@ -212,8 +240,7 @@ int execute_multi_pipe(t_env *env, t_cmd *data, int numcmd, char **envp, t_exp *
 			j = 0;
 			while (j < numcmd - 1)
 			{
-				close(pipes[j][0]);
-				close(pipes[j][1]);
+				(close(pipes[j][0]), close(pipes[j][1]));
 				j++;
 			}
 			if (is_builtin(curr->cmd[0]))
@@ -236,13 +263,16 @@ int execute_multi_pipe(t_env *env, t_cmd *data, int numcmd, char **envp, t_exp *
 				if (!commande)
 					exit(EXIT_FAILURE);
 				// printf("HELLO\n");
-				if (ft_strchr(data->cmd[0] , '/'))
+				if (data->cmd)
 				{
-					if (access(curr->cmd[0], X_OK | F_OK) == 0)
+					if (ft_strchr(data->cmd[0] , '/'))
 					{
-						commande[0] = ft_strdup(curr->cmd[i]);
-						commande[1] = NULL;
-						execve(curr->cmd[i], commande, envp);
+						if (access(curr->cmd[0], X_OK | F_OK) == 0)
+						{
+							commande[0] = ft_strdup(curr->cmd[i]);
+							commande[1] = NULL;
+							execve(curr->cmd[i], commande, envp);
+						}
 					}
 				}
 				j = 0;
@@ -404,17 +434,16 @@ int ft_execute(t_exp *exp, t_env *env, t_cmd *data, char **envp)
 		return (ft_do_redirections(data->files, data->redirection), 1);
 	if (data)
 		numcmd = len_cmd(data);
-	if (data->cmd[0])
+	if (notpipe(data) == 1)
 	{
-		if (notpipe(data) == 1)
-		{
-			if (is_builtin(data->cmd[0]))
-				ft_builtins(env, exp, data);
-			else
-				execute_single_cmd(env, envp, data);
-		}
+		if (is_builtin(data->cmd[0]))
+			ft_builtins(env, exp, data);
 		else
-			execute_multi_pipe(env, data, numcmd, envp, exp);
+			execute_single_cmd(env, envp, data);
+	}
+	else
+	{
+		execute_multi_pipe(env, data, numcmd, envp, exp);
 	}
 	return (1);
 }

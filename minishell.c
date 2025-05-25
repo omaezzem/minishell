@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 11:17:45 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/24 13:55:50 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/25 14:39:15 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,6 +104,7 @@ int main(int ac, char **av, char **envp)
     exp = &head;
     exp = ft_create_env_export(envp, exp);
 
+    // check
     signal(SIGINT, sigint_handler);
     signal(SIGQUIT, SIG_IGN);
     while (1)

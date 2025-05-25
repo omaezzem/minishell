@@ -55,13 +55,28 @@ int overflow in long 0
 
 
 
-==============================================================
+================================================================
 
-ls | /bin/cat
+minishell$ echo '"$HOME'"
+"$HOME 
+must be an error check bash 
 
-for (i = 0; cmd->cmd && cmd->cmd[i]; i++)
-    printf("cmd->cmd[%d] = %s\n", i, cmd->cmd[i]);
-
-minishell$ ls | /bin/cat 
-cmd->cmd[0] = ls
+minishell$ > $a
 minishell$ 
+must print ambigious redirect 
+
+minishell$ echo "$$$$HOME"
+/mnt/homes/omaezzem  ila kano majmou3 ta3 $ even maghayexpandix ola kan odd ayexpandi 
+check bash
+
+
+
+
+================================================================
+
+minishell$ echo loop > $aa"" 
+minishell: No such file or directory
+loop
+
+must be just 
+minishell: No such file or directory
