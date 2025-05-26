@@ -3,15 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   joining.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-badd <mel-badd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/17 11:33:09 by mel-badd          #+#    #+#             */
-/*   Updated: 2025/05/24 13:25:34 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/23 23:11:40 by mel-badd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/minishell.h"
 
+#include "../../include/minishell.h"
 char **append_string_array(char **arr, char *str)
 {
     int len = 0;
@@ -99,23 +99,23 @@ t_cmd *create_command_block_from_arrays(char **args, char **redir, char **files)
     cmd->next = NULL;
     return cmd;
 }
-// void print_cmd_list(t_cmd *cmd)
-// {
-//     // int i;
-//     // while (cmd)
-//     // {
-//     //     for (i = 0; cmd->cmd && cmd->cmd[i]; i++)
-//     //         printf("cmd->cmd[%d] = %s\n", i, cmd->cmd[i]);
+void print_cmd_list(t_cmd *cmd)
+{
+    int i;
+    while (cmd)
+    {
+        for (i = 0; cmd->cmd && cmd->cmd[i]; i++)
+            printf("cmd->cmd[%d] = %s\n", i, cmd->cmd[i]);
 
-//     //     for (i = 0; cmd->redirection && cmd->redirection[i]; i++)
-//     //         printf("cmd->redirection[%d] = %s\n", i, cmd->redirection[i]);
+        for (i = 0; cmd->redirection && cmd->redirection[i]; i++)
+            printf("cmd->redirection[%d] = %s\n", i, cmd->redirection[i]);
 
-//     //     for (i = 0; cmd->files && cmd->files[i]; i++)
-//     //         printf("cmd->files[%d] = %s\n", i, cmd->files[i]);
+        for (i = 0; cmd->files && cmd->files[i]; i++)
+            printf("cmd->files[%d] = %s\n", i, cmd->files[i]);
 
-//     //     cmd = cmd->next;
-//     // }
-// }
+        cmd = cmd->next;
+    }
+}
 
 
 t_cmd *joining2(t_token *tokens)
@@ -167,7 +167,7 @@ t_cmd *joining2(t_token *tokens)
         if (tokens && tokens->type == TOKEN_PIPE)
             tokens = tokens->next;
     }
-    // print_cmd_list(head);
+    print_cmd_list(head);
     return head;
 }
 

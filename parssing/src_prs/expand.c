@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   expand.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-badd <mel-badd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/18 20:00:24 by mel-badd          #+#    #+#             */
-/*   Updated: 2025/05/22 16:41:21 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/23 23:42:16 by mel-badd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
-
+#include <stdio.h>
+#include <string.h>
 
 extern int prev_status;
 // static char *append_to_result(char *final, const char *part, size_t total_len) {
@@ -165,32 +166,66 @@ char *expand(t_token *token, t_env *env) {
 
         while (*src) {
             if (*src == '\'' && !in_double) {
-                in_single = !in_single; // toggle single quote
-                // include the quote in result
+                in_single = !in_single;
                 result = append_to_result(result, "'", total++);
                 src++;
                 continue;
             }
             if (*src == '\"' && !in_single) {
-                in_double = !in_double; // toggle double quote
-                // include the quote in result
+                in_double = !in_double;
                 result = append_to_result(result, "\"", total++);
                 src++;
                 continue;
             }
 
             if (*src == '$' && !in_single) {
-                src++;
-                char varname[256];
-                int brace = (*src == '{');
-                if (brace) src++;
-                int i = 0;
-                while ((brace ? *src && *src != '}' : (ft_isalnum(*src) || *src == '_')) && i < 255) {
-                    varname[i++] = *src++;
+                // Count consecutive $ signs
+                int dollar_count = 0;
+                while (*src == '$') {
+                    dollar_count++;
+                    src++;
                 }
-                varname[i] = '\0';
-                if (brace && *src == '}') src++;
 
+                int escape_count = dollar_count / 2;
+                int expand = dollar_count % 2;
+
+                // Append escaped $'s
+                for (int i = 0; i < escape_count; i++) {
+                    result = append_to_result(result, "$", total);
+                    total++;
+                }
+
+                if (!expand) continue; // if even, no expansion
+
+                // Now parse variable name for expansion
+                char varname[256] = {0};
+                int brace = (*src == '{');
+                int valid = 0;
+
+                if (brace) {
+                    src++;  // skip {
+                    int i = 0;
+                    while (*src && *src != '}' && i < 255)
+                        varname[i++] = *src++;
+                    varname[i] = '\0';
+                    if (*src == '}') src++;  // skip }
+                    valid = i > 0;
+                } else if (*src == '?' || *src == '#' || *src == '$' || isdigit(*src) || ft_isalpha(*src) || *src == '_') {
+                    int i = 0;
+                    while ((ft_isalnum(*src) || *src == '_') && i < 255)
+                        varname[i++] = *src++;
+                    varname[i] = '\0';
+                    valid = i > 0;
+                }
+
+                if (!valid) {
+                    // Invalid var: just output one $
+                    result = append_to_result(result, "$", total);
+                    total++;
+                    continue;
+                }
+
+                // Expand the var
                 char *val = NULL;
                 if (strcmp(varname, "?") == 0) {
                     char buf[16];
@@ -205,7 +240,7 @@ char *expand(t_token *token, t_env *env) {
                     snprintf(buf, sizeof(buf), "%d", getpid());
                     val = buf;
                 } else if (isdigit(varname[0])) {
-                    int idx = varname[0] - '0' + cmdline_shift;
+                    int idx = atoi(varname) + cmdline_shift;
                     val = (idx < cmdline_argc) ? cmdline_argv[idx] : "";
                 } else {
                     val = find_env(env, varname);
@@ -233,6 +268,5 @@ char *expand(t_token *token, t_env *env) {
         token = token->next;
     }
 
-    // printf("result: %s\n", result);
     return result;
 }

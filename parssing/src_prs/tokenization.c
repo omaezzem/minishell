@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tokenization.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-badd <mel-badd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/17 11:14:49 by mel-badd          #+#    #+#             */
-/*   Updated: 2025/05/22 16:40:52 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/23 23:42:28 by mel-badd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,6 @@ t_type get_token_type(char *str)
 		return TOKEN_HEREDOC;
 	if (ft_strcmp(str, "<") == 0)
 		return TOKEN_REDIRECT_IN;
-    // if (ft_strcmp(str, "'") == 0)
-    //     return TOKEN_SQUOTE;
 	if (ft_strcmp(str, ">") == 0)
 		return TOKEN_REDIRECT_OUT;
 	if (ft_strcmp(str, "(") == 0)
@@ -34,16 +32,8 @@ t_type get_token_type(char *str)
 		return TOKEN_SPACE;
 	if (ft_strcmp(str, ")") == 0)
 		return TOKEN_CLOSE_PAREN;
-	// if (str[0] == '-' || str[0] == '~')
-	// 	return TOKEN_OPTION;
 	if (ft_strcmp(str, "~/") == 0)
 		return TOKEN_OPTION;
-	// if (ft_strcmp(str,  "\"\"") == 0)
-	// 	return TOKEN_DQUOTE;
-    // if (ft_strchr(str, '\''))
-    //     return TOKEN_WORD;
-    // if (ft_strchr(str, \"\"'))
-    //     return TOKEN_WORD;
 	return TOKEN_WORD;
 }
 
@@ -93,216 +83,124 @@ int		issspace(int c)
 
 void mark_file_tokens(t_token *tokens)
 {
-	while (tokens && tokens->next)
-	{
-		if (tokens->type == TOKEN_REDIRECT_IN ||
-			tokens->type == TOKEN_REDIRECT_OUT ||
-			tokens->type == TOKEN_APPEND ||
-			tokens->type == TOKEN_HEREDOC)
-		{
-			if (tokens->next->type == TOKEN_SPACE &&
-				tokens->next->next &&
-				tokens->next->next->type == TOKEN_WORD)
-			{
-				tokens->next->next->type = TOKEN_FILE;
-			}
-			else if (tokens->next->type == TOKEN_WORD)
-			{
-				tokens->next->type = TOKEN_FILE;
-			}
-		}
-		tokens = tokens->next;
-	}
+    while (tokens)
+    {
+        if (tokens->type == TOKEN_REDIRECT_IN ||
+            tokens->type == TOKEN_REDIRECT_OUT ||
+            tokens->type == TOKEN_APPEND ||
+            tokens->type == TOKEN_HEREDOC)
+        {
+            t_token *next = tokens->next;
+            while (next && next->type == TOKEN_SPACE)
+                next = next->next;
+            if (next && next->type == TOKEN_WORD)
+            {
+                printf("Marking token '%s' as TOKEN_FILE\n", next->value);
+                next->type = TOKEN_FILE;
+            }
+        }
+        tokens = tokens->next;
+    }
 }
 
-void hansle_space(int start, int *i, char *input, t_token **tokens)
+
+
+int ft_issspace(char c)
 {
-    start = *i;
-    while (issspace(input[*i]))
-        (*i)++;
-    char *space = ft_substr(input, start, *i - start);
-    append_token(tokens, create_token(space, TOKEN_SPACE));
-    free(space);
+    return (c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r');
 }
-void handle_quotes(int *i, char *input, t_token **tokens)
+
+int redir_pipe(char c)
 {
-    char quote = input[*i];
-    int start = *i;
-    (*i)++;  // Skip opening quote
-
-    while (input[*i] && input[*i] != quote)
-        (*i)++;
-
-    if (input[*i] == quote)
-        (*i)++;  // Include closing quote
-
-    char *quoted = ft_substr(input, start, *i - start);
-    append_token(tokens, create_token(quoted, TOKEN_WORD));
-    free(quoted);
+    return (c == '|' || c == '>' || c == '<' || c == '(' || c == ')');
 }
+
+int handle_redir(char *input, t_token **head, int i)
+{
+    int start = i;
+
+    if ((input[i] == '>' || input[i] == '<') && input[i+1] == input[i])
+        i += 2; // handles >> or <<
+    else
+        i++;
+
+    char *tmp = ft_substr(input, start, i - start);
+    t_token *new_token = create_token(tmp, get_token_type(tmp));
+    append_token(head, new_token);
+    free(tmp);
+    return i;
+}
+
+int skip_quotes(const char *s, int i) {
+    char quote = s[i++];
+    while (s[i] && s[i] != quote) {
+        if (s[i] == '\\' && quote == '\"' && s[i + 1])
+            i += 2;
+        else
+            i++;
+    }
+    return (s[i] == quote) ? i + 1 : i; // skip closing quote if found
+}
+
+int add_word(char *input, t_token **head, int i)
+{
+    int start;
+
+    start = i;
+    while (input[i] && !ft_issspace(input[i]) && !redir_pipe(input[i]))
+    {
+        if (input[i] == '\'' || input[i] == '"')
+        {
+            char quote = input[i++];
+            while (input[i] && input[i] != quote)
+                i++;
+            if (!input[i]) {
+                printf("minishell: syntax error: unclosed quote\n");
+                return -1;
+            }
+            i++;
+        }
+        else
+            i++;
+    }
+    char *tmp = ft_substr(input, start, i - start);
+    t_token *new_token = create_token(tmp, get_token_type(tmp));
+    append_token(head, new_token);
+    free(tmp);
+    return i;
+}
+
+
 
 t_token *tokenize(char *input)
 {
-    t_token *tokens = NULL;
+    t_token *head = NULL;
     int i = 0;
 
+    while (input[i] && ft_issspace(input[i]))
+        i++; // Skip leading spaces
     while (input[i])
     {
-        if (issspace(input[i]))
+        if (ft_issspace(input[i])) {
+            int start = i;
+            while (ft_issspace(input[i])) i++;
+            char *tmp = ft_substr(input, start, i - start);
+            append_token(&head, create_token(tmp, TOKEN_SPACE));
+            free(tmp);
+        }
+        else if (redir_pipe(input[i]))
+            i = handle_redir(input, &head, i);
+        else
+            i = add_word(input, &head, i);
+        if (i < 0)
         {
-            hansle_space(i, &i, input, &tokens);
-            continue;
-        }
-        if (input[i] == '\'' || input[i] == '"')
-        {
-            handle_quotes(&i, input, &tokens);
-            continue;
-        }
-
-        // Handle operators (existing code)
-        if (ft_strchr("><|&", input[i]) && input[i] == input[i + 1]) {
-            char op[3] = {input[i], input[i + 1], '\0'};
-            append_token(&tokens, create_token(op, get_token_type(op)));
-            i += 2;
-            continue;
-        }
-
-        // Handle single-character operators
-        if (ft_strchr("><|()", input[i])) {
-            char op[2] = {input[i], '\0'};
-            append_token(&tokens, create_token(op, get_token_type(op)));
-            i++;
-            continue;
-        }
-
-        // Handle variable assignments with quoted values
-        int start = i;
-        while (input[i] && !issspace(input[i]))
-        {
-            if (input[i] == '=' && (input[i+1] == '"' || input[i+1] == '\'')) {
-                // Skip = and quote
-                i += 2;
-                char quote = input[i-1];
-
-                // Find closing quote
-                while (input[i] && input[i] != quote)
-                    i++;
-
-                if (input[i] == quote)
-                    i++;  // Skip closing quote
-            }
-            else if (ft_strchr("><|()'\"", input[i])) {
-                break;
-            }
-            else {
-                i++;
-            }
-        }
-
-        if (i > start) {
-            char *word = ft_substr(input, start, i - start);
-            append_token(&tokens, create_token(word, TOKEN_WORD));
-            free(word);
+            // free_token_list(head);
+            return NULL; // Error in tokenization
         }
     }
-
-    mark_file_tokens(tokens);
-    return tokens;
+    return head;
 }
-t_token *tokenize_2(char *input)
-{
-    t_token *tokens = NULL;
-    int i = 0;
 
-    while (input[i])
-    {
-        if (issspace(input[i])) {
-            int start = i;
-            while (issspace(input[i]))
-                i++;
-            char *space = ft_substr(input, start, i - start);
-            append_token(&tokens, create_token(space, TOKEN_SPACE));
-            free(space);
-            continue;
-        }
-        if (ft_strchr("><|& ~/", input[i]) && input[i] == input[i + 1])
-        {
-            char op[3] = {input[i], input[i + 1], '\0'};
-            append_token(&tokens, create_token(op, get_token_type(op)));
-            i += 2;
-            continue;
-        }
-        // Handle quotes (single and double quotes as separate tokens)
-        if (input[i])
-        {
-            // char quote = input[i];  // Determine whether it's single or double quote
-            int start = i;
-            i++;  // Skip the opening quote
-
-            // Capture everything inside the quotes until we find the closing quote
-            while (input[i] && input[i] != ' ')
-                i++;
-            // If we reach the end of the string and no closing quote, print error
-            // if (input[i] == '\0') {
-            //     printf("minishell: syntax error: unmatched quote '%c'\n", quote);
-            //     return NULL;  // Return NULL indicating an error
-            // }
-
-            // Otherwise, we found the closing quote, so move past it
-            i++;  // Skip the closing quote
-
-            // Optionally, you can add the quoted string as a token here
-            char *quoted = ft_substr(input, start, i - start);  // Extract the quoted string)
-            append_token(&tokens, create_token(quoted, get_token_type(quoted)));
-            free(quoted);  // Free the extracted quoted string
-            continue;
-        }
-        if (input[i] == '$' || input[i + 1] != '{')
-        {
-        if (input[i] == '$') {
-            int start = i++;
-            if (input[i] == '{') {
-                i++; // skip '{'
-                while (input[i] && input[i] != '}')
-                    i++;
-                if (input[i] == '\0') {
-                    printf("minishell: syntax error: unmatched '{'\n");
-                    return NULL;
-                }
-                i++; // skip '}'
-            } else {
-                while (isalnum(input[i]) || input[i] == '_')
-                    i++;
-            }
-            char *var = ft_substr(input, start, i - start);
-            append_token(&tokens, create_token(var, get_token_type(var)));
-            free(var);
-            continue;
-            }
-
-        }
-        // Handle double-character operators (e.g., >>, ||, etc.)
-        // Handle single-character operators (e.g., <, >, |, (, ))
-        if (ft_strchr("><|()'", input[i]))
-        {
-            char op[2] = {input[i], '\0'};
-            append_token(&tokens, create_token(op, get_token_type(op)));
-            i++;
-            continue;
-        }
-
-        // Handle regular words (non-special tokens)
-        int start = i;
-        while (input[i] && !issspace(input[i]) && !ft_strchr("><|()'\"'", input[i]))
-            i++;
-        char *word = ft_substr(input, start, i - start);
-        append_token(&tokens, create_token(word, get_token_type(word)));
-        free(word);
-    }
-
-    mark_file_tokens(tokens);  // Mark tokens related to file operations (if any)
-    return tokens;
-}
 
 // t_cmd *parse(void)
 // {
@@ -595,7 +493,7 @@ int check_ambiguous_redirection(t_token *tokens, t_env *env)
 
             if (target && target->type == TOKEN_FILE && target->value[0] == '$')
             {
-                expanded = expand(target, env);
+                expand(target, env);
                 if (!expanded || ft_strcmp(expanded, "") == 0)
                 {
                     printf("minishell: %s: ambiguous redirect\n", target->value);
@@ -610,6 +508,52 @@ int check_ambiguous_redirection(t_token *tokens, t_env *env)
     return 1;
 }
 
+t_token *handle_tokenz_expansion(char *qote)
+{
+    t_token *tokens = NULL;
+    int i = 0;
+
+    while (qote[i])
+    {
+        // Skip whitespace and emit space token
+        if (ft_issspace(qote[i]))
+        {
+            while (qote[i] && ft_issspace(qote[i]))
+                i++;
+            append_token(&tokens, create_token(ft_strdup(" "), TOKEN_SPACE));
+        }
+        else
+        {
+            int start = i;
+            int in_single = 0, in_double = 0;
+
+            while (qote[i])
+            {
+                if (!in_single && qote[i] == '"' && !in_double)
+                    in_double = 1;
+                else if (in_double && qote[i] == '"')
+                    in_double = 0;
+                else if (!in_double && qote[i] == '\'' && !in_single)
+                    in_single = 1;
+                else if (in_single && qote[i] == '\'')
+                    in_single = 0;
+
+                if (!in_single && !in_double && ft_issspace(qote[i]))
+                    break;
+
+                i++;
+            }
+
+            char *word = ft_substr(qote, start, i - start);
+            append_token(&tokens, create_token(word, TOKEN_WORD));
+            free(word);
+        }
+    }
+
+    return tokens;
+}
+
+
 
 
 t_cmd *parse(t_env *env)
@@ -617,7 +561,6 @@ t_cmd *parse(t_env *env)
     t_token *tokens;
     t_cmd *cmd = NULL;
     char *input;
-    char *quoted;
 
     input = read_input("minishell$ ");
     tokens = tokenize(input);
@@ -626,137 +569,33 @@ t_cmd *parse(t_env *env)
         return NULL;
 
     mark_file_tokens(tokens);
-
-    // Debug print: print all tokens and their types
-    // t_token *tmp = tokens;
-    // while (tmp)
-    // {
-    //     printf("Value: %s\t", tmp->value);
-    //     print_type(tmp->type);
-    //     tmp = tmp->next;
-    // }
-
-    // Basic syntax error checks
+    t_token *tmp = tokens;
+    while (tmp)
+    {
+        printf("Value: %s\t", tmp->value);
+        print_type(tmp->type);
+        tmp = tmp->next;
+    }
     if (tokens->type == TOKEN_PIPE)
     {
         printf("minishell: syntax error near unexpected token '%s'\n", tokens->value);
         return NULL;
     }
-
     if (!error(tokens, env)) return NULL;
-    if (!error_pipe(tokens)) return NULL;
     if(check_ambiguous_redirection(tokens, env) == 0)
         return NULL;
-
-    // Expand environment variables
-    quoted = expand(tokens, env);
-    if (!quoted)
+    char *qote = expand(tokens, env);
+    tmp = tokens;
+    while (tmp)
     {
-        printf("Expansion error\n");
-        return NULL;
+        printf("Value: %s\t", tmp->value);
+        print_type(tmp->type);
+        tmp = tmp->next;
     }
-
-    // Re-tokenize the expanded string
-    tokens = tokenize(quoted);
-    free(quoted);
-    if (!tokens)
-        return NULL;
-
+    tokens = handle_tokenz_expansion(qote);
+    tokens = tokenize(qote);
     mark_file_tokens(tokens);
-
-    // Build the command structure
-//    int i;
-//         int j = 0;
-//         // t_cmd *cmdd = cmd;
-//         while (cmdd->cmd)
-//         {
-//             i = 0;
-//             while (cmdd->cmd[i])
-//             {
-//                 printf("cmd[%d]>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>: %s\n", j,  cmdd->cmd[i]);
-//                 // printf("cmd[%d]>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>: %s\n", j,  cmdd->cmd[i]);
-//                 i++;
-//             }
-//             cmdd = cmdd->next;
-//             j++;
-//         }
    cmd = joining2(tokens);
-   if (!cmd)
-    cmd = joining(tokens);
-        // int i;
-        // int j = 0;
-        // t_cmd *cmdd = cmd;
-        // while (cmdd->cmd)
-        // {
-        //     i = 0;
-        //     while (cmdd->cmd[i])
-        //     {
-        //         printf("cmd[%d]>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>: %s\n", j,  cmdd->cmd[i]);
-        //         // printf("cmd[%d]>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>: %s\n", j,  cmdd->cmd[i]);
-        //         i++;
-        //     }
-        //     cmdd = cmdd->next;
-        //     j++;
-        // }
-    // t_token *tmp2 = tokens;
-    // while (tmp2)
-    // {
-    //     printf("Value: %s\t", tmp2->value);
-    //     print_type(tmp2->type);
-    //     tmp2 = tmp2->next;
-    // }
-    // if (!cmd) {
-        // if (!cmd)
-        // {
-    //         printf("Joining error\n");
-    //         return NULL;
-    //     }
-    // }
-        // if (!cmd)
-        // {
-        //     printf("Joining error\n");
-        //     return NULL;
-        // }
-        // int i = 0;
-        // t_cmd *cmdd = cmd;
-        // while (cmdd)
-        // {
-        //     if (ft_strcmp(cmdd->redirection[i], ">>") == 0)
-        //     {
-        //         ft_output_append(cmdd->files[i], cmdd->cmd[0], i);
-        //     }
-        //     i++;
-        // }
-    // printf("cmd is NULL\n");
-    // return NULL;
-// }
-
-    // while (cmd->cmd)
-    // {
-    //     printf("cmd[%d]>>>>>>>>>>>>>>>>>>>>>>dgdfg>>>>>>>", i++);
-    //     for (int j = 0; cmd->cmd[j]; j++)
-    //     {
-    //         printf("%s", cmd->cmd[j]);
-    //         if (cmd->cmd[j + 1])
-    //             printf(" ");
-    //     }
-    //     printf("\n");
-    // }
-    // Remove quotes from cmd fields (not from tokens)
     remove_quotes_cmd(cmd);
-    // printf("cmd : %p\n", cmd->cmd[0]);
-        //     int i;
-        // int j = 0;
-        // while (cmd->cmd)
-        // {
-        //     i = 0;
-        //     while (cmd->cmd[i])
-        //     {
-        //         printf("cmd[%d]>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>: %s\n", j,  cmd->cmd[i]);
-        //         i++;
-        //     }
-        //     cmd = cmd->next;
-        //     j++;
-        // }
     return cmd;
 }

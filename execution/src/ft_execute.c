@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 10:05:28 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/25 14:32:23 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/26 18:15:12 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ int ft_builtins(t_env *env, t_exp *exp, t_cmd *data)
 	else if (ft_strcmp(data->cmd[0], "cd") == 0)
 		return (ft_cd(env, data->cmd), 1);
 	else if (ft_strcmp(data->cmd[0], "pwd") == 0)
-		return (ft_pwd(), 1);
+		return (ft_pwd(env), 1);
 	else if (ft_strcmp(data->cmd[0], "export") == 0)
 		return (ft_export(exp, env, data->cmd), 1);
 	else if (ft_strcmp(data->cmd[0], "env") == 0)
@@ -342,84 +342,83 @@ int execute_multi_pipe(t_env *env, t_cmd *data, int numcmd, char **envp, t_exp *
 	return 1;
 }
 
+int execute_path(t_cmd *data, char **envp, char **commande)
+{
+	if (ft_strchr(data->cmd[0] , '/'))
+	{
+		if (access(data->cmd[0], X_OK | F_OK) == 0)
+		{
+			commande[0] = ft_strdup(data->cmd[0]);
+			commande[1] = NULL;
+			execve(data->cmd[0], commande, envp);
+			return (perror("minishell"), exit(EXIT_FAILURE), 0);
+		}
+		else
+			return (perror("minishell"), exit(EXIT_FAILURE), 0);
+	}
+	return 1;
+}
+
+void	invalid_msg(char *cmd)
+{
+	ft_putstr_fd("minishell: ", 2);
+	ft_putstr_fd(cmd, 2);
+	ft_putstr_fd(": command not found\n", 2);
+	exit(EXIT_FAILURE);
+}
+
+void	access_and_execute(char *path, char **commande, t_cmd *data, char **envp)
+{
+	char	**splitpath;
+	char	*joinslash;
+	char	*cmd;
+	int		i;
+
+	splitpath = mysplit(path, ':');
+	if (!splitpath)
+	{
+		free(commande);
+		exit(EXIT_FAILURE);
+	}
+	i = -1;
+	while (data->cmd[++i])
+		commande[i] = ft_strdup(data->cmd[i]);
+	commande[i] = NULL;
+	i = -1;
+	while (splitpath[++i])
+	{
+		joinslash = ft_strjoin(splitpath[i], "/");
+		cmd = ft_strjoin(joinslash, data->cmd[0]);
+		free(joinslash);
+		if (access(cmd, X_OK | F_OK) == 0)
+			execve(cmd, commande, envp);
+	}
+	free_split(splitpath);
+}
+
 int execute_single_cmd(t_env *env, char **envp, t_cmd *data)
 {
 	char *path;
-	char **splitpath;
-	char *joinslash;
-	char *cmd;
-	int i;
 	int pid;
 	char **commande;
-	int lenargs;
-
 
 	if (!data->cmd[0] || !env)
 		return 0;
-	lenargs = len_arg(&data->cmd[0]);
 	pid = fork();
 	if (pid == 0)
 	{
+		signal(SIGQUIT, SIG_DFL);
 		if (data->files && data->redirection)
 			ft_do_redirections(data->files, data->redirection);
-		i = 0;
-		commande = malloc(sizeof(char *) * (lenargs + 1));
+		commande = malloc(sizeof(char *) * (len_arg(&data->cmd[0]) + 1));
 		if (!commande)
 			exit(EXIT_FAILURE);
-		if (ft_strchr(data->cmd[0] , '/'))
-		{
-			if (access(data->cmd[0], X_OK | F_OK) == 0)
-			{
-				commande[0] = ft_strdup(data->cmd[0]);
-				commande[1] = NULL;
-				execve(data->cmd[0], commande, envp);
-				perror("minishell");
-				exit(EXIT_FAILURE);
-			}
-			else
-			{
-				perror("minishell");
-				exit(EXIT_FAILURE);
-			}
-		}
+		execute_path(data, envp, commande);
 		path = find_env(env, "PATH");
 		if (!path)
-		{
-			ft_putstr_fd("minishell: ", 2);
-			ft_putstr_fd(data->cmd[0], 2);
-			ft_putstr_fd(": command not found\n", 2);
-			free(commande);
-			exit(EXIT_FAILURE);
-		}
-		splitpath = mysplit(path, ':');
-		if (!splitpath)
-		{
-			free(commande);
-			exit(EXIT_FAILURE);
-		}
-		i = 0;
-		while (data->cmd[i])
-		{
-			commande[i] = ft_strdup(data->cmd[i]);
-			i++;
-		}
-		commande[i] = NULL;
-		i = 0;
-		while (splitpath[i])
-		{
-			joinslash = ft_strjoin(splitpath[i], "/");
-			cmd = ft_strjoin(joinslash, data->cmd[0]);
-			free(joinslash);
-			if (access(cmd, X_OK | F_OK) == 0)
-				execve(cmd, commande, envp);
-			i++;
-		}
-		free_split(commande);
-		free_split(splitpath);
-		ft_putstr_fd("minishell: ", 2);
-		ft_putstr_fd(data->cmd[0], 2);
-		ft_putstr_fd("  command not found\n", 2);
-		exit(EXIT_FAILURE);
+			(invalid_msg(data->cmd[0]), free(commande));
+		access_and_execute(path, commande, data, envp);
+		(free_split(commande), invalid_msg(data->cmd[0]), exit(EXIT_FAILURE));
 	}
 	else
 		waitpid(pid, NULL, 0);

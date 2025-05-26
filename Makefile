@@ -6,19 +6,29 @@
 #    By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/03/14 02:29:51 by omaezzem          #+#    #+#              #
-#    Updated: 2025/05/22 16:33:07 by omaezzem         ###   ########.fr        #
+#    Updated: 2025/05/26 11:33:13 by omaezzem         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 #------------------------------Source Files------------------------------------#
 
-SRC = 	execution/builtins/builtin_cd.c \
+SRC = 	execution/builtins/cd/builtin_cd.c \
+		execution/builtins/cd/utils_cd.c\
 		execution/builtins/builtin_pwd.c \
 		execution/builtins/builtin_echo.c \
 		execution/builtins/builtin_env.c \
 		execution/builtins/builtin_exit.c \
-		execution/builtins/builtin_export.c \
 		execution/builtins/builtin_unset.c \
+		execution/builtins/ft_export/builtin_export.c\
+		execution/builtins/ft_export/add_to.c\
+		execution/builtins/ft_export/create_exp.c\
+		execution/builtins/ft_export/parse_exp.c\
+		execution/builtins/ft_export/rm_double_var.c\
+		execution/builtins/ft_export/search.c\
+		execution/builtins/ft_export/update.c\
+		execution/builtins/ft_export/sort_exp.c\
+		execution/builtins/ft_export/utils_export.c\
+		execution/builtins/ft_export/parset_exp.c\
 		execution/env/env.c \
 		execution/utils_exe.c/free_ptr.c \
 		execution/utils_exe.c/len_redirections.c\
@@ -26,6 +36,7 @@ SRC = 	execution/builtins/builtin_cd.c \
 		execution/utils_exe.c/ft_lstadd_back.c \
 		execution/utils_exe.c/ft_lstnew.c \
 		execution/utils_exe.c/mysplit.c \
+		execution/utils_exe.c/len_args.c\
 		execution/src/ft_execute.c \
 		execution/src/single_redirect.c\
 		execution/src/redirections.c\

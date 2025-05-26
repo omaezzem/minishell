@@ -6,15 +6,15 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 23:14:24 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/24 15:06:10 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/26 10:05:33 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-int  len_argsone(char *args)
+int	len_argsone(char *args)
 {
-	int i;
+	int	i;
 
 	i = 1;
 	if (args[0] == '-' && args[1] == 'n')
@@ -23,30 +23,17 @@ int  len_argsone(char *args)
 		while (args[i] && args[i] == 'n')
 		{
 			if (args[i] != 'n')
-				return i;
+				return (i);
 			i++;
 		}
 	}
-	return i;
+	return (i);
 }
 
-int		ft_echo(char **args)
+void	print_echo(int k, char **args)
 {
-	int i;
-	int j;
-	int k;
+	int	i;
 
-	if (!args)
-		return 0;
-	j = 1;
-	k = 0;
-	while (args[j])
-	{
-		if (len_argsone(args[j]) != ft_strlen(args[j]))
-			break;
-		k++;
-		j++;
-	}
 	if (k == 0)
 	{
 		i = k + 1;
@@ -70,5 +57,24 @@ int		ft_echo(char **args)
 			i++;
 		}
 	}
-	return 1;
+}
+
+int	ft_echo(char **args)
+{
+	int	j;
+	int	k;
+
+	if (!args)
+		return (0);
+	j = 1;
+	k = 0;
+	while (args[j])
+	{
+		if (len_argsone(args[j]) != ft_strlen(args[j]))
+			break ;
+		k++;
+		j++;
+	}
+	print_echo(k, args);
+	return (1);
 }

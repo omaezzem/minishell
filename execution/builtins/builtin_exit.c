@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 05:58:14 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/24 15:50:29 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/26 10:06:23 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ int	is_num(char *str)
 	int	i;
 
 	i = 0;
-	if (str[0] == '-' || str[0] == '+') 
+	if (str[0] == '-' || str[0] == '+')
 		i++;
 	if (!str[i])
 		return (FAILURE);
@@ -32,7 +32,7 @@ int	is_num(char *str)
 
 int	len_arg(char **args)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	if (args)
@@ -42,6 +42,7 @@ int	len_arg(char **args)
 	}
 	return (i);
 }
+
 static int	calculate_exit_code(int exit_code)
 {
 	int	modulo;
