@@ -99,23 +99,23 @@ t_cmd *create_command_block_from_arrays(char **args, char **redir, char **files)
     cmd->next = NULL;
     return cmd;
 }
-void print_cmd_list(t_cmd *cmd)
-{
-    int i;
-    while (cmd)
-    {
-        for (i = 0; cmd->cmd && cmd->cmd[i]; i++)
-            printf("cmd->cmd[%d] = %s\n", i, cmd->cmd[i]);
+// void print_cmd_list(t_cmd *cmd)
+// {
+//     int i;
+//     while (cmd)
+//     {
+//         for (i = 0; cmd->cmd && cmd->cmd[i]; i++)
+//             printf("cmd->cmd[%d] = %s\n", i, cmd->cmd[i]);
 
-        for (i = 0; cmd->redirection && cmd->redirection[i]; i++)
-            printf("cmd->redirection[%d] = %s\n", i, cmd->redirection[i]);
+//         for (i = 0; cmd->redirection && cmd->redirection[i]; i++)
+//             printf("cmd->redirection[%d] = %s\n", i, cmd->redirection[i]);
 
-        for (i = 0; cmd->files && cmd->files[i]; i++)
-            printf("cmd->files[%d] = %s\n", i, cmd->files[i]);
+//         for (i = 0; cmd->files && cmd->files[i]; i++)
+//             printf("cmd->files[%d] = %s\n", i, cmd->files[i]);
 
-        cmd = cmd->next;
-    }
-}
+//         cmd = cmd->next;
+//     }
+// }
 
 
 t_cmd *joining2(t_token *tokens)
@@ -167,7 +167,7 @@ t_cmd *joining2(t_token *tokens)
         if (tokens && tokens->type == TOKEN_PIPE)
             tokens = tokens->next;
     }
-    print_cmd_list(head);
+    // print_cmd_list(head);
     return head;
 }
 

@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 11:03:16 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/26 15:35:47 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/28 13:48:28 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ t_env	*give_env(char **env, t_env **ev)
 		new_node->var = ft_strdup(eqsplit[0]);
 		new_node->val = ft_strdup(eqsplit[1]);
 		new_node->next = NULL;
-		(ft_lstadd_back_env(ev, new_node),free_split(eqsplit));
+		(ft_lstadd_back_env(ev, new_node), free_split(eqsplit));
 	}
 	return *ev;
 }
@@ -55,13 +55,16 @@ t_env *ft_create_env(char **env, t_env **ev)
 
 char	*find_env(t_env *env, char *var)
 {
-	while (env != NULL)
+	t_env *curr;
+
+	curr = env;
+	while (curr != NULL)
 	{
-		if (!ft_strcmp(env->var, var))
+		if (!ft_strcmp(curr->var, var))
 		{
-			return (env->val);
+			return (curr->val);
 		}
-		env = env->next;
+		curr = curr->next;
 	}
 	return (NULL);
 }

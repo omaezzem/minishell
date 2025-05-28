@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 02:10:50 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/04/29 10:50:09 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/27 20:43:41 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@ int ft_strcmp(char *s1, char *s2)
 {
 	int i = 0;
 
+	if (!s1 && !s2)
+		return 0;
 	while((s1[i] == s2[i]) && s1[i] && s2[i])
 		i++;
 	return (s1[i]-s2[i]);

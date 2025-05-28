@@ -80,3 +80,5 @@ loop
 
 must be just 
 minishell: No such file or directory
+
+bash-3.2$  exit 8888888888888888888888888888888888888888888888888888888888888888888 | cat 

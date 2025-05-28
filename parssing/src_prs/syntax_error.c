@@ -95,7 +95,14 @@ int	is_quoted(char *str)
 	return ((str[0] == '\'' && str[len - 1] == '\'')
 		|| (str[0] == '"' && str[len - 1] == '"'));
 }
-
+char *generate_heredoc_filename(int index)
+{
+	char *base = ".heredoc_";
+	char *num = ft_itoa(index); // تحويل index إلى string
+	char *name = ft_strjoin(base, num);
+	free(num);
+	return (name);
+}
 void	remove_quotes2_token(t_token *token)
 {
 	char	*tmp;
@@ -125,7 +132,8 @@ static int	write_heredoc_line(char *line, char *delimiter,
 	to_write = line;
 	if (!quoted && ft_strchr(line, '$'))
 	{
-		expand(tokenize(line), env);
+		to_write = expand_herdoc(tokenize(line), env);
+		printf("heredoc: %s\n", to_write);
 		free(line);
 	}
 	write(fd, to_write, ft_strlen(to_write));
@@ -151,8 +159,13 @@ static int	handle_loop(int fd, char *delimiter, int quoted, t_env *env)
 }
 int	handle_heredoc(t_token *delimiter, t_env *env, int quoted)
 {
+	static int heredoc_count = 0; // ← static to count total calls
+
 	char	*tmp;
 	int		fd;
+
+	heredoc_count++;
+	printf("Opening heredoc #%d: %s\n", heredoc_count, delimiter->value);
 
 	if (delimiter->value[0] == '\0')
 	{
@@ -162,18 +175,20 @@ int	handle_heredoc(t_token *delimiter, t_env *env, int quoted)
 	}
 	remove_quotes2_token(delimiter);
 	tmp = ft_strdup(delimiter->value);
-	fd = open(".heredoc_tmp", O_CREAT | O_WRONLY | O_TRUNC, 0600);
+	char *filename = generate_heredoc_filename(heredoc_count); // ← index = 1, 2, 3...
+	fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0600);
 	if (fd < 0)
     {
         perror("open");
         exit(1);
     }
-	unlink(".heredoc_tmp");
+	unlink(filename);
 	tokenize(tmp);
 	if (handle_loop(fd, delimiter->value, quoted, env) < 0)
 		return (free(tmp), close(fd), -1);
 	return (free(tmp), fd);
 }
+
 
 int	is_redir_syntax_err(t_token *cur)
 {
@@ -209,34 +224,40 @@ static int	handle_heredoc_token(t_token **cur, t_env *env)
 	delim = (*cur)->next;
 	while (delim && delim->type == TOKEN_SPACE)
 		delim = delim->next;
+
 	if (!delim || delim->type != TOKEN_FILE)
 		return (printf("minishell: syntax error near unexpected token `newline'\n"), 0);
+
 	if (delim->value[0] == '\0')
-		return (*cur = delim->next, 1);
+	{
+		*cur = delim; // ← فقط ننتقل إلى delimiter، والباقي على اللوب
+		return (1);
+	}
+
 	quoted = is_quoted(delim->value);
 	env->fd = handle_heredoc(delim, env, quoted);
 	if (env->fd < 0)
-		return (*cur = delim->next, 1);
-	*cur = delim->next;
+		return (*cur = delim, 1); // ← نبقى عند delimiter
+
+	*cur = delim; // ← فقط نرجع cur إلى delimiter لكي next يروح لـ next heredoc
 	return (1);
 }
 
+
 int	error(t_token *tokens, t_env *env)
 {
-	t_token	*cur;
+	t_token	*cur = tokens;
 
-	cur = tokens;
 	while (cur)
 	{
 		if (cur->type == TOKEN_HEREDOC)
 		{
 			if (!handle_heredoc_token(&cur, env))
 				return (0);
-			continue ;
+			continue;
 		}
 		if (is_redir_syntax_err(cur))
-			return (printf("minishell: syntax error near unexpected token '%s'\n",
-					cur->value), 0);
+			return (printf("minishell: syntax error near unexpected token '%s'\n", cur->value), 0);
 		if (!error2(cur))
 			return (0);
 		cur = cur->next;

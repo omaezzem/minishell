@@ -6,10 +6,9 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 10:05:28 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/26 18:15:12 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/28 13:44:11 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 #include "../../include/minishell.h"
 
@@ -51,24 +50,24 @@ int     check_dir_file(char **args)
 	}
 	return 0;
 }
-int ft_builtins(t_env *env, t_exp *exp, t_cmd *data)
+int ft_builtins(t_env **env, t_exp **exp, t_cmd *data)
 {
 	if (data->files && data->redirection && notpipe(data))
 		ft_do_redirections(data->files, data->redirection);
 	if (ft_strcmp(data->cmd[0], "echo") == 0)
 		return(ft_echo(&data->cmd[0]), 1);
 	else if (ft_strcmp(data->cmd[0], "cd") == 0)
-		return (ft_cd(env, data->cmd), 1);
+		return (ft_cd(*env, data->cmd, *exp), 1);
 	else if (ft_strcmp(data->cmd[0], "pwd") == 0)
-		return (ft_pwd(env), 1);
+		return (ft_pwd(*env), 1);
 	else if (ft_strcmp(data->cmd[0], "export") == 0)
-		return (ft_export(exp, env, data->cmd), 1);
+		return (ft_export(*exp, *env, data->cmd), 1);
 	else if (ft_strcmp(data->cmd[0], "env") == 0)
-		return (builtin_env(&env, data->cmd), 1);
+		return (builtin_env(env, data->cmd), 1);
 	else if (ft_strcmp(data->cmd[0], "exit") == 0)
 		return (ft_exit(data, data->cmd), 1);
 	else if (ft_strcmp(data->cmd[0], "unset") == 0)
-		return (ft_unset(&exp, &env, data->cmd), 1);
+		return (ft_unset(exp, env, data->cmd), 1);
 	else
 		return (0);
 }
@@ -245,7 +244,7 @@ int execute_multi_pipe(t_env *env, t_cmd *data, int numcmd, char **envp, t_exp *
 			}
 			if (is_builtin(curr->cmd[0]))
 			{
-				ft_builtins(env, exp, curr);
+				ft_builtins(&env, &exp, curr);
 				curr = curr->next;
 				i++;
 				exit(EXIT_SUCCESS);
@@ -396,7 +395,7 @@ void	access_and_execute(char *path, char **commande, t_cmd *data, char **envp)
 	free_split(splitpath);
 }
 
-int execute_single_cmd(t_env *env, char **envp, t_cmd *data)
+int execute_single_cmd(t_env **env, char **envp, t_cmd *data)
 {
 	char *path;
 	int pid;
@@ -414,7 +413,7 @@ int execute_single_cmd(t_env *env, char **envp, t_cmd *data)
 		if (!commande)
 			exit(EXIT_FAILURE);
 		execute_path(data, envp, commande);
-		path = find_env(env, "PATH");
+		path = find_env(*env, "PATH");
 		if (!path)
 			(invalid_msg(data->cmd[0]), free(commande));
 		access_and_execute(path, commande, data, envp);
@@ -425,7 +424,7 @@ int execute_single_cmd(t_env *env, char **envp, t_cmd *data)
 	return 1;
 }
 
-int ft_execute(t_exp *exp, t_env *env, t_cmd *data, char **envp)
+int ft_execute(t_exp **exp, t_env **env, t_cmd *data, char **envp)
 {
 	int numcmd;
 
@@ -442,7 +441,7 @@ int ft_execute(t_exp *exp, t_env *env, t_cmd *data, char **envp)
 	}
 	else
 	{
-		execute_multi_pipe(env, data, numcmd, envp, exp);
+		execute_multi_pipe(*env, data, numcmd, envp, *exp);
 	}
 	return (1);
 }

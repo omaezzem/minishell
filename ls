@@ -1,9 +1,0 @@
-Makefile
-execution
-include
-ls
-minishell
-minishell.c
-minishell.o
-parssing
-utils

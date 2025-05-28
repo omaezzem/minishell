@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 23:17:48 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/26 18:14:32 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/28 14:01:57 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,8 @@
 # define FAILURE	0
 # define SUCCESS	1
 # define PMAX	4096
-# define PATH_ENV "/mnt/homes/omaezzem/brew/bin:/mnt/homes/omaezzem/brew/bin:/mnt/homes/omaezzem/brew/bin:/mnt/homes/omaezzem/goinfre/homebrew/bin:\
-					/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/munki:/Library/Apple/usr/bin"
+# define PATH_ENV "/mnt/homes/omaezzem/brew/bin:/mnt/homes/omaezzem/brew/bin:/mnt/homes/omaezzem/brew/bin:/mnt/homes/omaezzem/goinfre/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/munki:/Library/Apple/usr/bin"
+
 typedef  enum
 {
 	TOKEN_WORD,
@@ -62,6 +62,7 @@ typedef struct s_env
 {
     char			*var;
 	int				fd;
+	int				*flagenv;
 	char			*val;
 	struct  s_env	*next;
 }				t_env;
@@ -85,6 +86,7 @@ typedef struct s_exp
 {
     char			*vr;
     char			*vl;
+	int				flagexp;
     struct  s_exp	*next;
 }				t_exp;
 
@@ -130,18 +132,18 @@ char	*ft_itoa(int n);
 /*---------------------------------------------execution--------------------------------------------*/
 
 int		ft_echo(char **args);
-int		ft_cd(t_env *env, char **args);
+int		ft_cd(t_env *env, char **args ,t_exp *exp);
 t_env	*ft_create_env(char **env, t_env **ev);
 int		builtin_env(t_env **env_head, char **args);
 void	ft_exit(t_cmd *data, char **args);
 char	*find_env(t_env *env, char *var);
-int		execute_single_cmd(t_env *env, char **envp, t_cmd *data);
+int execute_single_cmd(t_env **env, char **envp, t_cmd *data);
 int		ft_pwd(t_env *env);
 int		ft_export(t_exp *exp, t_env *env, char **args);
-t_exp	**ft_create_env_export(char **env, t_exp **list);
+t_exp	*ft_create_env_export(char **env, t_exp **list);
 void	ft_unset(t_exp **exp, t_env **env, char **args);
 void	to_single_redirection(char **files, char **redirections);
-int		ft_execute(t_exp *exp, t_env *env, t_cmd *data, char **envp);
+int ft_execute(t_exp **exp, t_env **env, t_cmd *data, char **envp);
 void	add_usr_bin_env(t_env **env_head);
 void	add_path(t_env **env_head);
 void	add_shlvl(t_env **env_head);
@@ -166,7 +168,6 @@ void	update_join_env(t_env *env, char *var, char *val);
 void	add_to_export_list_vl(t_exp **exp, char *avzero, char *avone);
 void	add_to_export_list_v(t_exp **exp, char *avzero);
 void	add_to_env_list(t_env *env, char *args, char *avzero, char *avone);
-t_exp	**ft_create_env_export(char **env, t_exp **list);
 void	sort_exp_list(t_exp **exp);
 void	minishell_invalid(char *invalid_str);
 char	*check_var(char *var);
@@ -198,6 +199,7 @@ int		error_pipe(t_token *tokens);
 void	sigint_handler(int sig);
 t_token	*tokenize(char *input);
 char	*read_input(char *prompt);
+char *expand_herdoc(t_token *token, t_env *env);
 t_cmd	*parse(t_env *env);
 t_cmd *joining(t_token *tokens);
 t_cmd *joining2(t_token *tokens);
@@ -212,3 +214,5 @@ int		is_match(char *str, char *ptrn);
 int		expand_wildcard(char **oldp, char **newp, int space_left);
 
 #endif
+
+

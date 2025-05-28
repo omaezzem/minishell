@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 13:59:21 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/26 10:09:22 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/27 23:50:23 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,8 @@ static void	remove_env_var(t_env **env, char *var_name)
 	t_env	*to_free;
 
 	prev = NULL;
+	if (!env[0] || !var_name)
+		return ;
 	curr = *env;
 	while (curr != NULL)
 	{
@@ -89,20 +91,20 @@ static void	remove_exp_var(t_exp **exp, char *var_name)
 
 void	ft_unset(t_exp **exp, t_env **env, char **args)
 {
-	int	i;
+	int	k;
 
 	if (len_arg(args) < 2)
 		return ;
-	i = 1;
-	while (args[i])
+	k = 1;
+	while (args[k])
 	{
-		if (!check_args(args[i]))
-			unset_invalid(args[i]);
+		if (!check_args(args[k]))
+			unset_invalid(args[k]);
 		else
 		{
-			remove_env_var(env, args[i]);
-			remove_exp_var(exp, args[i]);
+			remove_env_var(env, args[k]);
+			remove_exp_var(exp, args[k]);
 		}
-		i++;
+		k++;
 	}
 }

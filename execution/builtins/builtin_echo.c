@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 23:14:24 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/26 10:05:33 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/28 15:03:28 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,10 @@ int	len_argsone(char *args)
 {
 	int	i;
 
-	i = 1;
+	i = 0;
 	if (args[0] == '-' && args[1] == 'n')
 	{
+		i = 1;
 		i++;
 		while (args[i] && args[i] == 'n')
 		{
@@ -36,6 +37,7 @@ void	print_echo(int k, char **args)
 
 	if (k == 0)
 	{
+		
 		i = k + 1;
 		while (args[i])
 		{
@@ -68,6 +70,7 @@ int	ft_echo(char **args)
 		return (0);
 	j = 1;
 	k = 0;
+
 	while (args[j])
 	{
 		if (len_argsone(args[j]) != ft_strlen(args[j]))

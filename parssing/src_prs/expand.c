@@ -270,3 +270,105 @@ char *expand(t_token *token, t_env *env) {
 
     return result;
 }
+char *expand_herdoc(t_token *token, t_env *env) {
+    char *result = NULL;
+    size_t total = 0;
+
+    while (token) {
+        char *src = token->value;
+        int in_single = 0;
+
+        while (*src) {
+
+            if (*src == '$' && !in_single) {
+                // Count consecutive $ signs
+                int dollar_count = 0;
+                while (*src == '$') {
+                    dollar_count++;
+                    src++;
+                }
+
+                int escape_count = dollar_count / 2;
+                int expand = dollar_count % 2;
+
+                // Append escaped $'s
+                for (int i = 0; i < escape_count; i++) {
+                    result = append_to_result(result, "$", total);
+                    total++;
+                }
+
+                if (!expand) continue; // if even, no expansion
+
+                // Now parse variable name for expansion
+                char varname[256] = {0};
+                int brace = (*src == '{');
+                int valid = 0;
+
+                if (brace) {
+                    src++;  // skip {
+                    int i = 0;
+                    while (*src && *src != '}' && i < 255)
+                        varname[i++] = *src++;
+                    varname[i] = '\0';
+                    if (*src == '}') src++;  // skip }
+                    valid = i > 0;
+                } else if (*src == '?' || *src == '#' || *src == '$' || isdigit(*src) || ft_isalpha(*src) || *src == '_') {
+                    int i = 0;
+                    while ((ft_isalnum(*src) || *src == '_') && i < 255)
+                        varname[i++] = *src++;
+                    varname[i] = '\0';
+                    valid = i > 0;
+                }
+
+                if (!valid) {
+                    // Invalid var: just output one $
+                    result = append_to_result(result, "$", total);
+                    total++;
+                    continue;
+                }
+
+                // Expand the var
+                char *val = NULL;
+                if (strcmp(varname, "?") == 0) {
+                    char buf[16];
+                    snprintf(buf, sizeof(buf), "%d", prev_status);
+                    val = buf;
+                } else if (strcmp(varname, "#") == 0) {
+                    char buf[16];
+                    snprintf(buf, sizeof(buf), "%d", cmdline_argc - cmdline_shift);
+                    val = buf;
+                } else if (strcmp(varname, "$") == 0) {
+                    char buf[16];
+                    snprintf(buf, sizeof(buf), "%d", getpid());
+                    val = buf;
+                } else if (isdigit(varname[0])) {
+                    int idx = atoi(varname) + cmdline_shift;
+                    val = (idx < cmdline_argc) ? cmdline_argv[idx] : "";
+                } else {
+                    val = find_env(env, varname);
+                    if (!val) val = "";
+                }
+
+                result = append_to_result(result, val, total);
+                total += ft_strlen(val);
+                continue;
+            }
+
+            // Regular character
+            char tmp[2] = {*src, '\0'};
+            result = append_to_result(result, tmp, total);
+            total++;
+            src++;
+        }
+
+        // Add space after token if next is TOKEN_SPACE
+        if (token->next && token->next->type == TOKEN_SPACE) {
+            result = append_to_result(result, " ", total);
+            total++;
+        }
+
+        token = token->next;
+    }
+
+    return result;
+}

@@ -246,15 +246,38 @@ t_token *tokenize(char *input)
 #include <string.h>
 char *strip_quotes(char *str)
 {
+    if (!str)
+        return NULL;
+
     size_t len = ft_strlen(str);
     char *result = malloc(len + 1);
-    size_t i = 0, j = 0;
     if (!result)
         return NULL;
 
+    size_t i = 0, j = 0;
     while (str[i])
     {
-        if (str[i] == '\'' || str[i] == '"')
+        // Handle empty double quotes
+        if (str[i] == '"' && str[i + 1] == '"')
+        {
+            result[j++] = ' ';  // Replace "" with space
+            i += 2;
+        }
+        // Handle empty single quotes
+        else if (str[i] == '\'' && str[i + 1] == '\'')
+        {
+            result[j++] = ' ';  // Replace '' with space
+            i += 2;
+        }
+        // Handle escaped quotes
+        else if (str[i] == '\\' && 
+                (str[i + 1] == '\'' || str[i + 1] == '"' || str[i + 1] == '\\'))
+        {
+            result[j++] = str[i + 1];
+            i += 2;
+        }
+        // Handle regular quoted content
+        else if (str[i] == '\'' || str[i] == '"')
         {
             char quote = str[i++];
             while (str[i] && str[i] != quote)
@@ -262,6 +285,7 @@ char *strip_quotes(char *str)
             if (str[i] == quote)
                 i++;
         }
+        // Normal character
         else
         {
             result[j++] = str[i++];
@@ -270,7 +294,6 @@ char *strip_quotes(char *str)
     result[j] = '\0';
     return result;
 }
-
 void remove_quotes_cmd(t_cmd *cmd)
 {
     while (cmd)
@@ -569,13 +592,13 @@ t_cmd *parse(t_env *env)
         return NULL;
 
     mark_file_tokens(tokens);
-    t_token *tmp = tokens;
-    while (tmp)
-    {
-        printf("Value: %s\t", tmp->value);
-        print_type(tmp->type);
-        tmp = tmp->next;
-    }
+    // t_token *tmp = tokens;
+    // while (tmp)
+    // {
+    //     printf("Value: %s\t", tmp->value);
+    //     print_type(tmp->type);
+    //     tmp = tmp->next;
+    // }
     if (tokens->type == TOKEN_PIPE)
     {
         printf("minishell: syntax error near unexpected token '%s'\n", tokens->value);
@@ -585,17 +608,18 @@ t_cmd *parse(t_env *env)
     if(check_ambiguous_redirection(tokens, env) == 0)
         return NULL;
     char *qote = expand(tokens, env);
-    tmp = tokens;
-    while (tmp)
-    {
-        printf("Value: %s\t", tmp->value);
-        print_type(tmp->type);
-        tmp = tmp->next;
-    }
+    // // tmp = tokens;
+    // while (tmp)
+    // {
+    //     printf("Value: %s\t", tmp->value);
+    //     print_type(tmp->type);
+    //     tmp = tmp->next;
+    // }
     tokens = handle_tokenz_expansion(qote);
     tokens = tokenize(qote);
     mark_file_tokens(tokens);
    cmd = joining2(tokens);
     remove_quotes_cmd(cmd);
+    // printf("env->fd: %d\n", env->fd);
     return cmd;
 }

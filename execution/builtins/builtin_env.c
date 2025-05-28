@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 10:43:20 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/26 10:06:42 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/27 23:12:39 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ void	add_shlvl(t_env **env_head)
 	ft_lstadd_back_env(env_head, new_node);
 }
 
-int	builtin_env(t_env **env_head, char **args)
+int	builtin_env(t_env **env, char **args)
 {
 	t_env	*current;
 
@@ -76,7 +76,10 @@ int	builtin_env(t_env **env_head, char **args)
 		ft_putstr_fd("env: too many arguments\n", 2);
 		return (0);
 	}
-	current = *env_head;
+
+    current = *env;
+	if (current == NULL)
+		return 0;
 	while (current != NULL)
 	{
 		if (current->var && current->val)

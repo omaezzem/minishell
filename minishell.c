@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 11:17:45 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/25 14:39:15 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/28 14:18:05 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,14 +99,16 @@ int main(int ac, char **av, char **envp)
     t_cmd *cmd = NULL;
     t_exp *head;
     t_env *env = ft_create_env(envp, &env);
-    t_exp **exp;
+    t_exp *exp;
     head = NULL;
-    exp = &head;
-    exp = ft_create_env_export(envp, exp);
+    exp = head;
+    exp = ft_create_env_export(envp, &exp);
 
     // check
     signal(SIGINT, sigint_handler);
     signal(SIGQUIT, SIG_IGN);
+    // int i = 0;
+    env->flagenv = malloc(sizeof(int));
     while (1)
     {
         cmd = parse(env);
@@ -119,7 +121,7 @@ int main(int ac, char **av, char **envp)
         //     cmd = cmd->next;
         // }
         // handle_heredoc(cmd->files[0], &fd)
-        ft_execute(*exp, env, cmd, envp);
+        ft_execute(&exp, &env, cmd, envp);
         dup2(STDERR_FILENO,STDOUT_FILENO);
     }
     return 0;
