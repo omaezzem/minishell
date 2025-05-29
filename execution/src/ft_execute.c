@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 10:05:28 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/29 16:18:04 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/29 16:41:34 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,19 +47,23 @@ int	dup_and_close_pipes(int *pipes[2], int i, int numcmd)
 
 int		is_cmd_path(t_cmd *data, t_cmd *curr, char **commande, char **envp, int i)
 {
+	int	j;
+
+	j = -1;
 	if (data->cmd)
 	{
 		if (ft_strchr(data->cmd[0] , '/'))
 		{
 			if (access(curr->cmd[0], X_OK | F_OK) == 0)
 			{
-				commande[0] = ft_strdup(curr->cmd[i]);
-				commande[1] = NULL;
+				while (curr->cmd[++j])
+					commande[j] = ft_strdup(curr->cmd[j]);
+				commande[j] = NULL;
 				execve(curr->cmd[i], commande, envp);
 			}
 		}
 	}
-	return 1;
+	return (1);
 }
 
 void	ft_close_wait(int numcmd, int *pipes[2], int *pids)
