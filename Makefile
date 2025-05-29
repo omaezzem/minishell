@@ -6,7 +6,7 @@
 #    By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/03/14 02:29:51 by omaezzem          #+#    #+#              #
-#    Updated: 2025/05/27 23:42:15 by omaezzem         ###   ########.fr        #
+#    Updated: 2025/05/29 15:23:25 by omaezzem         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,12 +32,19 @@ SRC = 	execution/builtins/cd/builtin_cd.c \
 		execution/env/env.c \
 		execution/utils_exe.c/free_ptr.c \
 		execution/utils_exe.c/len_redirections.c\
+		execution/src/infile_outfile.c\
+		execution/src/is_dir_file.c\
+		execution/src/is_bultin.c\
+		execution/utils_exe.c/msg_invalid.c\
 		execution/utils_exe.c/free_split.c \
 		execution/utils_exe.c/ft_lstadd_back.c \
 		execution/utils_exe.c/ft_lstnew.c \
 		execution/utils_exe.c/mysplit.c \
 		execution/utils_exe.c/len_args.c\
 		execution/src/ft_execute.c \
+		execution/src/execute_single_cmd.c\
+		execution/utils_exe.c/len_cmd.c\
+		execution/utils_exe.c/ft_atoi.c\
 		execution/src/single_redirect.c\
 		execution/src/redirections.c\
 		parssing/utils_prs/append_token.c \

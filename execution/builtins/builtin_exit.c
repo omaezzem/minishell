@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 05:58:14 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/26 10:06:23 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/29 16:03:14 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,20 +42,6 @@ int	len_arg(char **args)
 	}
 	return (i);
 }
-
-static int	calculate_exit_code(int exit_code)
-{
-	int	modulo;
-
-	if (exit_code > 255)
-		modulo = exit_code % 256;
-	else if (exit_code < 0)
-		modulo = exit_code + 256;
-	else
-		modulo = exit_code;
-	return (modulo);
-}
-
 static void	handle_exit_error(t_cmd *data, char *arg)
 {
 	ft_putstr_fd("exit\n", STDERR_FILENO);
@@ -66,10 +52,26 @@ static void	handle_exit_error(t_cmd *data, char *arg)
 	exit(255);
 }
 
+static int	calculate_exit_code(long long exit_code, char *arg, t_cmd *data)
+{
+	int	modulo;
+
+	if (exit_code > INT_MAX || exit_code < INT_MIN)
+		handle_exit_error(data, arg);
+	if (exit_code > 255)
+		modulo = exit_code % 256;
+	else if (exit_code < 0)
+		modulo = exit_code + 256;
+	else
+		modulo = exit_code;
+	return (modulo);
+}
+
+
 void	ft_exit(t_cmd *data, char **args)
 {
 	int	largs;
-	int	exit_code;
+	long long	exit_code;
 
 	if (!args)
 		return ;
@@ -84,7 +86,7 @@ void	ft_exit(t_cmd *data, char **args)
 	{
 		if (is_num(args[1]) == FAILURE)
 			handle_exit_error(data, args[1]);
-		exit_code = calculate_exit_code(mini_atoi(args[1]));
+		exit_code = calculate_exit_code(ft_atoi(args[1]), args[1], data);
 		data->ex_status = exit_code;
 		ft_putstr_fd("exit\n", STDERR_FILENO);
 		exit(exit_code);

@@ -95,7 +95,7 @@ void mark_file_tokens(t_token *tokens)
                 next = next->next;
             if (next && next->type == TOKEN_WORD)
             {
-                printf("Marking token '%s' as TOKEN_FILE\n", next->value);
+                // printf("Marking token '%s' as TOKEN_FILE\n", next->value);
                 next->type = TOKEN_FILE;
             }
         }

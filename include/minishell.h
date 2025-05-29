@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 23:17:48 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/28 14:01:57 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/29 16:01:25 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,13 @@ typedef struct s_env
 	struct  s_env	*next;
 }				t_env;
 
+typedef struct s_exp
+{
+    char			*vr;
+    char			*vl;
+	int				flagexp;
+    struct  s_exp	*next;
+}				t_exp;
 
 typedef struct s_cmd
 {
@@ -75,20 +82,15 @@ typedef struct s_cmd
 	char			**files;
 	t_type			type;
 	t_env			*env;
+	t_exp			*exp;
 	char 			*value_expand;
-	char			*workdir;
 	char			**redirection;
+	char 			*workdir;
 	int				ex_status;
+	int				numcmd;
 	struct s_cmd	*next;
 }				t_cmd;
 
-typedef struct s_exp
-{
-    char			*vr;
-    char			*vl;
-	int				flagexp;
-    struct  s_exp	*next;
-}				t_exp;
 
 typedef struct s_token
 {
@@ -128,6 +130,7 @@ int		ft_len_redirections(char **redirections);
 int     ft_output_append(char **file, char **redirections, int i);
 int     ft_inp_heredoc(char **file, char **redirections, int i);
 char	*ft_itoa(int n);
+long long ft_atoi(const char *str);
 
 /*---------------------------------------------execution--------------------------------------------*/
 
@@ -137,13 +140,13 @@ t_env	*ft_create_env(char **env, t_env **ev);
 int		builtin_env(t_env **env_head, char **args);
 void	ft_exit(t_cmd *data, char **args);
 char	*find_env(t_env *env, char *var);
-int execute_single_cmd(t_env **env, char **envp, t_cmd *data);
+int		execute_single_cmd(t_env **env, char **envp, t_cmd *data);
 int		ft_pwd(t_env *env);
 int		ft_export(t_exp *exp, t_env *env, char **args);
 t_exp	*ft_create_env_export(char **env, t_exp **list);
 void	ft_unset(t_exp **exp, t_env **env, char **args);
 void	to_single_redirection(char **files, char **redirections);
-int ft_execute(t_exp **exp, t_env **env, t_cmd *data, char **envp);
+int		ft_execute(t_exp **exp, t_env **env, t_cmd *data, char **envp);
 void	add_usr_bin_env(t_env **env_head);
 void	add_path(t_env **env_head);
 void	add_shlvl(t_env **env_head);
@@ -175,7 +178,15 @@ char	*args_zero(char *args);
 char	*args_one(char *args);
 int		search_var_in_exp(t_exp *exp, char *var);
 int		search_var_in_env(t_env *env, char *var);
-
+int		ft_builtins(t_env **env, t_exp **exp, t_cmd *data);
+int		is_builtin(char *args);
+int		check_dir_file(char **args);
+int		len_cmd(t_cmd *data);
+int		notpipe(t_cmd *data);
+void	invalid_msg(char *cmd, t_cmd *data);
+void    exit_failure(t_cmd *data);
+void    exit_success(t_cmd *data);
+void	invalid_path(t_cmd *data);
 
 /*---------------------------------------------parsing--------------------------------------*/
 

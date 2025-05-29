@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 10:46:01 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/16 17:07:30 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/29 15:18:09 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ int mini_atoi(char *str)
 {
 	int	nb;
 	int sign;
-	
+
 	nb = atoi_ph(str, &sign);
 	if (nb == -1)
 		return (-1);

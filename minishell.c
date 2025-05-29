@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 11:17:45 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/28 14:18:05 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/29 16:20:29 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,6 +118,8 @@ int main(int ac, char **av, char **envp)
         // {
         //     for (i = 0; cmd->cmd && cmd->cmd[i]; i++)
         //         printf("cmd->cmd[%d] = %s\n", i, cmd->cmd[i]);
+        //     for (i = 0; cmd->files && cmd->files[i]; i++)
+        //         printf("cmd->cmd[%d] = %s\n", i, cmd->files[i]);
         //     cmd = cmd->next;
         // }
         // handle_heredoc(cmd->files[0], &fd)
