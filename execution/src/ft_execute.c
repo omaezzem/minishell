@@ -6,20 +6,20 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 10:05:28 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/29 16:41:34 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/30 00:21:21 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-void	free_pipes(int *pipes[2], t_cmd *data, int numcmd)
+void	free_pipes(int (*pipes)[2], t_cmd *data, int numcmd)
 {
 	    if (numcmd > 1)
 			free(pipes);
        	exit_failure(data);	
 }
 
-int		create_pipes(int numcmd, int *pipes[2], int *pids, t_cmd *data)
+int		create_pipes(int numcmd, int (*pipes)[2], int *pids, t_cmd *data)
 {
 	int i;
 
@@ -31,7 +31,7 @@ int		create_pipes(int numcmd, int *pipes[2], int *pids, t_cmd *data)
     }
 	return (1);
 }
-int	dup_and_close_pipes(int *pipes[2], int i, int numcmd)
+int	dup_and_close_pipes(int (*pipes)[2], int i, int numcmd)
 {
 	int j;
 
@@ -66,7 +66,7 @@ int		is_cmd_path(t_cmd *data, t_cmd *curr, char **commande, char **envp, int i)
 	return (1);
 }
 
-void	ft_close_wait(int numcmd, int *pipes[2], int *pids)
+void	ft_close_wait(int numcmd, int (*pipes)[2], int *pids)
 {
 	int i;
 
@@ -133,15 +133,16 @@ int		ft_execve(t_cmd *curr, t_env *env, t_cmd *data, char **envp, int i)
 
 int execute_multi_pipe(t_env *env, t_cmd *data, int numcmd, char **envp, t_exp *exp)
 {
-    int		*pipes[2];
+    int		(*pipes)[2];
     int		*pids;
     int		i;
     t_cmd	*curr;
 
+	pipes = NULL;
     if (numcmd > 1)
 	{
-        *pipes = malloc((numcmd - 1) * (sizeof(int) * 2));
-        if (!*pipes) 
+        pipes = malloc((numcmd - 1) * (sizeof(*pipes)));
+        if (!pipes) 
             (perror("malloc"), exit_failure(data));
     }
     pids = malloc(numcmd * sizeof(int));
@@ -180,7 +181,6 @@ int execute_multi_pipe(t_env *env, t_cmd *data, int numcmd, char **envp, t_exp *
 	ft_close_wait(numcmd, pipes, pids);
 	return 1;
 }
-
 
 int ft_execute(t_exp **exp, t_env **env, t_cmd *data, char **envp)
 {

@@ -6,37 +6,41 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 20:07:00 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/28 20:08:18 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/29 21:12:22 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-static int index_last_outfile(char **files, char **redirections)
+static int	index_last_outfile(char **files, char **redirections)
 {
-	int i = 0;
-	int s = 0;
- 
+	int	i;
+	int	s;
+
+	i = 0;
+	s = 0; 
 	while (files[i] != NULL)
 	{
 		if(redirections[i][0] == '>')
 			s = i;
 		i++;
 	}
-	return s;
+	return (s);
 }
-static int index_last_infile(char **files, char **redirections)
+static int	index_last_infile(char **files, char **redirections)
 {
-	int i = 0;
-	int s = 0;
+	int	i;
+	int	s;
 
+	i = 0;
+	s = 0; 
 	while (files[i] != NULL)
 	{
 		if(redirections[i][0] == '<')
 			s = i;
 		i++;
 	}
-	return s;
+	return (s);
 }
 
 static int	process_outputs(char **files, char **redirections, int i_outfl)

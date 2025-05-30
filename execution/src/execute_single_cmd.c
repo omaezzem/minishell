@@ -6,18 +6,18 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 19:36:54 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/29 16:26:07 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/29 21:10:45 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-int execute_path(t_cmd *data, char **envp, char **commande)
+int	execute_path(t_cmd *data, char **envp, char **commande)
 {
-	int i;
+	int	i;
 
 	i = -1;
-	if (ft_strchr(data->cmd[0] , '/'))
+	if (ft_strchr(data->cmd[0], '/'))
 	{
 		if (access(data->cmd[0], X_OK | F_OK) == 0)
 		{
@@ -30,7 +30,7 @@ int execute_path(t_cmd *data, char **envp, char **commande)
 		else
 			return (perror("minishell"), exit_failure(data), 0);
 	}
-	return 1;
+	return (1);
 }
 
 void	access_and_execute(char *path, char **commande, t_cmd *data, char **envp)
@@ -44,9 +44,9 @@ void	access_and_execute(char *path, char **commande, t_cmd *data, char **envp)
 	if (!splitpath)
 		(free(commande), exit_failure(data));
 	i = -1;
-    while (data->cmd[++i])
-	    commande[i] = ft_strdup(data->cmd[i]);
-    commande[i] = NULL;
+	while (data->cmd[++i])
+		commande[i] = ft_strdup(data->cmd[i]);
+	commande[i] = NULL;
 	i = -1;
 	while (splitpath[++i])
 	{
@@ -59,14 +59,14 @@ void	access_and_execute(char *path, char **commande, t_cmd *data, char **envp)
 	free_split(splitpath);
 }
 
-int execute_single_cmd(t_env **env, char **envp, t_cmd *data)
+int	execute_single_cmd(t_env **env, char **envp, t_cmd *data)
 {
-	char *path;
-	int pid;
-	char **commande;
+	char	*path;
+	int		pid;
+	char	**commande;
 
 	if (!data->cmd[0] || !env)
-		return 0;
+		return (0);
 	pid = fork();
 	if (pid == 0)
 	{
@@ -75,15 +75,15 @@ int execute_single_cmd(t_env **env, char **envp, t_cmd *data)
 			ft_do_redirections(data->files, data->redirection);
 		commande = malloc(sizeof(char *) * (len_arg(&data->cmd[0]) + 1));
 		if (!commande)
-            exit_failure(data);
+			exit_failure(data);
 		execute_path(data, envp, commande);
 		path = find_env(*env, "PATH");
 		if (!path)
 			(free(commande), invalid_path(data));
 		access_and_execute(path, commande, data, envp);
 		(free_split(commande), invalid_msg(data->cmd[0], data));
-    }
+	}
 	else
 		waitpid(pid, NULL, 0);
-	return 1;
+	return (1);
 }
