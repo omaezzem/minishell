@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 10:05:28 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/30 00:21:21 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/30 14:47:19 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,11 +164,11 @@ int execute_multi_pipe(t_env *env, t_cmd *data, int numcmd, char **envp, t_exp *
 		if (pids[i] == 0)
 		{
 			if (curr->files && curr->redirection)
-				ft_do_redirections(curr->files, curr->redirection);
+				ft_do_redirections(curr->files, curr->redirection, data->heredoc);
 			dup_and_close_pipes(pipes, i, numcmd);
 			if (is_builtin(curr->cmd[0]))
 			{
-				ft_builtins(&env, &exp, curr);
+				ft_builtins(&env, &exp, curr, data->heredoc);
 				curr = curr->next;
 				i++;
 				exit_success(data);
@@ -182,20 +182,20 @@ int execute_multi_pipe(t_env *env, t_cmd *data, int numcmd, char **envp, t_exp *
 	return 1;
 }
 
-int ft_execute(t_exp **exp, t_env **env, t_cmd *data, char **envp)
+int ft_execute(t_exp **exp, t_env **env, t_cmd *data, char **envp, t_heredoc *heredoc)
 {
 	int numcmd;
 
 	if(!data->cmd && data->files && data->redirection)
-		return (ft_do_redirections(data->files, data->redirection), 1);
+		return (ft_do_redirections(data->files, data->redirection, heredoc), 1);
 	if (data)
 		numcmd = len_cmd(data);
 	if (notpipe(data) == 1)
 	{
 		if (is_builtin(data->cmd[0]))
-			ft_builtins(env, exp, data);
+			ft_builtins(env, exp, data, heredoc);
 		else
-			execute_single_cmd(env, envp, data);
+			execute_single_cmd(env, envp, data, heredoc);
 	}
 	else
 	{

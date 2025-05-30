@@ -180,7 +180,7 @@ int	handle_heredoc(t_token *delimiter, t_env *env, int quoted)
 	if (fd < 0)
     {
         perror("open");
-        exit(1);
+        // exit(1);
     }
 	unlink(filename);
 	tokenize(tmp);
@@ -199,24 +199,28 @@ int	is_redir_syntax_err(t_token *cur)
 		|| (t == TOKEN_REDIRECT_IN && !cur->next)
 		|| (t == TOKEN_APPEND && !cur->next)
 		|| (t == TOKEN_HEREDOC && !cur->next)
-		|| (t == TOKEN_HEREDOC && n == TOKEN_SPACE && !cur->next->next)
+		// || (t == TOKEN_HEREDOC && n == TOKEN_SPACE && !cur->next->next)
 		|| (t == TOKEN_APPEND && (n == TOKEN_REDIRECT_OUT || n == TOKEN_REDIRECT_IN))
+		|| (t == TOKEN_APPEND && n == TOKEN_PIPE)
 		|| (t == TOKEN_REDIRECT_IN && n == TOKEN_APPEND)
 		|| (t == TOKEN_HEREDOC && n == TOKEN_HEREDOC)
 		|| (t == TOKEN_APPEND && n == TOKEN_APPEND)
+		|| (t == TOKEN_APPEND && n == TOKEN_HEREDOC)
 		|| (t == TOKEN_REDIRECT_OUT && (n == TOKEN_REDIRECT_IN || n == TOKEN_HEREDOC))
 		|| (t == TOKEN_HEREDOC && n == TOKEN_REDIRECT_OUT)
-		|| (t == TOKEN_REDIRECT_OUT && n == TOKEN_REDIRECT_OUT)
 		|| (t == TOKEN_REDIRECT_IN && n == TOKEN_REDIRECT_IN)
-		|| (t == TOKEN_HEREDOC && n == TOKEN_SPACE && !cur->next->next)
-		|| (t == TOKEN_APPEND && n == TOKEN_SPACE && !cur->next->next)
+		// || (t == TOKEN_REDIRECT_OUT && n == TOKEN_SPACE && cur->next->next->type == TOKEN_PIPE)
+		|| (t == TOKEN_REDIRECT_IN && cur->next->type == TOKEN_PIPE)
+		// || (t == TOKEN_REDIRECT_IN && cur->next->type == TOKEN_SPACE && cur->next->next->type == TOKEN_PIPE)
+		// || (t == TOKEN_HEREDOC && n == TOKEN_SPACE && !cur->next->next)
+		// || (t == TOKEN_APPEND && n == TOKEN_SPACE && !cur->next->next)
 		// || (t == TOKEN_REDIRECT_IN && n == TOKEN_SPACE && cur->next->next->type == TOKEN_PIPE)
 		// || (t == TOKEN_REDIRECT_OUT && n == TOKEN_SPACE && cur->next->next->type == TOKEN_PIPE)
-		|| (t == TOKEN_APPEND && n == TOKEN_SPACE && cur->next->next->type == TOKEN_PIPE)
-		|| (t == TOKEN_HEREDOC && n == TOKEN_SPACE && cur->next->next->type == TOKEN_PIPE)
+		// || (t == TOKEN_APPEND && n == TOKEN_SPACE && cur->next->next->type == TOKEN_PIPE)
+		// || (t == TOKEN_HEREDOC && n == TOKEN_SPACE && cur->next->next->type == TOKEN_PIPE)
 		|| (t == TOKEN_REDIRECT_OUT && n == TOKEN_PIPE));
 }
-static int	handle_heredoc_token(t_token **cur, t_env *env)
+static int	handle_heredoc_token(t_token **cur, t_env *env, t_heredoc *heredoc)
 {
 	t_token	*delim;
 	int		quoted;
@@ -235,16 +239,16 @@ static int	handle_heredoc_token(t_token **cur, t_env *env)
 	}
 
 	quoted = is_quoted(delim->value);
-	env->fd = handle_heredoc(delim, env, quoted);
-	if (env->fd < 0)
-		return (*cur = delim, 1); // ← نبقى عند delimiter
+	heredoc->fd = handle_heredoc(delim, env, quoted);
+	if (heredoc->fd < 0)
+		return (*cur = delim, 1);
 
-	*cur = delim; // ← فقط نرجع cur إلى delimiter لكي next يروح لـ next heredoc
+	*cur = delim;
 	return (1);
 }
 
 
-int	error(t_token *tokens, t_env *env)
+int	error(t_token *tokens, t_env *env, t_heredoc *heredoc)
 {
 	t_token	*cur = tokens;
 
@@ -252,7 +256,8 @@ int	error(t_token *tokens, t_env *env)
 	{
 		if (cur->type == TOKEN_HEREDOC)
 		{
-			if (!handle_heredoc_token(&cur, env))
+			heredoc->flag_heredoc = 1;
+			if (!handle_heredoc_token(&cur, env, heredoc))
 				return (0);
 			continue;
 		}

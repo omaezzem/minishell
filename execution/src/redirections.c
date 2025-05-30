@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 16:36:47 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/22 17:31:02 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/30 14:50:27 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,16 +38,10 @@ int ft_inp_heredoc(char **files, char **redirections, int i)
 {
     int fd;
 
+    fd = 0;
     if (!redirections[0] || !files[0])
         return FAILURE;
-
     if (ft_strcmp(redirections[i], "<") == 0)
-    {
-        fd = open(files[i], O_RDONLY);
-        if (fd == -1)
-            return (perror("minishell"), FAILURE);
-    }
-    if (ft_strcmp(redirections[i], "<<") == 0)
     {
         fd = open(files[i], O_RDONLY);
         if (fd == -1)

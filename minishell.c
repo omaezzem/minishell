@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 11:17:45 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/29 16:20:29 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/30 13:53:50 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,34 +96,38 @@ int main(int ac, char **av, char **envp)
     cmdline_shift = 0;
     prev_status = 0;
     // int fd = 0;
+    if (ac != 1)
+    {
+        write(2, "Error: No arguments expected\n", 30);
+        return (1);
+    }
     t_cmd *cmd = NULL;
     t_exp *head;
     t_env *env = ft_create_env(envp, &env);
-    t_exp *exp;
+    t_exp **exp;
+    t_heredoc *heredoc = malloc(sizeof(t_heredoc));
+    if (!heredoc)
+    {
+        perror("malloc");
+        return (1);
+    }
+    heredoc->delimiter = NULL;
+    heredoc->flag_heredoc = 0;
     head = NULL;
-    exp = head;
-    exp = ft_create_env_export(envp, &exp);
+    exp = &head;
+    *exp = ft_create_env_export(envp, exp);
 
-    // check
     signal(SIGINT, sigint_handler);
     signal(SIGQUIT, SIG_IGN);
-    // int i = 0;
-    env->flagenv = malloc(sizeof(int));
     while (1)
     {
-        cmd = parse(env);
+        cmd = parse(env, heredoc);
         if (!cmd)
             continue;
-        // while (cmd)
-        // {
-        //     for (i = 0; cmd->cmd && cmd->cmd[i]; i++)
-        //         printf("cmd->cmd[%d] = %s\n", i, cmd->cmd[i]);
-        //     for (i = 0; cmd->files && cmd->files[i]; i++)
-        //         printf("cmd->cmd[%d] = %s\n", i, cmd->files[i]);
-        //     cmd = cmd->next;
-        // }
-        // handle_heredoc(cmd->files[0], &fd)
-        ft_execute(&exp, &env, cmd, envp);
+        // printf("cmd----->%s\n", cmd->cmd[0]);
+        // printf("exp------>%s\n", cmd->value_expand);
+
+        ft_execute(exp, &env, cmd, envp, heredoc);
         dup2(STDERR_FILENO,STDOUT_FILENO);
     }
     return 0;

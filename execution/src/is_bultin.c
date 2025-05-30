@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 19:51:16 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/28 19:52:23 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/30 14:44:59 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,10 @@ int notpipe(t_cmd *data)
 	return 0;
 }
 
-int ft_builtins(t_env **env, t_exp **exp, t_cmd *data)
+int ft_builtins(t_env **env, t_exp **exp, t_cmd *data, t_heredoc *heredoc)
 {
 	if (data->files && data->redirection && notpipe(data))
-		ft_do_redirections(data->files, data->redirection);
+		ft_do_redirections(data->files, data->redirection, heredoc);
 	if (ft_strcmp(data->cmd[0], "echo") == 0)
 		return(ft_echo(&data->cmd[0]), 1);
 	else if (ft_strcmp(data->cmd[0], "cd") == 0)

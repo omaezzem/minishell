@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 23:17:48 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/29 16:01:25 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/30 14:52:02 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,14 @@ typedef struct s_exp
     struct  s_exp	*next;
 }				t_exp;
 
+typedef struct s_herdoc
+{
+	char *delimiter;
+	int flag_heredoc;
+	int fd;
+	struct s_heredoc *next;
+} t_heredoc;
+
 typedef struct s_cmd
 {
     char			**cmd;
@@ -83,6 +91,7 @@ typedef struct s_cmd
 	t_type			type;
 	t_env			*env;
 	t_exp			*exp;
+	t_heredoc		*heredoc;
 	char 			*value_expand;
 	char			**redirection;
 	char 			*workdir;
@@ -99,6 +108,8 @@ typedef struct s_token
 	t_type type;
 	struct s_token *next;
 } t_token;
+
+
 
 /*---------------------------------------------utils---------------------------------------------*/
 
@@ -140,19 +151,19 @@ t_env	*ft_create_env(char **env, t_env **ev);
 int		builtin_env(t_env **env_head, char **args);
 void	ft_exit(t_cmd *data, char **args);
 char	*find_env(t_env *env, char *var);
-int		execute_single_cmd(t_env **env, char **envp, t_cmd *data);
+int		execute_single_cmd(t_env **env, char **envp, t_cmd *data, t_heredoc *heredoc);
 int		ft_pwd(t_env *env);
 int		ft_export(t_exp *exp, t_env *env, char **args);
 t_exp	*ft_create_env_export(char **env, t_exp **list);
 void	ft_unset(t_exp **exp, t_env **env, char **args);
-void	to_single_redirection(char **files, char **redirections);
-int		ft_execute(t_exp **exp, t_env **env, t_cmd *data, char **envp);
+void to_single_redirection(char **files, char **redirections, t_heredoc *heredoc);
+int		ft_execute(t_exp **exp, t_env **env, t_cmd *data, char **envp, t_heredoc *heredoc);
 void	add_usr_bin_env(t_env **env_head);
 void	add_path(t_env **env_head);
 void	add_shlvl(t_env **env_head);
 void	add_pwd(t_env **env_head);
 void	minishell_invalid(char *invalid_str);
-int 	ft_do_redirections(char **files, char **redirections);
+int		ft_do_redirections(char **files, char **redirections, t_heredoc *heredoc);
 void	update_val_env(t_env *env, char *var, char *val);
 void	update_val_exp(t_exp *exp, char *var, char *val);
 void	update_new(t_env *ev, char *newpath);
@@ -178,7 +189,7 @@ char	*args_zero(char *args);
 char	*args_one(char *args);
 int		search_var_in_exp(t_exp *exp, char *var);
 int		search_var_in_env(t_env *env, char *var);
-int		ft_builtins(t_env **env, t_exp **exp, t_cmd *data);
+int		ft_builtins(t_env **env, t_exp **exp, t_cmd *data, t_heredoc *heredoc);
 int		is_builtin(char *args);
 int		check_dir_file(char **args);
 int		len_cmd(t_cmd *data);
@@ -204,17 +215,18 @@ void	append_token(t_token **head, t_token *new_token);
 t_token	*create_token(char *value, t_type type);
 void	print_type(t_type type);
 t_type	get_token_type(char *str);
-int error(t_token *tokens, t_env *env);
+int error(t_token *tokens, t_env *env, t_heredoc *heredoc);
 char	*ft_substr(char *s, int start, int len);
 int		error_pipe(t_token *tokens);
 void	sigint_handler(int sig);
 t_token	*tokenize(char *input);
 char	*read_input(char *prompt);
 char *expand_herdoc(t_token *token, t_env *env);
-t_cmd	*parse(t_env *env);
+t_cmd	*parse(t_env *env, t_heredoc *heredoc);
 t_cmd *joining(t_token *tokens);
 t_cmd *joining2(t_token *tokens);
-char	*expand(t_token *token, t_env *env);
+t_token *tokenize1(char *input);
+t_token	*expand(t_token *token, t_env *env);
 int		expand_env(char **oldp, char **newp, int brace_flag, char *var, t_env *env);
 int		expand_pid(char **newp, int space_left);
 int		expand_argv(char **oldp, char **newp, int space_left);
@@ -223,6 +235,7 @@ char	*gitenv(const char* name);
 int		expand_argc(char **newp, int space_left);
 int		is_match(char *str, char *ptrn);
 int		expand_wildcard(char **oldp, char **newp, int space_left);
+
 
 #endif
 

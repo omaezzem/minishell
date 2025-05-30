@@ -95,7 +95,7 @@ void mark_file_tokens(t_token *tokens)
                 next = next->next;
             if (next && next->type == TOKEN_WORD)
             {
-                // printf("Marking token '%s' as TOKEN_FILE\n", next->value);
+                printf("Marking token '%s' as TOKEN_FILE\n", next->value);
                 next->type = TOKEN_FILE;
             }
         }
@@ -169,6 +169,33 @@ int add_word(char *input, t_token **head, int i)
     free(tmp);
     return i;
 }
+int add_word1(char *input, t_token **head, int i)
+{
+    int start;
+
+    start = i;
+    while (input[i] && !ft_issspace(input[i]))
+    {
+        if (input[i] == '\'' || input[i] == '"')
+        {
+            char quote = input[i++];
+            while (input[i] && input[i] != quote)
+                i++;
+            if (!input[i]) {
+                printf("minishell: syntax error: unclosed quote\n");
+                return -1;
+            }
+            i++;
+        }
+        else
+            i++;
+    }
+    char *tmp = ft_substr(input, start, i - start);
+    t_token *new_token = create_token(tmp, TOKEN_WORD);
+    append_token(head, new_token);
+    free(tmp);
+    return i;
+}
 
 
 
@@ -182,6 +209,7 @@ t_token *tokenize(char *input)
     while (input[i])
     {
         if (ft_issspace(input[i])) {
+            // i++; // Skip spaces
             int start = i;
             while (ft_issspace(input[i])) i++;
             char *tmp = ft_substr(input, start, i - start);
@@ -192,6 +220,59 @@ t_token *tokenize(char *input)
             i = handle_redir(input, &head, i);
         else
             i = add_word(input, &head, i);
+        if (i < 0)
+        {
+            // free_token_list(head);
+            return NULL; // Error in tokenization
+        }
+    }
+    return head;
+}
+t_token *tokenize2(char *input)
+{
+    t_token *head = NULL;
+    int i = 0;
+
+    while (input[i] && ft_issspace(input[i]))
+        i++; // Skip leading spaces
+    while (input[i])
+    {
+        if (ft_issspace(input[i])) {
+            i++; // Skip ?
+        }
+        else if (redir_pipe(input[i]))
+            i = handle_redir(input, &head, i);
+        else
+            i = add_word(input, &head, i);
+        if (i < 0)
+        {
+            // free_token_list(head);
+            return NULL; // Error in tokenization
+        }
+    }
+    return head;
+}
+t_token *tokenize1(char *input)
+{
+    t_token *head = NULL;
+    int i = 0;
+
+    // while (input[i] && ft_issspace(input[i]))
+    //     i++; // Skip leading spaces
+    while (input[i])
+    {
+        if (ft_issspace(input[i])) {
+            // i++; // Skip spaces
+            printf("space found at %d\n", i);
+            int start = i;
+            while (ft_issspace(input[i])) i++;
+            printf("space found at %d\n", i);
+            char *tmp = ft_substr(input, start, i - start);
+            append_token(&head, create_token(tmp, TOKEN_SPACE));
+            free(tmp);
+        }
+        else
+            i = add_word1(input, &head, i);
         if (i < 0)
         {
             // free_token_list(head);
@@ -516,7 +597,8 @@ int check_ambiguous_redirection(t_token *tokens, t_env *env)
 
             if (target && target->type == TOKEN_FILE && target->value[0] == '$')
             {
-                expand(target, env);
+                expand_herdoc(target, env);
+                printf("Expanding: %s\n", target->value);
                 if (!expanded || ft_strcmp(expanded, "") == 0)
                 {
                     printf("minishell: %s: ambiguous redirect\n", target->value);
@@ -577,22 +659,47 @@ t_token *handle_tokenz_expansion(char *qote)
 }
 
 
+// t_token *token_space(t_token *tokens)
+// {
+//     t_token *head = NULL;
+//     t_token *last = NULL;
 
+//     while (tokens)
+//     {
+//         if (tokens->type == TOKEN_SPACE)
+//         {
+//             if (!head || last->type != TOKEN_SPACE)
+//             {
+//                 t_token *new_token = create_token(" ", TOKEN_SPACE);
+//                 append_token(&head, new_token);
+//                 last = new_token;
+//             }
+//         }
+//         else
+//         {
+//             append_token(&head, tokens);
+//             last = tokens;
+//         }
+//         tokens = tokens->next;
+//     }
 
-t_cmd *parse(t_env *env)
+//     return head;
+// }
+
+t_cmd *parse(t_env *env, t_heredoc *heredoc)
 {
     t_token *tokens;
     t_cmd *cmd = NULL;
     char *input;
 
     input = read_input("minishell$ ");
-    tokens = tokenize(input);
+    tokens = tokenize2(input);
     free(input);
     if (!tokens)
         return NULL;
 
     mark_file_tokens(tokens);
-    // t_token *tmp = tokens;
+    t_token *tmp = tokens;
     // while (tmp)
     // {
     //     printf("Value: %s\t", tmp->value);
@@ -604,21 +711,41 @@ t_cmd *parse(t_env *env)
         printf("minishell: syntax error near unexpected token '%s'\n", tokens->value);
         return NULL;
     }
-    if (!error(tokens, env)) return NULL;
+    if (!error(tokens, env, heredoc)) return NULL;
     if(check_ambiguous_redirection(tokens, env) == 0)
         return NULL;
-    char *qote = expand(tokens, env);
-    // // tmp = tokens;
+    // tokens = tokenize(input);
+    tokens = expand(tokens, env);
+    // printf("qote: %s\n", qote);
+    tmp = tokens;
+    while (tmp)
+    {
+        printf("Value: %s\t", tmp->value);
+        print_type(tmp->type);
+        tmp = tmp->next;
+    }
+    // tokens = handle_tokenz_expansion(qote);
+    // tokens = tokenize(qote);
+    // mark_file_tokens(tokens);
+    // tmp = tokens;
     // while (tmp)
     // {
     //     printf("Value: %s\t", tmp->value);
     //     print_type(tmp->type);
     //     tmp = tmp->next;
     // }
-    tokens = handle_tokenz_expansion(qote);
-    tokens = tokenize(qote);
-    mark_file_tokens(tokens);
    cmd = joining2(tokens);
+//    t_cmd *tmp_cmd = cmd;
+//     while (tmp_cmd)
+//     {
+//         printf("Command: ");
+//         for (int i = 0; tmp_cmd->cmd && tmp_cmd->cmd[i]; i++)
+//         {
+//             printf("%s \n", tmp_cmd->cmd[i]);
+//         }
+//         printf("\n");
+//         tmp_cmd = tmp_cmd->next;
+//     }
     remove_quotes_cmd(cmd);
     // printf("env->fd: %d\n", env->fd);
     return cmd;

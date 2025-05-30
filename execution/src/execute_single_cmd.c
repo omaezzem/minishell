@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 19:36:54 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/29 21:10:45 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/30 14:53:39 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,8 +58,33 @@ void	access_and_execute(char *path, char **commande, t_cmd *data, char **envp)
 	}
 	free_split(splitpath);
 }
+void ft_execute_heredoc(char **commande, char *path, t_cmd *data, char **envp)
+{
+	int		i;
+	char	**splitpath;
+	char	*joinslash;
+	char	*cmd;
 
-int	execute_single_cmd(t_env **env, char **envp, t_cmd *data)
+	splitpath = mysplit(path, ':');
+	if (!splitpath)
+		(free(commande), exit_failure(data));
+	i = -1;
+	while (data->cmd[++i])
+		commande[i] = ft_strdup(data->cmd[i]);
+	commande[i] = NULL;
+	i = -1;
+	while (splitpath[++i])
+	{
+		joinslash = ft_strjoin(splitpath[i], "/");
+		cmd = ft_strjoin(joinslash, data->cmd[0]);
+		free(joinslash);
+		if (access(cmd, X_OK | F_OK) == 0)
+			execve(cmd, commande, envp);
+	}
+	(free_split(commande), invalid_msg(data->cmd[0], data));
+}
+
+int	execute_single_cmd(t_env **env, char **envp, t_cmd *data, t_heredoc *heredoc)
 {
 	char	*path;
 	int		pid;
@@ -72,7 +97,7 @@ int	execute_single_cmd(t_env **env, char **envp, t_cmd *data)
 	{
 		signal(SIGQUIT, SIG_DFL);
 		if (data->files && data->redirection)
-			ft_do_redirections(data->files, data->redirection);
+			ft_do_redirections(data->files, data->redirection, heredoc);
 		commande = malloc(sizeof(char *) * (len_arg(&data->cmd[0]) + 1));
 		if (!commande)
 			exit_failure(data);
@@ -80,6 +105,8 @@ int	execute_single_cmd(t_env **env, char **envp, t_cmd *data)
 		path = find_env(*env, "PATH");
 		if (!path)
 			(free(commande), invalid_path(data));
+		if (heredoc->flag_heredoc)
+			ft_execute_heredoc(commande, path, data, envp);
 		access_and_execute(path, commande, data, envp);
 		(free_split(commande), invalid_msg(data->cmd[0], data));
 	}
