@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 16:01:11 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/30 14:51:49 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/30 18:59:45 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,11 +60,12 @@ int ft_inp_heredoc_s(char **files, char **redirections, t_heredoc *heredoc)
     {
         if (heredoc->fd == -1)
             return (perror("minishell"), FAILURE);
-        if (dup2(heredoc->fd, STDIN_FILENO) == -1)
+        else if (dup2(heredoc->fd, 0) == -1)
             return (close(heredoc->fd), perror("minishell"), FAILURE);
+        printf("----->%d\n", heredoc->fd);
         close(heredoc->fd);
     }
-    return SUCCESS;
+    return (SUCCESS);
 }
 
 void to_single_redirection(char **files, char **redirections, t_heredoc *heredoc)

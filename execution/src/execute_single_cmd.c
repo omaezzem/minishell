@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 19:36:54 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/30 14:53:39 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/30 19:06:25 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,10 @@ void ft_execute_heredoc(char **commande, char *path, t_cmd *data, char **envp)
 		cmd = ft_strjoin(joinslash, data->cmd[0]);
 		free(joinslash);
 		if (access(cmd, X_OK | F_OK) == 0)
-			execve(cmd, commande, envp);
+		{
+			if (execve(cmd, commande, envp) == -1)
+				printf("------------lsls\n");
+		}
 	}
 	(free_split(commande), invalid_msg(data->cmd[0], data));
 }

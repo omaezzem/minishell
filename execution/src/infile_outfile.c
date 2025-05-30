@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 20:07:00 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/30 14:52:14 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/30 16:49:25 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ static int	process_inputs(char **files, char **redirections, int i_infl, t_hered
 		if (fd == -1 || dup2(fd, STDIN_FILENO) == -1)
 			return (close(fd), perror("minishell"), FAILURE);
 	}
-	else if (files[i_infl] || ft_strcmp(redirections[i_infl], "<<") == 0)
+	else if (files[i_infl] && ft_strcmp(redirections[i_infl], "<<") == 0)
 	{
 		if (heredoc->fd == -1 || dup2(heredoc->fd, STDIN_FILENO) == -1)
 			return (close(heredoc->fd), perror("minishell"), FAILURE);

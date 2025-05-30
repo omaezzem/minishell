@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 10:05:28 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/30 14:47:19 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/30 16:55:04 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ int		create_pipes(int numcmd, int (*pipes)[2], int *pids, t_cmd *data)
     }
 	return (1);
 }
+
 int	dup_and_close_pipes(int (*pipes)[2], int i, int numcmd)
 {
 	int j;
@@ -105,6 +106,7 @@ int join_execve_cmd(char *path, char **commande, t_cmd *curr, char **envp, t_cmd
 	free_split(splitpath);
 	return 1;
 }
+
 int		ft_execve(t_cmd *curr, t_env *env, t_cmd *data, char **envp, int i)
 {
 	int lencmd;
