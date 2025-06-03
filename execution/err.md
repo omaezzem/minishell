@@ -39,46 +39,20 @@ echo $""
 
 echo "$"""
 
-****************************************************
+================================================================================================================================
 
-export $?  ------------------------> bash: export: `0': not a valid identifier
-export HOLA=bon;jour
+#parsing **********************
 
+minishell$ echo loop > $aa""
+minishell: $aa"": ambiguous redirect
+                                        ---------> makatkhelihach twsel 3andi bash itle3  "No such file or directory"
+bash-3.2$ echo loop > $aa""
+bash: : No such file or directory
 
-
-int overflow in int 0
-int overflow in long 0
-== 999 -> ""
-> 999 -> 1
-> 0 -> 0
-
-
+~
+~
 
 
-================================================================
-
-minishell$ echo '"$HOME'"
-"$HOME 
-must be an error check bash 
-
-minishell$ > $a
-minishell$ 
-must print ambigious redirect 
-
-minishell$ echo "$$$$HOME"
-/mnt/homes/omaezzem  ila kano majmou3 ta3 $ even maghayexpandix ola kan odd ayexpandi 
-check bash
-
-
-
-
-================================================================
-
-minishell$ echo loop > $aa"" 
-minishell: No such file or directory
-loop
-
-must be just 
-minishell: No such file or directory
-
-bash-3.2$  exit 8888888888888888888888888888888888888888888888888888888888888888888 | cat 
+$
+~
+================================================================================================================================

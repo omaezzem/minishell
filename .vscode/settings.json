@@ -59,6 +59,11 @@
   "files.associations": {
     "iterator": "c",
     "complex": "c",
-    "minishell.h": "c"
+    "minishell.h": "c",
+    "locale": "c",
+    "array": "c",
+    "string": "c",
+    "string_view": "c",
+    "vector": "c"
   }
 }

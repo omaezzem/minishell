@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 19:53:31 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/28 19:53:43 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/05/31 13:20:56 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,13 +24,15 @@ bool is_file(const char *path)
 	return (stat(path, &path_stat) == 0) && S_ISREG(path_stat.st_mode);
 }
 
-int     check_dir_file(char **args)
+int     check_dir_file(char **args, t_cmd *data)
 {
 	if (is_dir(args[0]))
 	{
 		ft_putstr_fd("minishell: ", 2);
 		ft_putstr_fd(args[0], 2);
 		ft_putstr_fd(": is a directory\n", 2);
+		data->ex_status = 126;
+		exit(126);
 		return 1;
 	}
 	if (is_file(args[0]))
@@ -38,6 +40,8 @@ int     check_dir_file(char **args)
 		ft_putstr_fd("minishell: ", 2);
 		ft_putstr_fd(args[0], 2);
 		ft_putstr_fd(": Permission denied\n", 2);
+		data->ex_status = 126;
+		exit(126);
 		return 1;
 	}
 	return 0;

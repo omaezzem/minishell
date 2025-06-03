@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 23:17:48 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/30 14:52:02 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/02 18:46:47 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,9 +77,10 @@ typedef struct s_exp
 
 typedef struct s_herdoc
 {
-	char *delimiter;
-	int flag_heredoc;
-	int fd;
+	char	*delimiter;
+	char	*filename;
+	int		flag_heredoc;
+	int		fd;
 	struct s_heredoc *next;
 } t_heredoc;
 
@@ -166,9 +167,9 @@ void	minishell_invalid(char *invalid_str);
 int		ft_do_redirections(char **files, char **redirections, t_heredoc *heredoc);
 void	update_val_env(t_env *env, char *var, char *val);
 void	update_val_exp(t_exp *exp, char *var, char *val);
-void	update_new(t_env *ev, char *newpath);
+void	update_new(t_env **ev, char *newpath);
 char	*determine_path(t_env *env, char **args, int lenargs);
-void	update_old(t_env *ev, char *oldpath);
+void	update_old(t_env **ev, char *oldpath);
 int		find_plus(char *var);
 int		len_alnum_var(char *var);
 int		find_equal(char *str);
@@ -191,10 +192,11 @@ int		search_var_in_exp(t_exp *exp, char *var);
 int		search_var_in_env(t_env *env, char *var);
 int		ft_builtins(t_env **env, t_exp **exp, t_cmd *data, t_heredoc *heredoc);
 int		is_builtin(char *args);
-int		check_dir_file(char **args);
+int     check_dir_file(char **args, t_cmd *data);
 int		len_cmd(t_cmd *data);
 int		notpipe(t_cmd *data);
-void	invalid_msg(char *cmd, t_cmd *data);
+
+void	invalid_msg(char **cmd, t_cmd *data);
 void    exit_failure(t_cmd *data);
 void    exit_success(t_cmd *data);
 void	invalid_path(t_cmd *data);
@@ -215,18 +217,18 @@ void	append_token(t_token **head, t_token *new_token);
 t_token	*create_token(char *value, t_type type);
 void	print_type(t_type type);
 t_type	get_token_type(char *str);
-int error(t_token *tokens, t_env *env, t_heredoc *heredoc);
+int	error(t_token *tokens, t_heredoc *heredoc);
 char	*ft_substr(char *s, int start, int len);
 int		error_pipe(t_token *tokens);
 void	sigint_handler(int sig);
 t_token	*tokenize(char *input);
 char	*read_input(char *prompt);
 char *expand_herdoc(t_token *token, t_env *env);
-t_cmd	*parse(t_env *env, t_heredoc *heredoc);
+t_cmd *parse(t_env *env, t_heredoc *heredoc, t_cmd *cmd_1);
 t_cmd *joining(t_token *tokens);
 t_cmd *joining2(t_token *tokens);
 t_token *tokenize1(char *input);
-t_token	*expand(t_token *token, t_env *env);
+t_token *expand(t_token *token, t_env *env, t_cmd *cmd);
 int		expand_env(char **oldp, char **newp, int brace_flag, char *var, t_env *env);
 int		expand_pid(char **newp, int space_left);
 int		expand_argv(char **oldp, char **newp, int space_left);

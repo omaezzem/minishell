@@ -6,48 +6,62 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 09:45:32 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/26 09:55:46 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/01 18:26:08 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../include/minishell.h"
 
-void	update_old(t_env *ev, char *oldpath)
+void	update_old(t_env **ev, char *oldpath)
 {
 	t_env	*add;
 
-	add = ev;
-	while (ev != NULL)
+	add = *ev;
+	while (add != NULL)
 	{
-		if (ft_strcmp(ev->var, "OLDPWD") == 0)
+		if (ft_strcmp((add)->var, "OLDPWD") == 0)
 		{
-			free(ev->val);
-			ev->val = ft_strdup(oldpath);
-			ev = add;
+			free((add)->val);
+			(add)->val = ft_strdup(oldpath);
 			break ;
 		}
-		ev = ev->next;
+		(add) = (add)->next;
 	}
-	ev = add;
 }
 
-void	update_new(t_env *ev, char *newpath)
+void	update_new(t_env **ev, char *newpath)
 {
 	t_env	*add;
+	char	un_pwd[PATH_MAX];
+	int		i;
+	t_env	*nnode;
 
-	add = ev;
-	while (ev != NULL)
+	i = 1;
+	add = *ev;
+	while (add != NULL)
 	{
-		if (ft_strcmp(ev->var, "PWD") == 0)
+		if (ft_strcmp(add->var, "PWD") == 0)
 		{
-			free(ev->val);
-			ev->val = ft_strdup(newpath);
-			ev = add;
+			i = 0;
+			free(add->val);
+			add->val = ft_strdup(newpath);
 			break ;
 		}
-		ev = ev->next;
+		add = (add)->next;
 	}
-	ev = add;
+	if (i == 1)
+	{
+		if (getcwd(un_pwd, PATH_MAX))
+		{
+			nnode = malloc(sizeof(t_env));
+			if (!nnode)
+				return ;
+			nnode->var = ft_strdup("PWD");
+			nnode->val = ft_strdup(un_pwd);
+			nnode->next = NULL;
+			ft_lstadd_back_env(ev, nnode);
+		}
+	}
 }
 
 static char	*get_home_path(t_env *env)

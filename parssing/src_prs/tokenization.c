@@ -37,41 +37,40 @@ t_type get_token_type(char *str)
 	return TOKEN_WORD;
 }
 
-void print_type(t_type type)
-{
-	if (type == TOKEN_WORD)
-		printf("TOKEN_WORD\n");
-	else if (type == TOKEN_PIPE)
-		printf("TOKEN_PIPE\n");
-	else if (type == TOKEN_OR)
-		printf("TOKEN_OR\n");
-	else if (type == TOKEN_REDIRECT_IN)
-		printf("TOKEN_REDIRECT_IN\n");
-	else if (type == TOKEN_REDIRECT_OUT)
-		printf("TOKEN_REDIRECT_OUT\n");
-	else if (type == TOKEN_APPEND)
-		printf("TOKEN_APPEND\n");
-	else if (type == TOKEN_HEREDOC)
-		printf("TOKEN_HEREDOC\n");
-	else if (type == TOKEN_DQUOTE)
-		printf("TOKEN_DQUOTE\n");
-	else if (type == TOKEN_OPEN_PAREN)
-		printf("TOKEN_OPEN_PAREN\n");
-	else if (type == TOKEN_CLOSE_PAREN)
-		printf("TOKEN_CLOSE_PAREN\n");
-    else if (type == TOKEN_SQUOTE)
-        printf("TOKEN_SQUOTE\n");
-    else if (type == TOKEN_SPACE)
-        printf("TOKEN_SPACE\n");
-	// else if (type == TOKEN_OPTION)
-	// 	printf("TOKEN_OPTION\n");
-	else if (type == TOKEN_FILE)
-		printf("TOKEN_FILE\n");
-	else if (type == TOKEN_DQUOTE)
-		printf("TOKEN_DQUOTE\n");
-	// else
-	// 	printf("UNKNOWN TOKEN\n");
-}
+// void print_type(t_type type)
+// {
+// 	if (type == TOKEN_WORD)
+// 	else if (type == TOKEN_PIPE)
+// 		printf("TOKEN_PIPE\n");
+// 	else if (type == TOKEN_OR)
+// 		printf("TOKEN_OR\n");
+// 	else if (type == TOKEN_REDIRECT_IN)
+// 		printf("TOKEN_REDIRECT_IN\n");
+// 	else if (type == TOKEN_REDIRECT_OUT)
+// 		printf("TOKEN_REDIRECT_OUT\n");
+// 	else if (type == TOKEN_APPEND)
+// 		printf("TOKEN_APPEND\n");
+// 	else if (type == TOKEN_HEREDOC)
+// 		printf("TOKEN_HEREDOC\n");
+// 	else if (type == TOKEN_DQUOTE)
+// 		printf("TOKEN_DQUOTE\n");
+// 	else if (type == TOKEN_OPEN_PAREN)
+// 		printf("TOKEN_OPEN_PAREN\n");
+// 	else if (type == TOKEN_CLOSE_PAREN)
+// 		printf("TOKEN_CLOSE_PAREN\n");
+//     else if (type == TOKEN_SQUOTE)
+//         printf("TOKEN_SQUOTE\n");
+//     else if (type == TOKEN_SPACE)
+//         printf("TOKEN_SPACE\n");
+// 	// else if (type == TOKEN_OPTION)
+// 	// 	printf("TOKEN_OPTION\n");
+// 	else if (type == TOKEN_FILE)
+// 		printf("TOKEN_FILE\n");
+// 	else if (type == TOKEN_DQUOTE)
+// 		printf("TOKEN_DQUOTE\n");
+// 	// else
+// 	// 	printf("UNKNOWN TOKEN\n");
+// }
 int		issspace(int c)
 {
 	c = (unsigned char)c;
@@ -685,8 +684,52 @@ t_token *handle_tokenz_expansion(char *qote)
 
 //     return head;
 // }
-
-t_cmd *parse(t_env *env, t_heredoc *heredoc)
+void free_tokens(t_token *tokens)
+{
+    t_token *tmp;
+    while (tokens)
+    {
+        tmp = tokens;
+        tokens = tokens->next;
+        free(tmp->value);
+        free(tmp);
+    }
+}
+void free_cmd(t_cmd *cmd)
+{
+    t_cmd *tmp;
+    while (cmd)
+    {
+        tmp = cmd;
+        cmd = cmd->next;
+        if (tmp->cmd)
+        {
+            for (int i = 0; tmp->cmd[i]; i++)
+                free(tmp->cmd[i]);
+            free(tmp->cmd);
+        }
+        if (tmp->args)
+        {
+            for (int i = 0; tmp->args[i]; i++)
+                free(tmp->args[i]);
+            free(tmp->args);
+        }
+        if (tmp->files)
+        {
+            for (int i = 0; tmp->files[i]; i++)
+                free(tmp->files[i]);
+            free(tmp->files);
+        }
+        if (tmp->redirection)
+        {
+            for (int i = 0; tmp->redirection[i]; i++)
+                free(tmp->redirection[i]);
+            free(tmp->redirection);
+        }
+        free(tmp);
+    }
+}
+t_cmd *parse(t_env *env, t_heredoc *heredoc, t_cmd *cmd_1)
 {
     t_token *tokens;
     t_cmd *cmd = NULL;
@@ -697,56 +740,39 @@ t_cmd *parse(t_env *env, t_heredoc *heredoc)
     free(input);
     if (!tokens)
         return NULL;
-
     mark_file_tokens(tokens);
-    t_token *tmp = tokens;
-    // while (tmp)
-    // {
-    //     printf("Value: %s\t", tmp->value);
-    //     print_type(tmp->type);
-    //     tmp = tmp->next;
-    // }
-    if (tokens->type == TOKEN_PIPE)
+    if (!error(tokens, heredoc))
     {
-        printf("minishell: syntax error near unexpected token '%s'\n", tokens->value);
+        free_tokens(tokens);
         return NULL;
     }
-    if (!error(tokens, env, heredoc)) return NULL;
     if(check_ambiguous_redirection(tokens, env) == 0)
+    {
+        free_tokens(tokens);
         return NULL;
+    }
     // tokens = tokenize(input);
-    tokens = expand(tokens, env);
-    // printf("qote: %s\n", qote);
-    tmp = tokens;
+    tokens = expand(tokens, env, cmd_1);
+    if (!tokens)
+    {
+        free_tokens(tokens);
+        return NULL;
+    }
+    t_token *tmp = tokens;
     while (tmp)
     {
-        printf("Value: %s\t", tmp->value);
-        print_type(tmp->type);
+        // printf("Value: %s\t ", tmp->value);
+        // print_type(tmp->type);
         tmp = tmp->next;
     }
-    // tokens = handle_tokenz_expansion(qote);
-    // tokens = tokenize(qote);
-    // mark_file_tokens(tokens);
-    // tmp = tokens;
-    // while (tmp)
-    // {
-    //     printf("Value: %s\t", tmp->value);
-    //     print_type(tmp->type);
-    //     tmp = tmp->next;
-    // }
    cmd = joining2(tokens);
-//    t_cmd *tmp_cmd = cmd;
-//     while (tmp_cmd)
-//     {
-//         printf("Command: ");
-//         for (int i = 0; tmp_cmd->cmd && tmp_cmd->cmd[i]; i++)
-//         {
-//             printf("%s \n", tmp_cmd->cmd[i]);
-//         }
-//         printf("\n");
-//         tmp_cmd = tmp_cmd->next;
-//     }
+   if (!cmd)
+   {
+       free_tokens(tokens);
+       free_cmd(cmd);
+       return NULL;
+   }
+   free_tokens(tokens);
     remove_quotes_cmd(cmd);
-    // printf("env->fd: %d\n", env->fd);
     return cmd;
 }

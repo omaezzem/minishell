@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:50:42 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/27 14:58:26 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/02 16:57:06 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ int	ft_cd(t_env *env, char **args ,t_exp *exp)
 		return (0);
 	if (!getcwd(newpath, PATH_MAX))
 		return (ft_putstr_fd("cd: error retrieving current directory\n", 2), 0);
-	update_old(env, oldpath);
-	update_new(env, newpath);
+	update_old(&env, oldpath);
+	update_new(&env, newpath);
 	return (1);
 }

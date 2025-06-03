@@ -231,40 +231,40 @@ static char *append_to_result(char *final, char *part, size_t total_len) {
 
 // // ——— Single‐char handlers —————————————————————————
 
-int expand_status(char **newp, int space_left) {
-    int n, i = 0;
-    char status_buffer[10];
-    char *new = *newp;
-    n = snprintf(status_buffer, 10, "%d", prev_status);
-    if (n > space_left)
-        return ENOROOM;
-    while (status_buffer[i] != '\0')
-        *new++ = status_buffer[i++];
-    *newp = new;
-    return n;
-}
+// int expand_status(char **newp, int space_left) {
+//     int n, i = 0;
+//     char status_buffer[10];
+//     char *new = *newp;
+//     n = snprintf(status_buffer, 10, "%d", prev_status);
+//     if (n > space_left)
+//         return ENOROOM;
+//     while (status_buffer[i] != '\0')
+//         *new++ = status_buffer[i++];
+//     *newp = new;
+//     return n;
+// }
 
-int expand_argv(char **oldp, char **newp, int space_left) {
-    char arg_idx[4], *arg;
-    char *old = *oldp;
-    char *new = *newp;
-    int argn, n = 0, i = 0;
-    while (isdigit(*old) && i < 3)
-        arg_idx[i++] = *old++;
-    arg_idx[i] = '\0';
-    argn = atoi(arg_idx);
-    if ((argn + cmdline_shift) < cmdline_argc) {
-        n = ft_strlen(cmdline_argv[argn + cmdline_shift]);
-        if (n > space_left)
-            return ENOROOM;
-        arg = cmdline_argv[argn + cmdline_shift];
-        while (*arg != '\0')
-            *new++ = *arg++;
-    }
-    *oldp = old - 1;
-    *newp = new;
-    return n;
-}
+// int expand_argv(char **oldp, char **newp, int space_left) {
+//     char arg_idx[4], *arg;
+//     char *old = *oldp;
+//     char *new = *newp;
+//     int argn, n = 0, i = 0;
+//     while (isdigit(*old) && i < 3)
+//         arg_idx[i++] = *old++;
+//     arg_idx[i] = '\0';
+//     argn = atoi(arg_idx);
+//     if ((argn + cmdline_shift) < cmdline_argc) {
+//         n = ft_strlen(cmdline_argv[argn + cmdline_shift]);
+//         if (n > space_left)
+//             return ENOROOM;
+//         arg = cmdline_argv[argn + cmdline_shift];
+//         while (*arg != '\0')
+//             *new++ = *arg++;
+//     }
+//     *oldp = old - 1;
+//     *newp = new;
+//     return n;
+// }
 int expand_env(char **oldp, char **newp, int brace_flag, char *var, t_env *env) {
     char *old = *oldp;
     char *new = *newp;
@@ -304,33 +304,33 @@ int expand_env(char **oldp, char **newp, int brace_flag, char *var, t_env *env) 
 }
 
 
-int expand_argc(char **newp, int space_left) {
-    char argc_buffer[10], *new = *newp;
-    int n, i = 0;
-    if (cmdline_argc < cmdline_shift)
-        n = snprintf(argc_buffer, 10, "0");
-    else
-        n = snprintf(argc_buffer, 10, "%d", cmdline_argc - cmdline_shift);
-    if (n > space_left)
-        return ENOROOM;
-    while (argc_buffer[i] != '\0')
-        *new++ = argc_buffer[i++];
-    *newp = new;
-    return n;
-}
-int expand_pid(char **newp, int space_left) {
-    int i = 0, n;
-    pid_t pid = getpid();
-    char pid_buffer[10];
-    char *new = *newp;
-    n = snprintf(pid_buffer, 10, "%d", pid);
-    if (n > space_left)
-        return ENOROOM;
-    while (pid_buffer[i] != '\0')
-        *new++ = pid_buffer[i++];
-    *newp = new;
-    return n;
-}
+// int expand_argc(char **newp, int space_left) {
+//     char argc_buffer[10], *new = *newp;
+//     int n, i = 0;
+//     if (cmdline_argc < cmdline_shift)
+//         n = snprintf(argc_buffer, 10, "0");
+//     else
+//         n = snprintf(argc_buffer, 10, "%d", cmdline_argc - cmdline_shift);
+//     if (n > space_left)
+//         return ENOROOM;
+//     while (argc_buffer[i] != '\0')
+//         *new++ = argc_buffer[i++];
+//     *newp = new;
+//     return n;
+// }
+// int expand_pid(char **newp, int space_left) {
+//     int i = 0, n;
+//     pid_t pid = getpid();
+//     char pid_buffer[10];
+//     char *new = *newp;
+//     n = snprintf(pid_buffer, 10, "%d", pid);
+//     if (n > space_left)
+//         return ENOROOM;
+//     while (pid_buffer[i] != '\0')
+//         *new++ = pid_buffer[i++];
+//     *newp = new;
+//     return n;
+// }
 
 // ——— Full expand routine ——————————————————————————
 
@@ -355,25 +355,39 @@ int expand_pid(char **newp, int space_left) {
 //     }
 //     return NULL;
 // }
-typedef struct s_dynstr {
+typedef struct s_dynstr
+{
     char *data;
     size_t len;
     size_t cap;
 } t_dynstr;
 
-void dyn_str_init(t_dynstr *ds) {
+void dyn_str_init(t_dynstr *ds)
+{
     ds->data = NULL;
     ds->len = 0;
     ds->cap = 0;
 }
 
-int dyn_str_append(t_dynstr *ds, const char *str, size_t len) {
-    if (!str || len == 0) return 0;
+int dyn_str_append(t_dynstr *ds, const char *str, size_t len)
+{
+    char *new_data;
+    size_t new_cap;
+
+    if (str == NULL || len == 0)
+        return 0;
     if (ds->cap < ds->len + len + 1) {
-        size_t new_cap = ds->cap ? ds->cap * 2 : 256;
-        while (new_cap < ds->len + len + 1) new_cap *= 2;
-        char *new_data = realloc(ds->data, new_cap);
-        if (!new_data) return -1;
+        new_cap = ds->cap;
+        if (new_cap == 0)
+            new_cap = 256;
+        while (new_cap < ds->len + len + 1)
+            new_cap *= 2;
+        new_data = malloc(new_cap);
+        if (new_data == NULL)
+            return -1;
+        if (ds->data != NULL)
+            memcpy(new_data, ds->data, ds->len);
+        free(ds->data);
         ds->data = new_data;
         ds->cap = new_cap;
     }
@@ -383,18 +397,37 @@ int dyn_str_append(t_dynstr *ds, const char *str, size_t len) {
     return 0;
 }
 
-char *dyn_str_finalize(t_dynstr *ds) {
+
+#include <stdlib.h>
+#include <string.h>
+
+char *dyn_str_finalize(t_dynstr *ds)
+{
     if (!ds) return NULL;
+
     if (ds->cap < ds->len + 1) {
-        char *new_data = realloc(ds->data, ds->len + 1);
+        char *new_data = malloc(ds->len + 1);
         if (!new_data) return NULL;
+
+        memcpy(new_data, ds->data, ds->len); // نسخ المحتوى القديم
+        free(ds->data);                      // تحرير الميموري القديمة
+
         ds->data = new_data;
         ds->cap = ds->len + 1;
     }
+
     ds->data[ds->len] = '\0';
     return ds->data;
 }
-t_token *expand(t_token *token, t_env *env) {
+// int get_last_exit_status(void)
+// {
+//     char *status = malloc(20);
+//     if (!status) return NULL;
+//     // snprintf(status, 20, "%d", prev_status);
+//     return status;
+// }
+t_token *expand(t_token *token, t_env *env, t_cmd *cmd)
+{
     t_token *result = NULL;
     t_token **current = &result;
 
@@ -412,6 +445,7 @@ t_token *expand(t_token *token, t_env *env) {
                     in_single = !in_single;
                     dyn_str_append(&ds, "'", 1);
                     src++;
+                    printf("lala\n");
                     continue;
                 }
 
@@ -419,6 +453,7 @@ t_token *expand(t_token *token, t_env *env) {
                     in_double = !in_double;
                     dyn_str_append(&ds, "\"", 1);
                     src++;
+                    printf("baba\n");
                     continue;
                 }
 
@@ -436,25 +471,19 @@ t_token *expand(t_token *token, t_env *env) {
                     for (int i = 0; i < escape_count; i++) {
                         dyn_str_append(&ds, "$", 1);
                     }
-
+                    if (*src == '?')
+                    {
+                        printf("%d\n", cmd->ex_status);
+                        char *status = ft_itoa(cmd->ex_status);
+                        write(STDIN_FILENO, status, ft_strlen(status));
+                        dyn_str_append(&ds, status, ft_strlen(status));
+                        free(status);
+                    }
                     if (!expand) continue;
 
                     char varname[256] = {0};
-                    int brace = (*src == '{');
                     int valid = 0;
-
-                    if (brace) {
-                        src++;
-                        char *end = strchr(src, '}');
-                        if (!end) {
-                            dyn_str_append(&ds, "${", 2);
-                            continue;
-                        }
-                        strncpy(varname, src, end - src);
-                        src = end + 1;
-                        valid = 1;
-                    } else if (*src == '?' || *src == '#' || *src == '$' || 
-                               isdigit(*src) || isalpha(*src) || *src == '_') {
+                    if (isdigit(*src) || isalpha(*src) || *src == '_') {
                         char *start = src;
                         while (*src && (isalnum(*src) || *src == '_')) {
                             src++;
@@ -471,25 +500,9 @@ t_token *expand(t_token *token, t_env *env) {
                     }
 
                     char *val = NULL;
-                    if (strcmp(varname, "?") == 0) {
-                        char buf[20];
-                        snprintf(buf, sizeof(buf), "%d", prev_status);
-                        val = strdup(buf);
-                    } else if (strcmp(varname, "#") == 0) {
-                        char buf[20];
-                        snprintf(buf, sizeof(buf), "%d", cmdline_argc - cmdline_shift);
-                        val = strdup(buf);
-                    } else if (isdigit(varname[0])) {
-                        int idx = atoi(varname);
-                        if (idx + cmdline_shift < cmdline_argc) {
-                            val = strdup(cmdline_argv[idx + cmdline_shift]);
-                        } else {
-                            val = strdup("");
-                        }
-                    } else {
                         char *env_val = find_env(env, varname);
                         val = env_val ? strdup(env_val) : strdup("");
-                    }
+
 
                     if (val) {
                         dyn_str_append(&ds, val, strlen(val));
@@ -586,33 +599,20 @@ char *expand_herdoc(t_token *token, t_env *env) {
                     // Invalid var: just output one $
                     result = append_to_result(result, "$", total);
                     total++;
+                    printf("oo\n");
                     continue;
                 }
 
                 // Expand the var
                 char *val = NULL;
-                if (strcmp(varname, "?") == 0) {
-                    char buf[16];
-                    snprintf(buf, sizeof(buf), "%d", prev_status);
-                    val = buf;
-                } else if (strcmp(varname, "#") == 0) {
-                    char buf[16];
-                    snprintf(buf, sizeof(buf), "%d", cmdline_argc - cmdline_shift);
-                    val = buf;
-                } else if (strcmp(varname, "$") == 0) {
-                    char buf[16];
-                    snprintf(buf, sizeof(buf), "%d", getpid());
-                    val = buf;
-                } else if (isdigit(varname[0])) {
-                    int idx = atoi(varname) + cmdline_shift;
-                    val = (idx < cmdline_argc) ? cmdline_argv[idx] : "";
-                } else {
+                //   else {
                     val = find_env(env, varname);
                     if (!val) val = "";
-                }
+                // }
 
                 result = append_to_result(result, val, total);
                 total += ft_strlen(val);
+                printf("lolo\n");
                 continue;
             }
 
