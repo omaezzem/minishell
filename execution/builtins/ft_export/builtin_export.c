@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 11:23:25 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/26 15:33:19 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/09 23:10:22 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ void	handle_plus_case(t_exp *exp, t_env *env, char *arg, char *avzero)
 
 	avone = args_one(arg);
 	if (!avone)
-		return (free(avzero));
+		avone = ft_strdup("");
 	if (search_var_in_exp(exp, avzero))
 		update_join_exp(exp, avzero, avone);
 	else
@@ -27,7 +27,8 @@ void	handle_plus_case(t_exp *exp, t_env *env, char *arg, char *avzero)
 		update_join_env(env, avzero, avone);
 	else
 		add_to_env_list(env, arg, avzero, avone);
-	free(avzero);
+	if (ft_strcmp(avone, "") == 0)
+		free(avone);
 }
 
 void	handle_equal_case(t_exp *exp, t_env *env, char *arg, char *avzero)
@@ -39,32 +40,25 @@ void	handle_equal_case(t_exp *exp, t_env *env, char *arg, char *avzero)
 		avone = ft_strdup("");
 	add_to_export_list_vl(&exp, avzero, avone);
 	add_to_env_list(env, arg, avzero, avone);
-	free(avzero);
+	if (ft_strcmp(avone, "") == 0)
+		free(avone);
 }
 
-void	process_export_args(t_exp *exp, t_env *env, char **args)
+int	process_export_args(t_exp *exp, t_env *env, char **args)
 {
 	int		i;
-	char	*avzero;
 
 	i = 1;
 	while (args[i])
 	{
-		if (!args[i])
-			continue ;
-		if (!ft_isalpha(args[i][0]))
-			return (minishell_invalid(args[i]));
-		avzero = check_var(args_zero(args[i]));
-		if (!avzero)
-			return ;
-		if (find_plus(args[i]))
-			handle_plus_case(exp, env, args[i], avzero);
-		else if (find_equal(args[i]))
-			handle_equal_case(exp, env, args[i], avzero);
-		else
-			add_to_export_list_v(&exp, avzero);
+		if (!process_single_arg(exp, env, args[i]))
+		{
+			return 0;
+			break ;
+		}
 		i++;
 	}
+	return 1;
 }
 
 void	print_export_list(t_exp *exp)
@@ -92,9 +86,12 @@ int		ft_export(t_exp *exp, t_env *env, char **args)
 
 	len = len_arg(args);
 	if (len > 1)
-		process_export_args(exp, env, args);
-	if_double_var(&exp);
-	sort_exp_list(&exp);
+		if(!process_export_args(exp, env, args))
+			return (1);
+	if (!if_double_var(&exp))
+		return (1);
+	if (!sort_exp_list(&exp))
+		return (1);
 	if ((len_arg(args) == 1) && !ft_strcmp(args[0], "export"))
 		print_export_list(exp);
 	return (0);

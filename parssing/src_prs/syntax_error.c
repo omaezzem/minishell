@@ -13,6 +13,94 @@
 #include "../../include/minishell.h"
 
 
+void quote_handler(char *str, size_t *i, size_t *j, char *res)
+{
+    char quote = str[*i];
+    (*i)++;
+    while (str[*i] && str[*i] != quote)
+    {
+        res[(*j)++] = str[*i];
+        (*i)++;
+    }
+    if (str[*i] == quote)
+        (*i)++;
+}
+char *strip2_quotes(t_gc *gc, char *str)
+{
+	size_t	i = 0;
+    size_t	j = 0;
+	char	*res = gc_malloc(gc, ft_strlen(str) + 1); // بدل malloc بـ gc_malloc
+
+	if (!res)
+		return (NULL);
+	while (str[i])
+	{
+		if (str[i] == '\'' || str[i] == '"')
+			quote_handler(str, &i, &j, res);
+		else
+			res[j++] = str[i++];
+	}
+	res[j] = '\0';
+	return (res);
+}
+
+
+
+void remove_quotes2_token(t_gc *gc, t_token *token)
+{
+	char *tmp;
+
+	while (token)
+	{
+		if (token->value)
+		{
+			tmp = strip2_quotes(gc, token->value);
+			// free(token->value); // بدل free بـ gc_free
+			token->value = tmp;
+		}
+		token = token->next;
+	}
+}
+
+
+static char *make_heredoc_filename(t_gc *gc)
+{
+    int i = 0;
+    char *num;
+    char *tmp;
+    char *path;
+
+    while (1) {
+        num = gc_itoa(gc, i);
+        if (!num) return NULL;
+        tmp = gc_strjoin(gc, "/tmp/.heredoc_tmp_", num);
+        // free(num);  // بدل free بـ gc_free
+        if (!tmp) return NULL;
+        if (access(tmp, F_OK) != 0) {
+            path = tmp;
+            break;
+        }
+        // free(tmp);  // بدل free بـ gc_free
+        i++;
+    }
+    return path;
+}
+
+
+static int	is_invalid_pipe_sequence(t_token *cur)
+{
+	if (!cur->next)
+		return (1);
+	if (cur->next->type == TOKEN_PIPE || cur->next->type == TOKEN_OR)
+		return (1);
+	if (cur->next->type == TOKEN_SPACE
+		&& cur->next->next
+		&& (cur->next->next->type == TOKEN_PIPE
+			|| cur->next->next->type == TOKEN_OR))
+		return (1);
+	return (0);
+}
+
 int	error_pipe(t_token *tokens)
 {
 	t_token	*cur;
@@ -20,15 +108,13 @@ int	error_pipe(t_token *tokens)
 	cur = tokens;
 	while (cur)
 	{
-		if ((cur->type == TOKEN_PIPE && !cur->next)
-			|| cur->type == TOKEN_OR
-			|| (cur->type == TOKEN_PIPE && cur->next->type == TOKEN_REDIRECT_OUT)
-			|| (cur->type == TOKEN_PIPE && cur->next->type == TOKEN_SPACE
-				&& cur->next->next
-				&& cur->next->next->type == TOKEN_REDIRECT_OUT)
-			|| (cur->type == TOKEN_PIPE && cur->next->type == TOKEN_PIPE)
-			|| (cur->type == TOKEN_PIPE && cur->next->type == TOKEN_HEREDOC)
-			|| (cur->type == TOKEN_PIPE && cur->next->type == TOKEN_REDIRECT_IN))
+		if (cur->type == TOKEN_PIPE && is_invalid_pipe_sequence(cur))
+		{
+			printf("minishell: syntax error near unexpected token '%s'\n",
+				cur->value);
+			return (0);
+		}
+		if (cur->type == TOKEN_OR)
 		{
 			printf("minishell: syntax error near unexpected token '%s'\n",
 				cur->value);
@@ -38,6 +124,7 @@ int	error_pipe(t_token *tokens)
 	}
 	return (1);
 }
+
 
 int	error2(t_token *cur)
 {
@@ -57,229 +144,235 @@ int	error2(t_token *cur)
 	}
 	return (1);
 }
-
-static void	skip_quotes(const char *str, size_t *i, size_t *j, char *res)
+static void write_expanded_line(t_gc *gc, char *line, t_env *env, int fd)
 {
-	char	quote = str[(*i)++];
-
-	while (str[*i] && str[*i] != quote)
-		res[(*j)++] = str[(*i)++];
-	if (str[*i] == quote)
-		(*i)++;
+	char *expanded = expand_herdoc(tokenize(gc, line), env);
+	if (!expanded)
+		exit(1);
+	write(fd, expanded, ft_strlen(expanded));
+	write(fd, "\n", 1);
+	// free(expanded);
 }
 
-char	*strip2_quotes(char *str)
+static int should_expand_line(char *line, char *tmp, int expand_flag)
 {
-	size_t	i = 0, j = 0;
-	char	*res = malloc(ft_strlen(str) + 1);
+	return (expand_flag || (ft_strchr(line, '$') && 
+			!(ft_strchr(tmp, '"') || ft_strchr(tmp, '\''))));
+}
 
-	if (!res)
-		return (NULL);
-	while (str[i])
+static int is_end_of_heredoc(char *line, char *delim)
+{
+	return (!line || ft_strcmp(line, delim) == 0);
+}
+
+static void read_and_write_heredoc(t_gc *gc, int fd, char *delim, t_env *env, char *tmp, int expand_flag)
+{
+	char *line;
+
+	while (1)
 	{
-		if (str[i] == '\'' || str[i] == '"')
-			skip_quotes(str, &i, &j, res);
-		else
-			res[j++] = str[i++];
-	}
-	res[j] = '\0';
-	return (res);
-}
-
-
-
-int	is_quoted(char *str)
-{
-	size_t	len = ft_strlen(str);
-
-	return ((str[0] == '\'' && str[len - 1] == '\'')
-		|| (str[0] == '"' && str[len - 1] == '"'));
-}
-char *generate_heredoc_filename(int index)
-{
-	char *base = ".heredoc_";
-	char *num = ft_itoa(index); // تحويل index إلى string
-	char *name = ft_strjoin(base, num);
-	free(num);
-	return (name);
-}
-void	remove_quotes2_token(t_token *token)
-{
-	char	*tmp;
-
-	while (token)
-	{
-		if (token->value)
+		line = readline("> ");
+		if (is_end_of_heredoc(line, delim))
 		{
-			tmp = strip2_quotes(token->value);
-			free(token->value);
-			token->value = tmp;
+            printf("1\n");
+            free(line);
+			break;
 		}
-		token = token->next;
+		if (should_expand_line(line, tmp, expand_flag))
+        {
+        write_expanded_line(gc, line, env, fd);
+        }
+		else
+		{
+            write(fd, line, ft_strlen(line));
+			write(fd, "\n", 1);
+		}
+		free(line);
 	}
 }
 
-// In write_heredoc_line:
-// static int write_heredoc_line(char *line, char *delimiter,
-//     int quoted, t_env *env, int fd)
-// {
-//     char *to_write;
-
-//     if (ft_strcmp(line, delimiter) == 0) {
-//         free(line);
-//         return (1);
-//     }
-//     to_write = line;
-//     if (!quoted && ft_strchr(line, '$')) {
-//         to_write = expand_herdoc(tokenize(line), env);
-//         free(line);
-//     }
-//     write(fd, to_write, ft_strlen(to_write));
-//     write(fd, "\n", 1);
-//     if (to_write != line) {
-//         free(to_write);
-//     }
-//     return (0);
-// }
-
-static char *make_heredoc_filename(void)
+static void handle_heredoc_child(t_gc *gc, t_token *delim, int fd, t_env *env)
 {
-    int     i = 0;
-    char    *num;
-    char    *tmp;
-    char    *path;
+	char *tmp = gc_strdup(gc, delim->value);
+	int expand_flag = (*delim->value == '$' && *(delim->value + 1) != '\0');
+	char *clean_delim;
 
-    while (1) {
-        num = ft_itoa(i);
-        if (!num) return NULL;
-        tmp = ft_strjoin("/tmp/.heredoc_tmp_", num);
-        free(num);
-        if (!tmp) return NULL;
-        if (access(tmp, F_OK) != 0) {
-            path = tmp;
-            break;
-        }
-        free(tmp);
-        i++;
+	signal(SIGINT, SIG_DFL);
+	remove_quotes2_token(gc, delim);
+	clean_delim = delim->value;
+	if (expand_flag && *clean_delim == '$' && *(clean_delim + 1) == '\0')
+		clean_delim++;
+	if (fd < 0)
+		exit(1);
+    
+	read_and_write_heredoc(gc, fd, clean_delim, env, tmp, expand_flag);
+	// free(tmp);
+	close(fd);
+	exit(0);
+}
+static int open_heredoc_file(t_gc *gc, t_heredoc *heredoc)
+{
+    int fd;
+
+    heredoc->filename = make_heredoc_filename(gc);
+    if (!heredoc->filename)
+        return (-1);
+    fd = open(heredoc->filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	printf("fd: %d\n", fd);
+    if (fd < 0)
+    {
+        perror("minishell: heredoc");
+        return (-1);
     }
-    return path;
+    return (fd);
 }
 
-
-static void handle_heredoc_child(t_token *delim, int fd)
+static int handle_heredoc_parent(pid_t pid, int write_fd,
+        t_token *curr, t_token *delim, t_heredoc *heredoc)
 {
-    char *line;
-
-    signal(SIGINT, SIG_DFL);
-    if (fd < 0) exit(1);
-
-    while (1) {
-        line = readline("> ");
-        if (!line || ft_strcmp(line, delim->value) == 0) {
-            free(line);
-            break;
-        }
-        write(fd, line, ft_strlen(line));
-        write(fd, "\n", 1);
-        free(line);
-    }
-    close(fd);
-    exit(0);
-}
-
-void handle_heredocs_range(t_token *start, t_heredoc *heredoc)
-{
-    t_token *curr = start;
-    pid_t pid;
     int status;
 
-    while (curr) {
-        if (curr->type == TOKEN_HEREDOC) {
-            t_token *delim = curr->next;
-            if (!delim) break;
-		
-            remove_quotes2_token(delim);
-            heredoc->filename = make_heredoc_filename();
-            if (!heredoc->filename) return;
-            int write_fd = open(heredoc->filename, O_WRONLY|O_CREAT|O_TRUNC, 0644);
-            if (write_fd < 0) {
-                perror("minishell: heredoc");
-                free(heredoc->filename);
-                return;
-            }
-
-            pid = fork();
-            if (pid == 0) {
-                handle_heredoc_child(delim, write_fd);
-            } else {
-                waitpid(pid, &status, 0);
-                close(write_fd);
-                
-                heredoc->fd = open(heredoc->filename, O_RDONLY);
-                if (heredoc->fd < 0) {
-                    perror("minishell: heredoc");
-                    free(heredoc->filename);
-                    return;
-                }
-                
-                heredoc->flag_heredoc = 1;
-                curr->type = TOKEN_REDIRECT_IN;
-                free(delim->value);
-                delim->value = heredoc->filename;
-            }
-        }
-        curr = curr->next;
+    waitpid(pid, &status, 0);
+    close(write_fd);
+    heredoc->fd = open(heredoc->filename, O_RDONLY);
+    if (heredoc->fd < 0)
+    {
+        perror("minishell: heredoc");
+        return (0);
     }
+    heredoc->flag_heredoc = 1;
+    curr->type = TOKEN_REDIRECT_IN;
+    if (delim->value)
+        delim->value = heredoc->filename;
+    return (1);
 }
 
-int	is_redir_syntax_err(t_token *cur)
+static int	check_delim_validity(t_token *delim, t_heredoc *heredoc)
 {
-	int	t = cur->type;
-	int	n = -1;
-
-	if (cur->next)
-		n = cur->next->type;
-
-	return ((t == TOKEN_REDIRECT_OUT && !cur->next)
-		|| (t == TOKEN_REDIRECT_IN && !cur->next)
-		|| (t == TOKEN_APPEND && !cur->next)
-		|| (t == TOKEN_HEREDOC && !cur->next)
-		|| (t == TOKEN_APPEND && (n == TOKEN_REDIRECT_OUT || n == TOKEN_REDIRECT_IN))
-		|| (t == TOKEN_APPEND && n == TOKEN_PIPE)
-		|| (t == TOKEN_APPEND && n == TOKEN_HEREDOC)
-		|| (t == TOKEN_HEREDOC && n == TOKEN_APPEND)
-		|| (t == TOKEN_REDIRECT_IN && n == TOKEN_APPEND)
-		|| (t == TOKEN_HEREDOC && n == TOKEN_HEREDOC)
-		|| (t == TOKEN_APPEND && n == TOKEN_APPEND)
-		|| (t == TOKEN_APPEND && n == TOKEN_HEREDOC)
-		|| (t == TOKEN_REDIRECT_OUT && (n == TOKEN_REDIRECT_IN || n == TOKEN_HEREDOC))
-		|| (t == TOKEN_HEREDOC && n == TOKEN_REDIRECT_OUT)
-		|| (t == TOKEN_REDIRECT_IN && n == TOKEN_REDIRECT_IN)
-		|| (t == TOKEN_REDIRECT_IN && cur->next && cur->next->type == TOKEN_PIPE)
-		|| (t == TOKEN_REDIRECT_OUT && n == TOKEN_PIPE));
-}
-
-
-int	error(t_token *tokens, t_heredoc *heredoc)
-{
-	t_token	*cur = tokens;
-
-	while (cur)
+	if (!delim || delim->type != TOKEN_FILE)
 	{
-		if (cur->type == TOKEN_HEREDOC && cur->next && cur->next->type != TOKEN_APPEND
-		&& cur->next->type != TOKEN_HEREDOC)
+		heredoc->fd = -1;
+		return (0);
+	}
+	return (1);
+}
+
+static int	fork_and_handle(t_gc *gc, t_token *curr, t_token *delim,
+				t_heredoc *heredoc, t_env *env)
+{
+	pid_t	pid;
+	int		write_fd;
+
+	write_fd = open_heredoc_file(gc, heredoc);
+	if (write_fd < 0)
+		return (0);
+	pid = fork();
+	if (pid == 0)
+		handle_heredoc_child(gc, delim, write_fd, env);
+	else
+	{
+		if (!handle_heredoc_parent(pid, write_fd, curr, delim, heredoc))
+			return (0);
+	}
+	return (1);
+}
+
+void	handle_heredocs_range(t_gc *gc, t_token *start,
+			t_heredoc *heredoc, t_env *env)
+{
+	t_token	*curr;
+	t_token	*delim;
+
+	curr = start;
+	while (curr)
+	{
+		if (curr->type == TOKEN_HEREDOC)
 		{
-			heredoc->flag_heredoc = 1;
-			handle_heredocs_range(cur, heredoc);
+			delim = curr->next;
+			if (!check_delim_validity(delim, heredoc))
+				return ;
+			if (!fork_and_handle(gc, curr, delim, heredoc, env))
+				return ;
+		}
+		curr = curr->next;
+	}
+}
+
+
+int is_redir_syntax_err(t_token *cur)
+{
+    int t = cur->type;
+    int n = -1;
+
+    if (!cur->next)
+        return (t == TOKEN_REDIRECT_IN || t == TOKEN_REDIRECT_OUT
+			|| t == TOKEN_APPEND || t == TOKEN_HEREDOC);
+
+    n = cur->next->type;
+
+    if (t == TOKEN_PIPE && cur->next->type == TOKEN_PIPE)
+        return (1);
+    if (t == TOKEN_HEREDOC && !cur->next)
+        return (1);
+    if ((t == TOKEN_REDIRECT_IN || t == TOKEN_REDIRECT_OUT
+        || t == TOKEN_APPEND || t == TOKEN_HEREDOC)
+        && (n == TOKEN_REDIRECT_IN || n == TOKEN_REDIRECT_OUT
+        || n == TOKEN_APPEND || n == TOKEN_HEREDOC || n == TOKEN_PIPE))
+        return (1);
+
+    return (0);
+}
+int check_pipe_at_start(t_token *tokens)
+{
+	if (tokens && tokens->type == TOKEN_PIPE)
+	{
+		printf("minishell: syntax error near unexpected token '%s'\n", tokens->value);
+		return (0);
+	}
+	return (1);
+}
+
+static int	handle_heredoc_logic(t_gc *gc, t_token *cur, t_heredoc *heredoc, t_env *env)
+{
+	if (cur->type == TOKEN_HEREDOC && cur->next
+		&& cur->next->type != TOKEN_APPEND
+		&& cur->next->type != TOKEN_HEREDOC)
+	{
+		heredoc->flag_heredoc = 1;
+		handle_heredocs_range(gc, cur, heredoc, env);
+		return (1);
+	}
+	return (0);
+}
+
+
+int	error(t_gc *gc, t_token *tokens, t_heredoc *heredoc, t_env *env)
+{
+	t_token	*cur;
+
+	cur = tokens;
+	if (!check_pipe_at_start(tokens))
+		return (0);
+    while (cur)
+    {
+        if (!error_pipe(tokens))
+            return (0);
+		if (handle_heredoc_logic(gc, cur, heredoc, env))
+		{
+			cur = cur->next;
 			continue;
 		}
+		// if (cur->type == TOKEN_PIPE)
+		// 	heredoc->fd = -1;
 		if (is_redir_syntax_err(cur))
-			return (printf("minishell: syntax error near unexpected token '%s'\n", cur->value), 0);
+		{
+			printf("minishell: syntax error near unexpected token '%s'\n",
+				cur->value);
+			return (0);
+		}
 		if (!error2(cur))
 			return (0);
 		cur = cur->next;
 	}
-	if (!error_pipe(tokens))
-		return (0);
 	return (1);
 }

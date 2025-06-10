@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 10:43:45 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/26 15:33:30 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/08 18:21:22 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,12 +32,12 @@ char	*check_var(char *var)
 	if (!parsvar)
 		return (NULL);
 	if (ft_isnum(var[0]))
-		return (minishell_invalid(var), NULL);
+		return (minishell_invalid(var), free(var), free(parsvar), NULL);
 	i = -1;
 	while (var[++i])
 	{
 		if (var[i] == '+' &&  var[i+1] != '\0')
-			return (minishell_invalid(var), NULL);
+			return (minishell_invalid(var), free(var), free(parsvar), NULL);
 		if (!ft_isalnum(var[i]))
 		{
 			if (var[i-1])
@@ -45,10 +45,11 @@ char	*check_var(char *var)
 				if (ft_isalnum(var[i-1]) && var[i] == '+' &&  var[i+1] == '\0')
 					break ;
 			}
-			return (minishell_invalid(var), free(parsvar), NULL);
+			return (minishell_invalid(var), free(var) ,free(parsvar), NULL);
 		}
 		parsvar[i] = var[i];
 	}
+	free(var);
 	parsvar[i] = '\0';
 	return parsvar;
 }

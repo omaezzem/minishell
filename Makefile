@@ -6,7 +6,7 @@
 #    By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/03/14 02:29:51 by omaezzem          #+#    #+#              #
-#    Updated: 2025/05/29 15:23:25 by omaezzem         ###   ########.fr        #
+#    Updated: 2025/06/10 15:14:30 by omaezzem         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,12 +29,15 @@ SRC = 	execution/builtins/cd/builtin_cd.c \
 		execution/builtins/ft_export/sort_exp.c\
 		execution/builtins/ft_export/utils_export.c\
 		execution/builtins/ft_export/parset_exp.c\
+		execution/builtins/ft_export/exptwo.c\
 		execution/env/env.c \
 		execution/utils_exe.c/free_ptr.c \
 		execution/utils_exe.c/len_redirections.c\
 		execution/src/infile_outfile.c\
 		execution/src/is_dir_file.c\
 		execution/src/is_bultin.c\
+		execution/src/ft_excpone.c\
+		execution/src/ft_excptwo.c\
 		execution/utils_exe.c/msg_invalid.c\
 		execution/utils_exe.c/free_split.c \
 		execution/utils_exe.c/ft_lstadd_back.c \
@@ -47,6 +50,8 @@ SRC = 	execution/builtins/cd/builtin_cd.c \
 		execution/utils_exe.c/ft_atoi.c\
 		execution/src/single_redirect.c\
 		execution/src/redirections.c\
+		execution/utils_exe.c/ft_lstclear_env.c\
+		execution/utils_exe.c/ft_lstclear_exp.c\
 		parssing/utils_prs/append_token.c \
 		parssing/utils_prs/create_token.c \
 		parssing/src_prs/expand.c \
@@ -54,6 +59,7 @@ SRC = 	execution/builtins/cd/builtin_cd.c \
 		parssing/src_prs/syntax_error.c \
 		parssing/src_prs/tokenization.c \
 		utils/atoi_mini.c \
+		utils/ft_bezero.c \
 		utils/ft_isspace.c \
 		utils/ft_split.c \
 		utils/ft_strchr.c \
@@ -70,6 +76,7 @@ SRC = 	execution/builtins/cd/builtin_cd.c \
 		utils/ft_isnum.c\
 		utils/ft_isalpha.c\
 		utils/ft_strchr_add_one.c\
+		parssing/garbage_collectore/garbage_collectore.c \
 		minishell.c\
 
 #------------------------------Object Files------------------------------------#
@@ -77,7 +84,7 @@ OBJ = $(SRC:.c=.o)
 
 #------------------------------Compiler and Flags------------------------------#
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -g -fsanitize=address
+CFLAGS = -Wall -Wextra -Werror #-g -fsanitize=address
 
 #------------------------------Includes and Executables------------------------#
 NAME = minishell

@@ -11,297 +11,45 @@
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
-// #include <stdio.h>
-// #include <string.h>
-// #include "../../include/minishell.h"
-// #include <stdio.h>
-// #include <stdlib.h>
-// #include <string.h>
-// #include <unistd.h>
 
-extern int prev_status;
-
-// typedef struct s_dynstr {
-//     char *data;
-//     size_t len;
-//     size_t cap;
-// } t_dynstr;
-
-// static void dyn_str_init(t_dynstr *ds) {
-//     ds->data = NULL;
-//     ds->len = 0;
-//     ds->cap = 0;
-// }
-
-// static int dyn_str_append(t_dynstr *ds, const char *str, size_t len) {
-//     if (!str || len == 0) return 0;
-//     if (ds->cap < ds->len + len + 1) {
-//         size_t new_cap = ds->cap ? ds->cap * 2 : 256;
-//         while (new_cap < ds->len + len + 1)
-//             new_cap *= 2;
-//         char *new_data = realloc(ds->data, new_cap);
-//         if (!new_data) return -1;
-//         ds->data = new_data;
-//         ds->cap = new_cap;
-//     }
-//     memcpy(ds->data + ds->len, str, len);
-//     ds->len += len;
-//     return 0;
-// }
-
-// static char *dyn_str_finalize(t_dynstr *ds) {
-//     if (!ds) return NULL;
-//     if (ds->cap < ds->len + 1) {
-//         char *new_data = realloc(ds->data, ds->len + 1);
-//         if (!new_data) return NULL;
-//         ds->data = new_data;
-//         ds->cap = ds->len + 1;
-//     }
-//     ds->data[ds->len] = '\0';
-//     return ds->data;
-// }
-
-// static char *expand_token_string(char *src, t_env *env) {
-//     t_dynstr ds;
-//     dyn_str_init(&ds);
-//     int in_single = 0, in_double = 0;
-
-//     while (src && *src) {
-//         // Handle quotes
-//         if (*src == '\'' && !in_double) {
-//             in_single = !in_single;
-//             dyn_str_append(&ds, "'", 1);
-//             src++;
-//             continue;
-//         }
-        
-//         if (*src == '\"' && !in_single) {
-//             in_double = !in_double;
-//             dyn_str_append(&ds, "\"", 1);
-//             src++;
-//             continue;
-//         }
-
-//         // Handle variable expansion
-//         if (*src == '$' && !in_single) {
-//             int count = 0;
-//             while (src[count] == '$') count++;
-//             int escape_count = count / 2;
-//             int expand = count % 2;
-
-//             // Add escaped $
-//             for (int i = 0; i < escape_count; i++)
-//                 dyn_str_append(&ds, "$", 1);
-
-//             src += count;
-//             if (!expand || !*src) continue;
-
-//             char var[256] = {0};
-//             int brace = (*src == '{');
-//             int valid = 0;
-
-//             // Parse variable name
-//             if (brace) {
-//                 src++;
-//                 char *end = strchr(src, '}');
-//                 if (!end) {
-//                     dyn_str_append(&ds, "${", 2);
-//                     continue;
-//                 }
-//                 strncpy(var, src, end - src);
-//                 src = end + 1;
-//                 valid = 1;
-//             } 
-//             else if (*src == '?' || *src == '$' || *src == '#' || isdigit(*src) || isalpha(*src) || *src == '_') {
-//                 int i = 0;
-//                 // Single-char special vars
-//                 if (*src == '?' || *src == '$' || *src == '#') {
-//                     var[i++] = *src++;
-//                 } 
-//                 // Numeric params
-//                 else if (isdigit(*src)) {
-//                     while (isdigit(*src) && i < 255)
-//                         var[i++] = *src++;
-//                 } 
-//                 // Regular vars
-//                 else {
-//                     while ((isalnum(*src) || *src == '_') && i < 255)
-//                         var[i++] = *src++;
-//                 }
-//                 var[i] = '\0';
-//                 valid = 1;
-//             }
-
-//             if (!valid) {
-//                 dyn_str_append(&ds, "$", 1);
-//                 continue;
-//             }
-
-//             // Handle special variables
-//             char *val = NULL;
-//             if (strcmp(var, "?") == 0) {
-//                 char buf[20];
-//                 snprintf(buf, sizeof(buf), "%d", prev_status);
-//                 val = buf;
-//             } 
-//             else if (strcmp(var, "#") == 0) {
-//                 char buf[20];
-//                 snprintf(buf, sizeof(buf), "%d", cmdline_argc - cmdline_shift);
-//                 val = buf;
-//             } 
-//             else if (strcmp(var, "$") == 0) {
-//                 char buf[20];
-//                 snprintf(buf, sizeof(buf), "%d", getpid());
-//                 val = buf;
-//             } 
-//             else if (isdigit(var[0])) {
-//                 int idx = atoi(var);
-//                 if (idx + cmdline_shift < cmdline_argc)
-//                     val = cmdline_argv[idx + cmdline_shift];
-//                 else
-//                     val = "";
-//             } 
-//             // Regular environment variable
-//             else {
-//                 val = find_env(env, var);
-//                 if (!val) val = "";
-//             }
-
-//             dyn_str_append(&ds, val, strlen(val));
-//         } 
-//         // Regular character
-//         else {
-//             char ch[2] = {*src, '\0'};
-//             dyn_str_append(&ds, ch, 1);
-//             src++;
-//         }
-//     }
-//     return dyn_str_finalize(&ds);
-// }
-// char *expand(t_token *token, t_env *env) {
-//     t_dynstr ds;
-//     dyn_str_init(&ds);
-
-//     while (token) {
-//         char *expanded = NULL;
-//         if (token->type == TOKEN_WORD) {
-//             expanded = expand_token_string(token->value, env);
-//             if (!expanded) expanded = strdup("");
-//             dyn_str_append(&ds, expanded, strlen(expanded));
-//             free(expanded);
-//         } else if (token->type == TOKEN_SPACE) {
-//             dyn_str_append(&ds, " ", 1);
-//         } else {
-//             dyn_str_append(&ds, token->value, strlen(token->value));
-//         }
-//         token = token->next;
-//     }
-
-//     if (ds.cap == 0) {
-//         ds.data = malloc(1);
-//         if (ds.data) ds.data[0] = '\0';
-//     } else {
-//         ds.data[ds.len] = '\0';
-//     }
-//     return ds.data;
-// }
-// extern int prev_status;
-static char *append_to_result(char *final, char *part, size_t total_len) {
-    size_t part_len = ft_strlen(part);
-    char *t = malloc(total_len + part_len + 1);
-    if (!t) return NULL;
-    if (final) {
-        ft_memcpy(t, final, total_len);
-        free(final);
-    }
-    // copy part + null
-    ft_memcpy(t + total_len, part, part_len + 1);
-    return t;
-}
-
-// // find in linked-list env
-// // static char *find_env(t_env *e, const char *key) {
-// //     while (e) {
-// //         if (strcmp(e->var, key) == 0)
-// //             return e->val;
-// //         e = e->next;
-// //     }
-// //     return NULL;
-// // }
-
-// // ——— Single‐char handlers —————————————————————————
-
-// int expand_status(char **newp, int space_left) {
-//     int n, i = 0;
-//     char status_buffer[10];
-//     char *new = *newp;
-//     n = snprintf(status_buffer, 10, "%d", prev_status);
-//     if (n > space_left)
-//         return ENOROOM;
-//     while (status_buffer[i] != '\0')
-//         *new++ = status_buffer[i++];
-//     *newp = new;
-//     return n;
-// }
-
-// int expand_argv(char **oldp, char **newp, int space_left) {
-//     char arg_idx[4], *arg;
+// int expand_env(char **oldp, char **newp, int brace_flag, char *var, t_env *env)
+// {
 //     char *old = *oldp;
 //     char *new = *newp;
-//     int argn, n = 0, i = 0;
-//     while (isdigit(*old) && i < 3)
-//         arg_idx[i++] = *old++;
-//     arg_idx[i] = '\0';
-//     argn = atoi(arg_idx);
-//     if ((argn + cmdline_shift) < cmdline_argc) {
-//         n = ft_strlen(cmdline_argv[argn + cmdline_shift]);
-//         if (n > space_left)
-//             return ENOROOM;
-//         arg = cmdline_argv[argn + cmdline_shift];
-//         while (*arg != '\0')
-//             *new++ = *arg++;
+//     int  i = 0;
+
+//     // 1) parse NAME or {NAME}
+//     if (!brace_flag) {
+//         while (ft_isalnum(*old) || *old == '_') {
+//             if (i >= 255) return ENOROOM;
+//             var[i++] = *old++;
+//         }
+//     } else {
+//         old++; // skip '{'
+//         while (*old && *old != '}') {
+//             if (i >= 255) return ENOROOM;
+//             var[i++] = *old++;
+//         }
+//         if (!*old) return ENOBRACE;
+//         old++; // skip '}'
 //     }
-//     *oldp = old - 1;
+//     var[i] = '\0';
+
+//     // 2) lookup
+//     char *env_val = find_env(env, var);
+//     if (!env_val) env_val = "";
+
+//     // 3) copy ALL characters + null
+//     size_t len = ft_strlen(env_val);
+//     for (size_t j = 0; j < len; j++)
+//         *new++ = env_val[j];
+//     *new++ = '\0';
+
+//     // 4) update pointers
 //     *newp = new;
-//     return n;
+//     *oldp = old;
+//     return 0;
 // }
-int expand_env(char **oldp, char **newp, int brace_flag, char *var, t_env *env) {
-    char *old = *oldp;
-    char *new = *newp;
-    int  i = 0;
-
-    // 1) parse NAME or {NAME}
-    if (!brace_flag) {
-        while (ft_isalnum(*old) || *old == '_') {
-            if (i >= 255) return ENOROOM;
-            var[i++] = *old++;
-        }
-    } else {
-        old++; // skip '{'
-        while (*old && *old != '}') {
-            if (i >= 255) return ENOROOM;
-            var[i++] = *old++;
-        }
-        if (!*old) return ENOBRACE;
-        old++; // skip '}'
-    }
-    var[i] = '\0';
-
-    // 2) lookup
-    char *env_val = find_env(env, var);
-    if (!env_val) env_val = "";
-
-    // 3) copy ALL characters + null
-    size_t len = ft_strlen(env_val);
-    for (size_t j = 0; j < len; j++)
-        *new++ = env_val[j];
-    *new++ = '\0';
-
-    // 4) update pointers
-    *newp = new;
-    *oldp = old;
-    return 0;
-}
 
 
 // int expand_argc(char **newp, int space_left) {
@@ -353,14 +101,7 @@ int expand_env(char **oldp, char **newp, int brace_flag, char *var, t_env *env) 
 //             return env->val;
 //         env = env->next;
 //     }
-//     return NULL;
-// }
-typedef struct s_dynstr
-{
-    char *data;
-    size_t len;
-    size_t cap;
-} t_dynstr;
+
 
 void dyn_str_init(t_dynstr *ds)
 {
@@ -369,7 +110,7 @@ void dyn_str_init(t_dynstr *ds)
     ds->cap = 0;
 }
 
-int dyn_str_append(t_dynstr *ds, const char *str, size_t len)
+int dyn_str_append(t_gc *gc, t_dynstr *ds, const char *str, size_t len)
 {
     char *new_data;
     size_t new_cap;
@@ -382,35 +123,36 @@ int dyn_str_append(t_dynstr *ds, const char *str, size_t len)
             new_cap = 256;
         while (new_cap < ds->len + len + 1)
             new_cap *= 2;
-        new_data = malloc(new_cap);
+        new_data = gc_malloc(gc, new_cap);   // بدل malloc بـ gc_malloc
         if (new_data == NULL)
             return -1;
         if (ds->data != NULL)
-            memcpy(new_data, ds->data, ds->len);
-        free(ds->data);
+            ft_memcpy(new_data, ds->data, ds->len);
+        // لا تحتاج free(ds->data) لأن GC كيتكلف بها
         ds->data = new_data;
         ds->cap = new_cap;
     }
-    memcpy(ds->data + ds->len, str, len);
+    ft_memcpy(ds->data + ds->len, str, len);
     ds->len += len;
     ds->data[ds->len] = '\0';
     return 0;
 }
 
 
+
 #include <stdlib.h>
 #include <string.h>
 
-char *dyn_str_finalize(t_dynstr *ds)
+char *dyn_str_finalize(t_gc *gc, t_dynstr *ds)
 {
     if (!ds) return NULL;
 
     if (ds->cap < ds->len + 1) {
-        char *new_data = malloc(ds->len + 1);
+        char *new_data = gc_malloc(gc, ds->len + 1);  // بدل malloc بـ gc_malloc
         if (!new_data) return NULL;
 
-        memcpy(new_data, ds->data, ds->len); // نسخ المحتوى القديم
-        free(ds->data);                      // تحرير الميموري القديمة
+        ft_memcpy(new_data, ds->data, ds->len);
+        // free(ds->data); // ما تحتاجهاش
 
         ds->data = new_data;
         ds->cap = ds->len + 1;
@@ -419,6 +161,7 @@ char *dyn_str_finalize(t_dynstr *ds)
     ds->data[ds->len] = '\0';
     return ds->data;
 }
+
 // int get_last_exit_status(void)
 // {
 //     char *status = malloc(20);
@@ -426,137 +169,256 @@ char *dyn_str_finalize(t_dynstr *ds)
 //     // snprintf(status, 20, "%d", prev_status);
 //     return status;
 // }
-t_token *expand(t_token *token, t_env *env, t_cmd *cmd)
+// #include "minishell.h"
+void	handle_quotes(t_gc *gc, char c, int *s, int *d, t_dynstr *ds)
 {
-    t_token *result = NULL;
-    t_token **current = &result;
+	if (c == '\'' && !(*d))
+		*s ^= 1;
+	else if (c == '"' && !(*s))
+		*d ^= 1;
+	else
+		return ;
+	dyn_str_append(gc, ds, &c, 1);
+}
 
-    while (token) {
-        t_token *next = token->next;
-        token->next = NULL;
+char *get_var_name(t_gc *gc, const char **src)
+{
+    char var[256];
+    int i = 0;
 
-        if (token->type == TOKEN_WORD && strchr(token->value, '$')) {
-            char *src = token->value;
-            int in_single = 0, in_double = 0;
-            t_dynstr ds = {0};
-
-            while (*src) {
-                if (*src == '\'' && !in_double) {
-                    in_single = !in_single;
-                    dyn_str_append(&ds, "'", 1);
-                    src++;
-                    printf("lala\n");
-                    continue;
-                }
-
-                if (*src == '"' && !in_single) {
-                    in_double = !in_double;
-                    dyn_str_append(&ds, "\"", 1);
-                    src++;
-                    printf("baba\n");
-                    continue;
-                }
-
-                if (*src == '$' && !in_single) {
-                    int dollar_count = 0;
-                    char *dollar_start = src;
-                    while (*src == '$') {
-                        dollar_count++;
-                        src++;
-                    }
-
-                    int escape_count = dollar_count / 2;
-                    int expand = dollar_count % 2;
-
-                    for (int i = 0; i < escape_count; i++) {
-                        dyn_str_append(&ds, "$", 1);
-                    }
-                    if (*src == '?')
-                    {
-                        printf("%d\n", cmd->ex_status);
-                        char *status = ft_itoa(cmd->ex_status);
-                        write(STDIN_FILENO, status, ft_strlen(status));
-                        dyn_str_append(&ds, status, ft_strlen(status));
-                        free(status);
-                    }
-                    if (!expand) continue;
-
-                    char varname[256] = {0};
-                    int valid = 0;
-                    if (isdigit(*src) || isalpha(*src) || *src == '_') {
-                        char *start = src;
-                        while (*src && (isalnum(*src) || *src == '_')) {
-                            src++;
-                        }
-                        strncpy(varname, start, src - start);
-                        valid = 1;
-                        src--;  // Adjust for loop increment
-                    }
-
-                    if (!valid) {
-                        dyn_str_append(&ds, "$", 1);
-                        src = dollar_start + 1;
-                        continue;
-                    }
-
-                    char *val = NULL;
-                        char *env_val = find_env(env, varname);
-                        val = env_val ? strdup(env_val) : strdup("");
-
-
-                    if (val) {
-                        dyn_str_append(&ds, val, strlen(val));
-                        free(val);
-                    }
-                } else {
-                    char ch[2] = {*src, '\0'};
-                    dyn_str_append(&ds, ch, 1);
-                }
-
-                src++;
-            }
-
-            char *expanded_value = dyn_str_finalize(&ds);
-            free(token->value);
-            token->value = expanded_value;
-
-            t_token *new_tokens = tokenize1(expanded_value);
-
-            while (new_tokens) {
-                t_token *next_new = new_tokens->next;
-                new_tokens->next = NULL;
-
-                *current = new_tokens;
-                current = &new_tokens->next;
-
-                new_tokens = next_new;
-            }
-
-            // free(token);
-        } else {
-            *current = token;
-            current = &token->next;
-        }
-
-        token = next;
+    if (**src == '?')
+    {
+        (*src)++;
+        return gc_strdup(gc, "?");  // بدل ft_strdup بـ gc_strdup
     }
-
-    return result;
+    while (**src && (ft_isalnum(**src) || **src == '_') && i < 255)
+        var[i++] = *((*src)++);
+    var[i] = '\0';
+    if (!*var)
+        return NULL;
+    return gc_strdup(gc, var);
 }
 
 
-char *expand_herdoc(t_token *token, t_env *env) {
+char *get_var_value(t_gc *gc, const char **src, t_env *env, t_cmd *cmd)
+{
+    char *var;
+    char *val;
+    var = get_var_name(gc, src);
+    if (!var)
+        return NULL;
+    if (ft_strcmp(var, "?") == 0)
+    {
+        return gc_itoa(gc, cmd->ex_status);
+    }
+    val = find_env(env, var);
+    return gc_strdup(gc, val ? val : "");
+}
+
+void	append_dollars(t_gc *gc, t_dynstr *ds, int count)
+{
+	while (count--)
+		dyn_str_append(gc, ds, "$", 1);
+}
+
+void	handle_dollar(t_gc *gc, const char **src, t_dynstr *ds,
+			t_env *env, t_cmd *cmd)
+{
+	int			count;
+	const char	*start;
+	char		*val;
+
+	count = 0;
+	start = *src;
+	while (**src == '$')
+	{
+		count++;
+		(*src)++;
+	}
+	append_dollars(gc, ds, count / 2);
+	if (count % 2 == 0)
+		return ;
+	if (!**src || (!ft_isalpha(**src) && **src != '_' && **src != '?'))
+	{
+		dyn_str_append(gc, ds, "$", 1);
+		*src = start + 1;
+		return ;
+	}
+	val = get_var_value(gc, src, env, cmd);
+	if (val)
+	{
+		dyn_str_append(gc, ds, val, ft_strlen(val));
+		// free(val);
+	}
+}
+char	*expand_value(t_gc *gc, char *value, t_env *env, t_cmd *cmd)
+{
+	t_dynstr	ds;
+	const char	*src;
+	int			s;
+	int			d;
+
+	s = 0;
+	d = 0;
+	src = value;
+	dyn_str_init(&ds);
+	while (*src)
+	{
+		if ((*src == '\'' && !d) || (*src == '"' && !s))
+			handle_quotes(gc, *src++, &s, &d, &ds);
+		else if (*src == '$' && !s)
+            handle_dollar(gc, &src, &ds, env, cmd);
+		else
+        {
+            char tmp[1];
+            tmp[0] = *src++;
+            dyn_str_append(gc, &ds, tmp, 1);
+        }
+	}
+	return (dyn_str_finalize(gc, &ds));
+}
+t_token	*add_expanded_tokens(t_gc *gc, char *value, t_token **cur)
+{
+	t_token	*new_tks;
+	t_token	*next;
+
+	new_tks = tokenize1(gc, value);
+	while (new_tks)
+	{
+		next = new_tks->next;
+		new_tks->next = NULL;
+		*cur = new_tks;
+		cur = &new_tks->next;
+		new_tks = next;
+	}
+	return (*cur);
+}
+
+static void	handle_expansion(t_gc *gc, t_token **cur, t_token *tk, t_env *env, t_cmd *cmd)
+{
+	char	*exp;
+	t_token	*tmp;
+	t_token	*last;
+
+	exp = expand_value(gc, tk->value, env, cmd);
+	tmp = tokenize1(gc, exp);
+	last = *cur;
+	while (tmp)
+	{
+		if (last)
+			last->next = tmp;
+		last = tmp;
+		tmp = tmp->next;
+	}
+	*cur = last;
+}
+
+int contains_special_char(const char *str)
+{
+    if (!str)
+        return 0;
+
+    while (*str)
+    {
+        if (*str == '"' || *str == '\\' /* || أضف رموز أخرى */)
+            return 1;
+        str++;
+    }
+    return 0;
+}
+
+char *handle_special_chars(t_gc *gc, char *value)
+{
+	t_dynstr ds;
+	const char *src = value;
+	int s = 0, d = 0;
+
+	dyn_str_init(&ds);
+	while (*src)
+	{
+		if ((*src == '\'' && !d) || (*src == '"' && !s))
+		{
+			handle_quotes(gc, *src++, &s, &d, &ds);
+		}
+		else if (*src == '\\' && !s)
+		{
+			src++;
+			if (*src)
+				dyn_str_append(gc, &ds, src++, 1);
+		}
+		else
+		{
+			char tmp[1] = {*src++};
+			dyn_str_append(gc, &ds, tmp, 1);
+		}
+	}
+	return dyn_str_finalize(gc, &ds);
+}
+
+t_token	*expand(t_gc *gc, t_token *tk, t_env *env, t_cmd *cmd)
+{
+	t_token	head;
+	t_token	*cur;
+	t_token	*next;
+
+	head.next = NULL;
+	cur = &head;
+	while (tk)
+	{
+		next = tk->next;
+		tk->next = NULL;
+		if (contains_special_char(tk->value))
+		{
+			tk->value = handle_special_chars(gc, tk->value);
+			cur->next = tk;
+			cur = cur->next;
+			tk = next;
+			continue;
+		}
+		if (tk->type == TOKEN_WORD && ft_strchr(tk->value, '$'))
+			handle_expansion(gc, &cur, tk, env, cmd);
+		else
+		{
+			cur->next = tk;
+			cur = cur->next;
+		}
+		tk = next;
+	}
+	return (head.next);
+}
+
+
+
+
+static char *append_to1_result1(char *result, char *str, size_t *total)
+{
+    size_t len = ft_strlen(str);
+    char *new_result = malloc(*total + len + 1);
+    if (!new_result)
+        return NULL;
+
+    if (result)
+        ft_memcpy(new_result, result, *total);
+
+    ft_memcpy(new_result + *total, str, len);
+    *total += len;
+    new_result[*total] = '\0';
+
+    free(result); // مهم نحرر الذاكرة القديمة
+    return new_result;
+}
+
+
+char *expand_herdoc(t_token *token, t_env *env)
+{
     char *result = NULL;
     size_t total = 0;
 
     while (token) {
         char *src = token->value;
-        int in_single = 0;
 
         while (*src) {
-
-            if (*src == '$' && !in_single) {
-                // Count consecutive $ signs
+            if (*src == '$') {
                 int dollar_count = 0;
                 while (*src == '$') {
                     dollar_count++;
@@ -566,28 +428,25 @@ char *expand_herdoc(t_token *token, t_env *env) {
                 int escape_count = dollar_count / 2;
                 int expand = dollar_count % 2;
 
-                // Append escaped $'s
                 for (int i = 0; i < escape_count; i++) {
-                    result = append_to_result(result, "$", total);
-                    total++;
+                    result = append_to1_result1(result, "$", &total);
                 }
 
-                if (!expand) continue; // if even, no expansion
+                if (!expand) continue;
 
-                // Now parse variable name for expansion
                 char varname[256] = {0};
                 int brace = (*src == '{');
                 int valid = 0;
 
                 if (brace) {
-                    src++;  // skip {
+                    src++;
                     int i = 0;
                     while (*src && *src != '}' && i < 255)
                         varname[i++] = *src++;
                     varname[i] = '\0';
-                    if (*src == '}') src++;  // skip }
+                    if (*src == '}') src++;
                     valid = i > 0;
-                } else if (*src == '?' || *src == '#' || *src == '$' || isdigit(*src) || ft_isalpha(*src) || *src == '_') {
+                } else if (isdigit(*src) || ft_isalpha(*src) || *src == '_') {
                     int i = 0;
                     while ((ft_isalnum(*src) || *src == '_') && i < 255)
                         varname[i++] = *src++;
@@ -596,41 +455,28 @@ char *expand_herdoc(t_token *token, t_env *env) {
                 }
 
                 if (!valid) {
-                    // Invalid var: just output one $
-                    result = append_to_result(result, "$", total);
-                    total++;
-                    printf("oo\n");
+                    result = append_to1_result1(result, "$", &total);
                     continue;
                 }
 
-                // Expand the var
-                char *val = NULL;
-                //   else {
-                    val = find_env(env, varname);
-                    if (!val) val = "";
-                // }
+                char *val = find_env(env, varname);
+                if (!val) val = "";
 
-                result = append_to_result(result, val, total);
-                total += ft_strlen(val);
-                printf("lolo\n");
-                continue;
+                result = append_to1_result1(result, val, &total);
+                continue;  // <=== مهم جداً !!!
             }
 
-            // Regular character
             char tmp[2] = {*src, '\0'};
-            result = append_to_result(result, tmp, total);
-            total++;
+            result = append_to1_result1(result, tmp, &total);
             src++;
         }
 
-        // Add space after token if next is TOKEN_SPACE
         if (token->next && token->next->type == TOKEN_SPACE) {
-            result = append_to_result(result, " ", total);
-            total++;
+            result = append_to1_result1(result, " ", &total);
         }
 
         token = token->next;
     }
-
+    // printf("expand_herdoc: %s\n", result ? result : "(null)");
     return result;
 }

@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 23:17:48 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/06/02 18:46:47 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/10 00:50:24 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,6 @@ typedef  enum
 typedef struct s_env
 {
     char			*var;
-	int				fd;
-	int				*flagenv;
 	char			*val;
 	struct  s_env	*next;
 }				t_env;
@@ -71,7 +69,6 @@ typedef struct s_exp
 {
     char			*vr;
     char			*vl;
-	int				flagexp;
     struct  s_exp	*next;
 }				t_exp;
 
@@ -101,6 +98,12 @@ typedef struct s_cmd
 	struct s_cmd	*next;
 }				t_cmd;
 
+typedef struct s_dynstr
+{
+    char *data;
+    size_t len;
+    size_t cap;
+} t_dynstr;
 
 typedef struct s_token
 {
@@ -111,39 +114,53 @@ typedef struct s_token
 } t_token;
 
 
+typedef struct s_ctx {
+    t_env       *env;
+    t_cmd       *data;
+    int         numcmd;
+    char        **envp;
+    t_exp       *exp;
+    t_heredoc   *heredoc;
+	int 		fdher;
+    int         (*pipes)[2];
+    int         *pids;
+} t_ctx;
+
+
 
 /*---------------------------------------------utils---------------------------------------------*/
 
-t_env	*ft_lstnew_val(char *val);
-t_env	*ft_lstnew_var(char *var);
-void	ft_lstadd_back_env(t_env **lst, t_env *new);
-void	ft_lstadd_back_exp(t_exp **lst, t_exp *new);
-int		ft_strcmp(char *s1, char *s2);
-char	**mysplit(char *s, char c);
-void	free_split(char **arr);
-int		ft_strlen(char *str);
-char	*ft_strdup(char *s);
-int		ft_isalnum(int c);
-char	*ft_strjoin(char *s1, char *s2);
-void	print_exe(char *str);
-int		mini_atoi(char *str);
-void	ft_freeptr(void *ptr);
-int		ft_isspace(char *str);
-int		ft_strncmp(char *s1, char *s2, size_t n);
-char	*ft_strchr(char *s, int c);
-int		len_arg(char **args);
-char	**ft_split(char *s, char c);
-char	*ft_strchr_add_one(char *s, int c);
-int		ft_isnum(int c);
-void	ft_putstr_fd(char *s, int fd);
-int		ft_isalpha(int c);
-void	*ft_memcpy(void *dst, const void *src, size_t n);
-int		ft_len_redirections(char **redirections);
-int     ft_output_append(char **file, char **redirections, int i);
-int     ft_inp_heredoc(char **file, char **redirections, int i);
-char	*ft_itoa(int n);
-long long ft_atoi(const char *str);
-
+t_env		*ft_lstnew_val(char *val);
+t_env		*ft_lstnew_var(char *var);
+void		ft_lstadd_back_env(t_env **lst, t_env *new);
+void		ft_lstadd_back_exp(t_exp **lst, t_exp *new);
+int			ft_strcmp(char *s1, char *s2);
+char		**mysplit(char *s, char c);
+int			ft_strlen(char *str);
+char		*ft_strdup(char *s);
+int			ft_isalnum(int c);
+char		*ft_strjoin(char *s1, char *s2);
+void		print_exe(char *str);
+int			mini_atoi(char *str);
+void		ft_freeptr(void *ptr);
+int			ft_isspace(char *str);
+int			ft_strncmp(char *s1, char *s2, size_t n);
+char		*ft_strchr(char *s, int c);
+int			len_arg(char **args);
+char		**ft_split(char *s, char c);
+char		*ft_strchr_add_one(char *s, int c);
+int			ft_isnum(int c);
+void		ft_putstr_fd(char *s, int fd);
+int			ft_isalpha(int c);
+void		*ft_memcpy(void *dst, const void *src, size_t n);
+int			ft_len_redirections(char **redirections);
+int     	ft_output_append(char **file, char **redirections, int i);
+int     	ft_inp_heredoc(char **file, char **redirections, int i);
+char		*ft_itoa(int n);
+long long 	ft_atoi(const char *str);
+void		ft_exp_clear(t_exp **lst);
+void		free_split(char **arr);
+void		ft_env_clear(t_env **lst);
 /*---------------------------------------------execution--------------------------------------------*/
 
 int		ft_echo(char **args);
@@ -156,15 +173,15 @@ int		execute_single_cmd(t_env **env, char **envp, t_cmd *data, t_heredoc *heredo
 int		ft_pwd(t_env *env);
 int		ft_export(t_exp *exp, t_env *env, char **args);
 t_exp	*ft_create_env_export(char **env, t_exp **list);
-void	ft_unset(t_exp **exp, t_env **env, char **args);
-void to_single_redirection(char **files, char **redirections, t_heredoc *heredoc);
-int		ft_execute(t_exp **exp, t_env **env, t_cmd *data, char **envp, t_heredoc *heredoc);
+int	ft_unset(t_exp **exp, t_env **env, char **args);
+void	to_single_redirection(char **files, char **redirections, int herdocfd);
+int ft_execute(t_exp **exp, t_env **env, t_cmd **data, char **envp, t_heredoc *heredoc);
 void	add_usr_bin_env(t_env **env_head);
 void	add_path(t_env **env_head);
 void	add_shlvl(t_env **env_head);
 void	add_pwd(t_env **env_head);
 void	minishell_invalid(char *invalid_str);
-int		ft_do_redirections(char **files, char **redirections, t_heredoc *heredoc);
+int		ft_do_redirections(char **files, char **redirections, int heredoc);
 void	update_val_env(t_env *env, char *var, char *val);
 void	update_val_exp(t_exp *exp, char *var, char *val);
 void	update_new(t_env **ev, char *newpath);
@@ -175,7 +192,7 @@ int		len_alnum_var(char *var);
 int		find_equal(char *str);
 int		len_at_first_equal(char *str);
 int		len_equal(char *str);
-void	if_double_var(t_exp **exp);
+int	if_double_var(t_exp **exp);
 void	add_to_export_list_v(t_exp **exp, char *avzero);
 void	add_to_export_list_vl(t_exp **exp, char *avzero, char *avone);
 void	update_join_exp(t_exp *exp, char *var, char *val);
@@ -183,62 +200,94 @@ void	update_join_env(t_env *env, char *var, char *val);
 void	add_to_export_list_vl(t_exp **exp, char *avzero, char *avone);
 void	add_to_export_list_v(t_exp **exp, char *avzero);
 void	add_to_env_list(t_env *env, char *args, char *avzero, char *avone);
-void	sort_exp_list(t_exp **exp);
+int	sort_exp_list(t_exp **exp);
 void	minishell_invalid(char *invalid_str);
 char	*check_var(char *var);
 char	*args_zero(char *args);
 char	*args_one(char *args);
 int		search_var_in_exp(t_exp *exp, char *var);
 int		search_var_in_env(t_env *env, char *var);
-int		ft_builtins(t_env **env, t_exp **exp, t_cmd *data, t_heredoc *heredoc);
+int		ft_builtins(t_env **env, t_exp **exp, t_cmd *data, int herdcfd);
 int		is_builtin(char *args);
 int     check_dir_file(char **args, t_cmd *data);
 int		len_cmd(t_cmd *data);
 int		notpipe(t_cmd *data);
-
+void    exit_one_handred_twenty_seven(t_cmd *data);
 void	invalid_msg(char **cmd, t_cmd *data);
 void    exit_failure(t_cmd *data);
 void    exit_success(t_cmd *data);
 void	invalid_path(t_cmd *data);
+void    exit_one_handred_twenty_sex(t_cmd *data);
+int		is_cmd_path(t_cmd *data, t_cmd *curr, char **commande, char **envp, int i);
+int		join_execve_cmd(char *path, char **commande, t_cmd *curr, char **envp, t_cmd *data);
+int		ft_execve(t_cmd *curr, t_env **env, t_cmd *data, char **envp, int i);
+void	free_pipes(int (*pipes)[2], t_cmd *data, int *pids, int numcmd);
+int		create_pipes(int numcmd, int (*pipes)[2], int *pids, t_cmd *data);
+int		do_child_one(int i, t_ctx *ctx, t_cmd *curr);
+int 	do_child_two(t_cmd *curr, int i, t_ctx *ctx);
+int		dup_and_close_pipes(int (*pipes)[2], int i, int numcmd);
+int		execute_single_cmd(t_env **env, char **envp, t_cmd *data, t_heredoc *heredoc);
+int		execute_path(t_cmd *data, char **envp, char **commande);
+bool	process_single_arg(t_exp *exp, t_env *env, char *arg);
+void	determine_export_case(t_exp *exp, t_env *env, char *arg, char *avzero);
+void	handle_equal_case(t_exp *exp, t_env *env, char *arg, char *avzero);
+void	handle_plus_case(t_exp *exp, t_env *env, char *arg, char *avzero);
+void    update_exit_status(int status, t_cmd *data);
 
+typedef struct s_gc_node
+{
+    void                *ptr;
+    struct s_gc_node    *next;
+}   t_gc_node;
+
+typedef struct s_gc
+{
+    t_gc_node *list;
+}   t_gc;
 /*---------------------------------------------parsing--------------------------------------*/
 
 #define MAX_ENV 50
-
 # define ENOBRACE 1
 # define ENOROOM 2
 # define GRN  "\033[0;32m"
 
-extern int	cmdline_shift;
-extern int	cmdline_argc;
-extern char	**cmdline_argv;
 
 void	append_token(t_token **head, t_token *new_token);
-t_token	*create_token(char *value, t_type type);
+t_token	*create_token(t_gc *gc, char *value, t_type type);
 void	print_type(t_type type);
+void	ft_bzero(void *s, size_t n);
 t_type	get_token_type(char *str);
-int	error(t_token *tokens, t_heredoc *heredoc);
+int	error(t_gc *gc, t_token *tokens, t_heredoc *heredoc, t_env *env);
 char	*ft_substr(char *s, int start, int len);
 int		error_pipe(t_token *tokens);
 void	sigint_handler(int sig);
-t_token	*tokenize(char *input);
+t_token *tokenize(t_gc *gc, char *input);
 char	*read_input(char *prompt);
 char *expand_herdoc(t_token *token, t_env *env);
-t_cmd *parse(t_env *env, t_heredoc *heredoc, t_cmd *cmd_1);
+t_cmd	*parse(t_gc *gc, t_env *env, t_heredoc *heredoc, t_cmd **cmd_1);
 t_cmd *joining(t_token *tokens);
-t_cmd *joining2(t_token *tokens);
-t_token *tokenize1(char *input);
-t_token *expand(t_token *token, t_env *env, t_cmd *cmd);
+t_cmd	*joining2(t_gc *gc, t_token *tokens);
+// t_cmd	*joining2(t_token *tokens);
+t_token *tokenize1(t_gc *gc, char *input);
+int skip_quotes(const char *s, int i);
+void	free_cmd(t_cmd *cmd);
+t_token	*expand(t_gc *gc, t_token *tk, t_env *env, t_cmd *cmd);
 int		expand_env(char **oldp, char **newp, int brace_flag, char *var, t_env *env);
 int		expand_pid(char **newp, int space_left);
 int		expand_argv(char **oldp, char **newp, int space_left);
 int		expand_status(char **newp, int space_left);
 char	*gitenv(const char* name);
 int		expand_argc(char **newp, int space_left);
+char *gc_strdup(t_gc *gc, char *s);
+char	*gc_itoa(t_gc *gc, int n);
+char *gc_substr(t_gc *gc, char *s, int start, int len);
 int		is_match(char *str, char *ptrn);
+char *gc_strjoin(t_gc *gc, char *s1, char *s2);
 int		expand_wildcard(char **oldp, char **newp, int space_left);
+/*---------------------------------------------garbage collectore--------------------------------------*/
 
 
+void    gc_init(t_gc *gc);
+void    *gc_malloc(t_gc *gc, size_t size);
+void    gc_free_all(t_gc *gc);
 #endif
-
-

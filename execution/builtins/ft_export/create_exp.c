@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 10:39:19 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/28 14:02:11 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/07 18:18:21 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,10 +79,10 @@ t_exp	*give_exp(char **env, t_exp **list)
 }
 t_exp   *ft_create_env_export(char **env, t_exp **list)
 {
-	int		i;
+	// int		i;
 	t_exp	*new_list;
 
-	i = -1;
+	// i = -1;
 	*list = NULL;
 	if (env[0] == NULL)
 		return (add_oldpwd(list), add_pwdexp(list), add_shlvlexp(list), *list);

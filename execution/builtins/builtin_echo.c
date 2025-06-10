@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 23:14:24 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/28 15:03:28 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/09 22:38:03 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ int	ft_echo(char **args)
 	int	k;
 
 	if (!args)
-		return (0);
+		return (1);
 	j = 1;
 	k = 0;
 
@@ -79,5 +79,5 @@ int	ft_echo(char **args)
 		j++;
 	}
 	print_echo(k, args);
-	return (1);
+	return (0);
 }

@@ -12,23 +12,12 @@
 
 #include "../include/minishell.h"
 
-void	*ft_memcpy(void *dst, const void *src, size_t n)
+void *ft_memcpy(void *dst, const void *src, size_t n)
 {
-	size_t			i;
-	unsigned char	*dste;
-	unsigned char	*srce;
-
-	if (!dst && !src)
-		return (NULL);
-	i = 0;
-	dste = (unsigned char *) dst;
-	srce = (unsigned char *) src;
-	if (dste == srce)
-		return (dst);
-	while (i < n)
-	{
-		dste[i] = srce[i];
-		i++;
-	}
-	return (dst);
+    size_t i;
+    unsigned char *d = dst;
+    const unsigned char *s = src;
+    for (i = 0; i < n; i++)
+        d[i] = s[i];
+    return dst;
 }

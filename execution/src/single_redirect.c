@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 16:01:11 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/06/03 15:12:16 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/07 16:22:06 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,44 +37,36 @@ int ft_output_append_s(char **files, char **redirections)
 			return (close(fd), perror("minishell"), FAILURE);
 		close(fd);
 	}
-	return SUCCESS;
+	return (SUCCESS);
 }
 
-int ft_inp_heredoc_s(char **files, char **redirections, t_heredoc *heredoc)
+int ft_inp_heredoc_s(char **files, char **redirections, int heredoc)
 {
-	int fd;
+	int fd1;
 
     if (!redirections || !redirections[0] || !files || !files[0])
-        return FAILURE;
-        
-    if (ft_strcmp(redirections[0], "<<") == 0) {
-        if (heredoc->fd == -1) {
-            perror("minishell: heredoc");
-            return FAILURE;
-        }
-        if (dup2(heredoc->fd, STDIN_FILENO) == -1) {
-            close(heredoc->fd);
-            return (perror("minishell"), FAILURE);
-        }
-        close(heredoc->fd);
+        return (FAILURE);
+    if (ft_strcmp(redirections[0], "<<") == 0)
+	{
+        if (heredoc == -1)
+			return (perror("heredoc"), FAILURE);
+        if (dup2(heredoc, STDIN_FILENO) == -1)
+            return (close(heredoc), perror("minishell"), FAILURE);
+        close(heredoc);
     }
-    else if (ft_strcmp(redirections[0], "<") == 0) {
-
-		fd = open(files[0], O_RDONLY);
-        if (fd == -1) {
-            perror("minishell: heredoc");
-            return FAILURE;
-        }
-        if (dup2(fd, STDIN_FILENO) == -1) {
-            close(fd);
-            return (perror("minishell"), FAILURE);
-        }
-        close(fd);
+    else if (ft_strcmp(redirections[0], "<") == 0)
+	{
+		fd1 = open(files[0], O_RDONLY);
+        if (fd1 == -1)
+            return (perror("heredoc"), FAILURE);
+        if (dup2(fd1, STDIN_FILENO) == -1)
+            return (close(fd1), perror("minishell"), FAILURE);
+        close(fd1);
     }
-    return SUCCESS;
+    return (SUCCESS);
 }
 
-void to_single_redirection(char **files, char **redirections, t_heredoc *heredoc)
+void to_single_redirection(char **files, char **redirections, int herdocfd)
 {
 	if (!files[0] || !redirections[0])
 		return;
@@ -86,6 +78,6 @@ void to_single_redirection(char **files, char **redirections, t_heredoc *heredoc
 	else if ((ft_strcmp(redirections[0], "<") == 0) ||
 		(ft_strcmp(redirections[0], "<<") == 0))
 	{
-		ft_inp_heredoc_s(files, redirections, heredoc);
+		ft_inp_heredoc_s(files, redirections, herdocfd);
 	}
 }  

@@ -12,13 +12,13 @@
 
 #include "../../include/minishell.h"
 
-t_token *create_token(char *value, t_type type)
+t_token *create_token(t_gc *gc, char *value, t_type type)
 {
-	t_token *token = malloc(sizeof(t_token));
-	if (!token)
-		return NULL;
-	token->value = ft_strdup(value);
-	token->type = type;
-	token->next = NULL;
-	return token;
+    t_token *token = gc_malloc(gc, sizeof(t_token));
+    if (!token)
+        return NULL;
+    token->value = gc_strdup(gc, value);  // كذلك gc_strdup تحتاج gc
+    token->type = type;
+    token->next = NULL;
+    return token;
 }

@@ -1,29 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   builtin_pwd.c                                      :+:      :+:    :+:   */
+/*   ft_lstclear_env.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/14 02:14:59 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/06/09 22:40:16 by omaezzem         ###   ########.fr       */
+/*   Created: 2025/06/07 20:02:18 by omaezzem          #+#    #+#             */
+/*   Updated: 2025/06/07 20:05:54 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-int	ft_pwd(t_env *env)
+void	ft_env_clear(t_env **lst)
 {
-	char	cwd[PATH_MAX];
-	char	*path;
-	if (getcwd(cwd, sizeof(cwd)) != NULL)
-		return(printf("%s\n", cwd), 0);
-	else
+	t_env	*current;
+	t_env	*next;
+
+	if (!lst || !*lst)
+		return;
+	
+	current = *lst;
+	while (current)
 	{
-		path = find_env(env, "PWD");
-		ft_putstr_fd(path, 1);
-		ft_putstr_fd("\n", 1);
-		return 1;
+		next = current->next;
+		if (current->var)
+			free(current->var);
+		if (current->val)
+			free(current->val);
+		free(current);
+		current = next;
 	}
-	return 0;
+	*lst = NULL;
 }

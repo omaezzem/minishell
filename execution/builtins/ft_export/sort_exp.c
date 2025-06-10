@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 10:40:40 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/26 10:42:27 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/09 23:11:51 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,13 +25,13 @@ static void	swap_nodes(t_exp *a, t_exp *b)
 	b->vl = temp_vl;
 }
 
-void	sort_exp_list(t_exp **exp)
+int	sort_exp_list(t_exp **exp)
 {
 	t_exp	*current;
 	t_exp	*next_node;
 
 	if (!exp || !*exp)
-		return ;
+		return 0;
 	current = *exp;
 	while (current != NULL)
 	{
@@ -44,4 +44,5 @@ void	sort_exp_list(t_exp **exp)
 		}
 		current = current->next;
 	}
+	return 1;
 }

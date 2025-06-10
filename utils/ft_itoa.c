@@ -68,3 +68,30 @@ char	*ft_itoa(int n)
 	}
 	return (itoa);
 }
+char	*gc_itoa(t_gc *gc, int n)
+{
+	size_t	len;
+	char	*itoa;
+	long	nb;
+
+	len = ft_nblen(n);
+	itoa = (char *) gc_malloc(gc, len * sizeof(char) + 1);  // بدل malloc بـ gc_malloc
+	if (!itoa)
+		return (NULL);
+	nb = n;
+	itoa[len--] = '\0';
+	if (nb == 0)
+		zero(itoa);
+	if (nb < 0)
+	{
+		itoa[0] = '-';
+		nb *= -1;
+	}
+	while (nb > 0)
+	{
+		itoa[len] = (nb % 10) + 48;
+		nb /= 10;
+		len--;
+	}
+	return (itoa);
+}

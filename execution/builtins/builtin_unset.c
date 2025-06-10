@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 13:59:21 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/27 23:50:23 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/09 23:43:09 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,9 +39,9 @@ static void	remove_env_var(t_env **env, char *var_name)
 	t_env	*prev;
 	t_env	*to_free;
 
+    if (!env || !*env || !var_name)
+        return ;
 	prev = NULL;
-	if (!env[0] || !var_name)
-		return ;
 	curr = *env;
 	while (curr != NULL)
 	{
@@ -52,9 +52,7 @@ static void	remove_env_var(t_env **env, char *var_name)
 				*env = curr->next;
 			else
 				prev->next = curr->next;
-			free(to_free->var);
-			free(to_free->val);
-			free(to_free);
+			(free(to_free->var), free(to_free->val), free(to_free));
 			break ;
 		}
 		prev = curr;
@@ -68,6 +66,8 @@ static void	remove_exp_var(t_exp **exp, char *var_name)
 	t_exp	*prev;
 	t_exp	*to_free;
 
+	if (!exp || !*exp || !var_name)
+        return;
 	prev = NULL;
 	curr = *exp;
 	while (curr != NULL)
@@ -79,9 +79,7 @@ static void	remove_exp_var(t_exp **exp, char *var_name)
 				*exp = curr->next;
 			else
 				prev->next = curr->next;
-			free(to_free->vr);
-			free(to_free->vl);
-			free(to_free);
+			(free(to_free->vr), free(to_free->vl), free(to_free));
 			break ;
 		}
 		prev = curr;
@@ -89,22 +87,30 @@ static void	remove_exp_var(t_exp **exp, char *var_name)
 	}
 }
 
-void	ft_unset(t_exp **exp, t_env **env, char **args)
+int	ft_unset(t_exp **exp, t_env **env, char **args)
 {
 	int	k;
 
-	if (len_arg(args) < 2)
-		return ;
+	if (!args || len_arg(args) < 2)
+		return 1;
 	k = 1;
 	while (args[k])
 	{
+		if (!args[k])
+		{
+            k++;
+            continue;
+        }
 		if (!check_args(args[k]))
 			unset_invalid(args[k]);
 		else
 		{
-			remove_env_var(env, args[k]);
-			remove_exp_var(exp, args[k]);
+			if (env)
+				remove_env_var(env, args[k]);
+			if (exp)
+				remove_exp_var(exp, args[k]);
 		}
 		k++;
 	}
+	return 0;
 }

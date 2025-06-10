@@ -29,3 +29,19 @@ char	*ft_strdup(char *s)
 	d[i] = '\0';
 	return (d);
 }
+char *gc_strdup(t_gc *gc, char *s)
+{
+	int i = 0;
+	char *d;
+
+	d = gc_malloc(gc, (ft_strlen(s) + 1) * sizeof(char));
+	if (d == NULL)
+		return NULL;
+	while (s[i] != '\0')
+	{
+		d[i] = s[i];
+		i++;
+	}
+	d[i] = '\0';
+	return d;
+}

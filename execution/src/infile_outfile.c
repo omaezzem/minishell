@@ -6,105 +6,67 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 20:07:00 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/31 14:30:33 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/09 15:16:02 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-static int	index_last_outfile(char **files, char **redirections)
+void	fail_fd(int fd)
 {
-	int	i;
-	int	s;
-
-	i = 0;
-	s = 0; 
-	while (files[i] != NULL)
-	{
-		if(redirections[i][0] == '>')
-			s = i;
-		i++;
-	}
-	return (s);
+	if (fd == -1)
+		return (perror("minishell")); 
 }
-static int	index_last_infile(char **files, char **redirections)
-{
-	int	i;
-	int	s;
-
-	i = 0;
-	s = 0; 
-	while (files[i] != NULL)
-	{
-		if(redirections[i][0] == '<')
-			s = i;
-		i++;
-	}
-	return (s);
-}
-
-static int	process_outputs(char **files, char **redirections, int i_outfl)
+static int	process_redirection(char *file, char *redir, int heredoc_fd, int *in_fd, int *out_fd)
 {
 	int	fd;
-	int	i;
 
-	i = -1;
-	while (files[++i] && i < i_outfl)
+	if (ft_strcmp(redir, "<") == 0)
 	{
-		if (ft_strcmp(redirections[i], ">") == 0
-			|| ft_strcmp(redirections[i], ">>") == 0)
-			ft_output_append(files, redirections, i);
+		fd = open(file, O_RDONLY);
+		fail_fd(fd);
+		*in_fd = fd;
 	}
-	if (files[i_outfl] && (ft_strcmp(redirections[i_outfl], ">") == 0
-		|| ft_strcmp(redirections[i_outfl], ">>") == 0))
+	else if (ft_strcmp(redir, "<<") == 0)
+		*in_fd = heredoc_fd;
+	else if (ft_strcmp(redir, ">") == 0)
 	{
-		fd = ft_output_append(files, redirections, i_outfl);
-		if (fd == -1 || dup2(fd, STDOUT_FILENO) == -1)
-			return (close(fd), perror("minishell"), FAILURE);
+		fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		fail_fd(fd);
+		*out_fd = fd;
+	}
+	else if (ft_strcmp(redir, ">>") == 0)
+	{
+		fd = open(file, O_WRONLY | O_CREAT | O_APPEND, 0644);
+		fail_fd(fd);
+		*out_fd = fd;
 	}
 	return (SUCCESS);
 }
 
-static int	process_inputs(char **files, char **redirections, int i_infl, t_heredoc *heredoc)
+int	ft_do_redirections(char **files, char **redirections, int heredoc)
 {
-	int	fd;
 	int	i;
-
-	i = -1;
-	while (files[++i] && i < i_infl)
-	{
-		if (ft_strcmp(redirections[i], "<") == 0
-			|| ft_strcmp(redirections[i], "<<") == 0)
-			ft_inp_heredoc(files, redirections, i);
-	}
-	if (files[i_infl] && (ft_strcmp(redirections[i_infl], "<") == 0))
-	{
-		fd = ft_inp_heredoc(files, redirections, i_infl);
-		if (fd == -1 || dup2(fd, STDIN_FILENO) == -1)
-			return (close(fd), perror("minishell"), FAILURE);
-	}
-	else if (files[i_infl] && ft_strcmp(redirections[i_infl], "<<") == 0)
-	{
-		if (heredoc->fd == -1 || dup2(heredoc->fd, STDIN_FILENO) == -1)
-			return (close(heredoc->fd), perror("minishell"), FAILURE);
-	}
-	return (SUCCESS);
-}
-
-int	ft_do_redirections(char **files, char **redirections, t_heredoc *heredoc)
-{
-	int	i_outfl;
-	int	i_infl;
+	int	in_fd = -1;
+	int	out_fd = -1;
 
 	if (!files || !redirections)
 		return (SUCCESS);
 	if (ft_len_redirections(redirections) == 1)
 		return (to_single_redirection(files, redirections, heredoc), 1);
-	i_outfl = index_last_outfile(files, redirections);
-	i_infl = index_last_infile(files, redirections);
-	if (process_outputs(files, redirections, i_outfl) == FAILURE)
-		return (FAILURE);
-	if (process_inputs(files, redirections, i_infl, heredoc) == FAILURE)
-		return (FAILURE);
+	i = -1;
+	while (files[++i])
+	{
+		if (process_redirection(files[i], redirections[i], heredoc, &in_fd, &out_fd) == FAILURE)
+			return (FAILURE);
+	}
+	if (out_fd != -1 && dup2(out_fd, STDOUT_FILENO) == -1)
+		return (close(out_fd), perror("minishell"), FAILURE);
+	if (in_fd != -1 && dup2(in_fd, STDIN_FILENO) == -1)
+		return (close(in_fd), close(out_fd), perror("minishell"), FAILURE);
+	if (out_fd != -1)
+		close(out_fd);
+	if (in_fd != -1 && in_fd != heredoc)
+		close(in_fd);
 	return (SUCCESS);
 }

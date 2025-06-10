@@ -39,3 +39,30 @@ char	*ft_strjoin(char *s1, char *s2)
 	str[j] = '\0';
 	return (str);
 }
+char *gc_strjoin(t_gc *gc, char *s1, char *s2)
+{
+	size_t	i;
+	char	*str;
+	size_t	len;
+	size_t	j;
+
+	i = 0;
+	j = 0;
+	if (!s1 && !s2)
+		return (NULL);
+	if (!s1)
+		return (gc_strdup(gc, s2));
+	if (!s2)
+		return (gc_strdup(gc, s1));
+	len = ft_strlen(s1) + ft_strlen(s2);
+	str = gc_malloc(gc, (len + 1) * sizeof(char));  // بدل malloc بـ gc_malloc
+	if (!str)
+		return (NULL);
+	while (s1[i])
+		str[j++] = s1[i++];
+	i = 0;
+	while (s2[i])
+		str[j++] = s2[i++];
+	str[j] = '\0';
+	return (str);
+}

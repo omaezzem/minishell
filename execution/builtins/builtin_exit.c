@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 05:58:14 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/06/03 13:34:35 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/09 15:17:59 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,15 +87,12 @@ void	ft_exit(t_cmd *data, char **args)
 		if (is_num(args[1]) == FAILURE)
 			handle_exit_error(data, args[1]);
 		exit_code = calculate_exit_code(ft_atoi(args[1]), args[1], data);
-		printf("%lld\n", exit_code);
 		data->ex_status = exit_code;
-		ft_putstr_fd("exit\n", STDERR_FILENO);
-		exit(exit_code);
+		(ft_putstr_fd("exit\n", STDERR_FILENO), exit(exit_code));
 	}
 	else
 	{
 		data->ex_status = 127;
-		ft_putstr_fd("exit\n", STDERR_FILENO);
-		exit(127);
+		(ft_putstr_fd("exit\n", STDERR_FILENO), exit(127));
 	}
 }

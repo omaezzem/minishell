@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 10:13:20 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/26 10:20:26 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/08 18:39:57 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ int	len_alnum_var(char *var)
 	}
 	return (n);
 }
+
 int	find_equal(char *str)
 {
 	int i;
