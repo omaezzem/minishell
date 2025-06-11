@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 19:51:16 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/06/09 23:08:01 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/10 23:12:39 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ int notpipe(t_cmd *data)
 int ft_builtins(t_env **env, t_exp **exp, t_cmd *data, int herdcfd)
 {
 	if (data->files && data->redirection && notpipe(data))
-		ft_do_redirections(data->files, data->redirection,  herdcfd);
+		ft_do_redirections(data->files, data->redirection,  herdcfd, data);
 	if (ft_strcmp(data->cmd[0], "echo") == 0)
 		return((data->ex_status = ft_echo(&data->cmd[0])), 1);
 	else if (ft_strcmp(data->cmd[0], "cd") == 0)

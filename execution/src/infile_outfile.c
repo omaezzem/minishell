@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 20:07:00 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/06/09 15:16:02 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/10 23:12:14 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ static int	process_redirection(char *file, char *redir, int heredoc_fd, int *in_
 	return (SUCCESS);
 }
 
-int	ft_do_redirections(char **files, char **redirections, int heredoc)
+int	ft_do_redirections(char **files, char **redirections, int heredoc, t_cmd *data)
 {
 	int	i;
 	int	in_fd = -1;
@@ -53,7 +53,7 @@ int	ft_do_redirections(char **files, char **redirections, int heredoc)
 	if (!files || !redirections)
 		return (SUCCESS);
 	if (ft_len_redirections(redirections) == 1)
-		return (to_single_redirection(files, redirections, heredoc), 1);
+		return (to_single_redirection(files, redirections, heredoc, data), 1);
 	i = -1;
 	while (files[++i])
 	{

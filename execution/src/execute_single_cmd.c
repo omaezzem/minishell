@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 19:36:54 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/06/10 15:15:48 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/10 23:13:34 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ static void	prepare_and_execute(t_cmd *data, t_env **env, char **envp, int herdc
 	char	*path;
 
 	if (data->files && data->redirection)
-		ft_do_redirections(data->files, data->redirection, herdc);
+		ft_do_redirections(data->files, data->redirection, herdc, data);
 	commande = malloc(sizeof(char *) * (len_arg(&data->cmd[0]) + 1));
 	if (!commande)
 		exit_failure(data);

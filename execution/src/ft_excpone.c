@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/08 14:53:16 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/06/09 13:56:34 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/10 23:12:56 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ int		do_child_one(int i, t_ctx *ctx, t_cmd *curr)
 	if (!dup_and_close_pipes(ctx->pipes, i, ctx->numcmd))
 		exit_failure(ctx->data);
 	if (curr->files && curr->redirection)
-		ft_do_redirections(curr->files, curr->redirection, ctx->fdher);
+		ft_do_redirections(curr->files, curr->redirection, ctx->fdher, ctx->data);
 	return (1);
 }
 

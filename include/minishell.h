@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 23:17:48 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/06/10 00:50:24 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/10 23:12:28 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,14 +174,14 @@ int		ft_pwd(t_env *env);
 int		ft_export(t_exp *exp, t_env *env, char **args);
 t_exp	*ft_create_env_export(char **env, t_exp **list);
 int	ft_unset(t_exp **exp, t_env **env, char **args);
-void	to_single_redirection(char **files, char **redirections, int herdocfd);
+void to_single_redirection(char **files, char **redirections, int herdocfd, t_cmd *data);
 int ft_execute(t_exp **exp, t_env **env, t_cmd **data, char **envp, t_heredoc *heredoc);
 void	add_usr_bin_env(t_env **env_head);
 void	add_path(t_env **env_head);
 void	add_shlvl(t_env **env_head);
 void	add_pwd(t_env **env_head);
 void	minishell_invalid(char *invalid_str);
-int		ft_do_redirections(char **files, char **redirections, int heredoc);
+int	ft_do_redirections(char **files, char **redirections, int heredoc, t_cmd *data);
 void	update_val_env(t_env *env, char *var, char *val);
 void	update_val_exp(t_exp *exp, char *var, char *val);
 void	update_new(t_env **ev, char *newpath);

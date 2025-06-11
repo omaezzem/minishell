@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 10:05:28 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/06/10 00:49:04 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/10 23:13:26 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ int		ft_execute_pipes(t_ctx *ctx)
 	{
 		ctx->pids[i] = fork();
 		if (ctx->pids[i] == -1)
-			return (perror("fork"), exit_failure(ctx->data), 0);
+			return (perror("fork"), 0);
 		if (ctx->pids[i] == 0)
 			(do_child_one(i, ctx, curr),
 				do_child_two(curr, i, ctx));
@@ -104,10 +104,9 @@ int ft_execute(t_exp **exp, t_env **env, t_cmd **data, char **envp, t_heredoc *h
 	if (data)
 		numcmd = len_cmd(*data);
 	fdher = heredoc->fd;
-	// printf("%d\n", data->ex_status);
 	int std_in = dup(0);
 	if(!(*data)->cmd && (*data)->files && (*data)->redirection)
-		ft_do_redirections((*data)->files, (*data)->redirection, fdher);
+		ft_do_redirections((*data)->files, (*data)->redirection, fdher, *data);
 	if (notpipe(*data) == 1)
 	{
 		if (is_builtin((*data)->cmd[0]))
@@ -118,10 +117,6 @@ int ft_execute(t_exp **exp, t_env **env, t_cmd **data, char **envp, t_heredoc *h
 			execute_single_cmd(env, envp, *data, heredoc);
 	}
 	else
-	{
 		execute_multi_pipe(*data, envp, fdher, *env, *exp);
-	}
-	dup2(std_in, 0);
-	close(std_in);
-	return (1);
+	return ((dup2(std_in, 0), close(std_in)), 1);
 }

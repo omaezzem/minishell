@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/08 14:58:42 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/06/09 15:07:11 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/10 23:51:41 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,15 +47,18 @@ int join_execve_cmd(char *path, char **commande, t_cmd *curr, char **envp, t_cmd
 	while (splitpath[++j])
 	{
 		joinslash = ft_strjoin(splitpath[j], "/");
+		if (!joinslash)
+            (free_split(splitpath), free_split(commande), exit_failure(data));
 		cmd = ft_strjoin(joinslash, curr->cmd[0]);
 		free(joinslash);
+		if (!cmd) 
+            free_split(splitpath), free_split(commande), exit_failure(data);
 		if (access(cmd, X_OK | F_OK) == 0)
-			(free(splitpath), execve(cmd, commande, envp), exit_failure(data));
+			(free(splitpath), execve(cmd, commande, envp), free(cmd),
+				free_split(commande), exit_failure(data));
 		free(cmd);
 	}
-	free_split(commande);
-	free_split(splitpath);
-	return 1;
+	return (free_split(commande), free_split(splitpath), 1);
 }
 
 int	ft_execve(t_cmd *curr, t_env **env, t_cmd *data, char **envp, int i)
@@ -73,7 +76,7 @@ int	ft_execve(t_cmd *curr, t_env **env, t_cmd *data, char **envp, int i)
 			lencmd += len_arg(&curr->cmd[j]);
 		commande = malloc(sizeof(char *) * (lencmd + 1));
 		if (!commande)
-			exit_failure(data);
+			 exit_failure(data);
 		is_cmd_path(data, curr, commande, envp, i);
 		j = -1;
 		while (curr->cmd[++j])
@@ -83,7 +86,6 @@ int	ft_execve(t_cmd *curr, t_env **env, t_cmd *data, char **envp, int i)
 		if (!path)
 			(free(commande), invalid_path(data));
 		join_execve_cmd(path, commande, curr, envp, data);
-		free(commande);
 	}
 	return 1;
 }
