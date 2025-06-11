@@ -6,13 +6,13 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 16:01:11 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/06/10 23:11:41 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/11 06:48:15 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-int ft_output_append_s(char **files, char **redirections)
+int ft_output_append_s(char **files, char **redirections, t_cmd *data)
 {
 	int fd;
 
@@ -23,7 +23,7 @@ int ft_output_append_s(char **files, char **redirections)
 	{
 		fd = open(files[0], O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		if (fd == -1)
-			return (perror("minishell"), FAILURE);
+			return (perror("minishell"), exit_failure(data), FAILURE);
 		if (dup2(fd, STDOUT_FILENO) == -1)
 			return (close(fd), perror("minishell"), FAILURE);
 		close(fd);
@@ -32,7 +32,7 @@ int ft_output_append_s(char **files, char **redirections)
 	{
 		fd = open(files[0], O_WRONLY | O_CREAT | O_APPEND, 0644);
 		if (fd == -1)
-			return (perror("minishell"), FAILURE);
+			return (perror("minishell"), exit_failure(data), FAILURE);
 		if (dup2(fd, STDOUT_FILENO) == -1)
 			return (close(fd), perror("minishell"), FAILURE);
 		close(fd);
@@ -73,7 +73,7 @@ void to_single_redirection(char **files, char **redirections, int herdocfd, t_cm
 	if ((ft_strcmp(redirections[0], ">") == 0) ||
 		(ft_strcmp(redirections[0], ">>") == 0))
 	{
-		ft_output_append_s(files, redirections);
+		ft_output_append_s(files, redirections, data);
 	}
 	else if ((ft_strcmp(redirections[0], "<") == 0) ||
 		(ft_strcmp(redirections[0], "<<") == 0))

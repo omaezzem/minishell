@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:50:42 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/06/09 22:39:06 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/11 06:35:27 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@ int	ft_cd(t_env *env, char **args ,t_exp *exp)
 	if (!args[0] || !env)
 		return (1);
 	lenargs = len_arg(args);
+	if (lenargs > 2)
+		return(ft_putstr_fd("cd: to many argumants\n", 2), 1);
 	if (!getcwd(oldpath, PATH_MAX))
 	{
 		if (!ft_strcmp(args[1], ".."))
