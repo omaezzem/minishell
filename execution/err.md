@@ -47,3 +47,28 @@ bash-3.2$ echo $PATH
 /custom/path:/mnt/homes/omaezzem/.brew/bin:/mnt/homes/omaezzem/.brew/bin:/mnt/homes/omaezzem/.brew/bin:/mnt/homes/omaezzem/brew/bin:/mnt/homes/omaezzem/brew/bin:/mnt/homes/omaezzem/brew/bin:/mnt/homes/omaezzem/brew/bin:/mnt/homes/omaezzem/goinfre/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/munki:/Library/Apple/usr/bin
 bash-3.2$ 
 
+=====================================
+
+minishell$ << a cat
+> aasdf
+> as
+> asdf
+> a
+1
+aasdf
+as
+asdf
+minishell$ 
+
+
+
+
+========================
+
+exit -9223372036854775808
+
+# Expected behavior
+- Should exit with status 0 (LONG_MIN % 256)
+
+
+

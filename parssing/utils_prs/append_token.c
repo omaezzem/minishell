@@ -12,13 +12,15 @@
 
 #include "../../include/minishell.h"
 
-void append_token(t_token **head, t_token *new_token)
+void	append_token(t_token **head, t_token *new_token)
 {
+	t_token	*tmp;
+
 	if (!*head)
 		*head = new_token;
 	else
 	{
-		t_token *tmp = *head;
+		tmp = *head;
 		while (tmp->next)
 			tmp = tmp->next;
 		tmp->next = new_token;

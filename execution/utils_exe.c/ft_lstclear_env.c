@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/07 20:02:18 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/06/07 20:05:54 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/12 21:17:39 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,7 @@ void	ft_env_clear(t_env **lst)
 	t_env	*next;
 
 	if (!lst || !*lst)
-		return;
-	
+		return ;
 	current = *lst;
 	while (current)
 	{

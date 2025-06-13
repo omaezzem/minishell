@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 10:43:20 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/06/09 23:06:34 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/12 11:01:56 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,9 +73,9 @@ int	builtin_env(t_env **env, char **args)
 
 	if (args && args[1])
 		return (ft_putstr_fd("env: too many arguments\n", 2), 1);
-    current = *env;
+	current = *env;
 	if (current == NULL)
-		return 1;
+		return (1);
 	while (current != NULL)
 	{
 		if (current->var && current->val)

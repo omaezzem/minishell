@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 10:27:19 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/06/09 22:41:04 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/12 10:54:54 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,12 +48,12 @@ int	if_double_var(t_exp **exp)
 	t_exp	*current;
 
 	if (!exp || !*exp)
-		return 0;
+		return (0);
 	current = *exp;
 	while (current && current->vr)
 	{
 		check_duplicates(current);
 		current = current->next;
 	}
-	return 1;
+	return (1);
 }

@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 11:32:24 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/26 11:32:59 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/12 10:55:26 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 
 char	*args_zero(char *args)
 {
-	int     i;
-	char    *zero;
-	int     len;
+	int		i;
+	char	*zero;
+	int		len;
 
 	if (!args)
 		return (NULL);
@@ -30,25 +30,25 @@ char	*args_zero(char *args)
 	while (args[i])
 	{
 		if (args[i] == '=')
-			break;
+			break ;
 		zero[i] = args[i];
 		i++;
 	}
 	zero[i] = '\0';
-	return(zero);
+	return (zero);
 }
 
 char	*args_one(char *args)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (args[i])
 	{
-		if(args[i] == '=')
+		if (args[i] == '=')
 		{
-			if (args[i+1] != '\0')
-				return (&args[i+1]);
+			if (args[i + 1] != '\0')
+				return (&args[i + 1]);
 		}
 		i++;
 	}

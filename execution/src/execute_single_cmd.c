@@ -6,13 +6,14 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 19:36:54 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/06/11 06:48:38 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/13 19:40:21 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-void	access_and_execute(char *path, char **commande, t_cmd *data, char **envp)
+void	access_and_execute(char *path, char **commande,
+		t_cmd *data, char **envp)
 {
 	char	**splitpath;
 	char	*joinslash;
@@ -33,7 +34,7 @@ void	access_and_execute(char *path, char **commande, t_cmd *data, char **envp)
 		cmd = ft_strjoin(joinslash, data->cmd[0]);
 		free(joinslash);
 		if (access(cmd, X_OK | F_OK) == 0)
-			free_split(splitpath), execve(cmd, commande, envp);
+			(execve(cmd, commande, envp));
 		free(cmd);
 	}
 	if (splitpath)
@@ -46,7 +47,8 @@ static void	handle_child_signals(void)
 	signal(SIGINT, SIG_DFL);
 }
 
-static void	prepare_and_execute(t_cmd *data, t_env **env, char **envp, int herdc)
+static void	prepare_and_execute(t_cmd *data, t_env **env,
+		char **envp, int herdc)
 {
 	char	**commande;
 	char	*path;
@@ -76,11 +78,12 @@ static void	handle_parent_process(int status)
 		write(2, "Quit: 3\n", 8);
 }
 
-int	execute_single_cmd(t_env **env, char **envp, t_cmd *data, t_heredoc *heredoc)
+int	execute_single_cmd(t_env **env, char **envp,
+		t_cmd *data, t_heredoc *heredoc)
 {
 	int	pid;
 	int	herdc;
-	int status;
+	int	status;
 
 	herdc = heredoc->fd;
 	if (!data->cmd || !env)
@@ -89,9 +92,9 @@ int	execute_single_cmd(t_env **env, char **envp, t_cmd *data, t_heredoc *heredoc
 	if (pid == 0)
 	{
 		handle_child_signals();
-		if (data->cmd[0][0] == '.' && data->cmd[0][1] == '/'
+		if ((ft_strchr(data->cmd[0], '/')
 			&& ft_strcmp("./minishell", data->cmd[0])
-			&& access(data->cmd[0], X_OK | F_OK))
+			&& access(data->cmd[0], X_OK | F_OK)) || !ft_strcmp(data->cmd[0], "/"))
 			check_dir_file(&data->cmd[0], data);
 		prepare_and_execute(data, env, envp, herdc);
 	}

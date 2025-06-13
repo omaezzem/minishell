@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 10:36:29 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/06/08 18:45:23 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/12 10:57:38 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,10 @@
 
 void	add_to_export_list_vl(t_exp **exp, char *avzero, char *avone)
 {
-    t_exp   *add;
+	t_exp	*add;
 
 	add = NULL;
-
-    if (search_var_in_exp(*exp, avzero))
+	if (search_var_in_exp(*exp, avzero))
 		update_val_exp(*exp, avzero, avone);
 	add = malloc(sizeof(t_exp));
 	if (!add)
@@ -34,11 +33,11 @@ void	add_to_export_list_vl(t_exp **exp, char *avzero, char *avone)
 
 void	add_to_export_list_v(t_exp **exp, char *avzero)
 {
-    t_exp   *add;
+	t_exp	*add;
 
 	if (!exp || !avzero)
 		return ;
-    if (search_var_in_exp(*exp, avzero))
+	if (search_var_in_exp(*exp, avzero))
 		return ;
 	add = malloc(sizeof(t_exp));
 	if (!add)
@@ -53,8 +52,8 @@ void	add_to_env_list(t_env *env, char *args, char *avzero, char *avone)
 {
 	t_env	*nnode;
 
-	if (!env  || !args || !avzero || !avone) 
-		return;
+	if (!env || !args || !avzero || !avone)
+		return ;
 	if ((find_equal(args) == 1))
 	{
 		if (search_var_in_env(env, avzero))

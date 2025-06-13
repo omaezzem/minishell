@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 14:09:30 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/06/07 18:18:02 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/12 21:12:07 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	free_split(char **arr)
 {
-	int i;
+	int	i;
 
 	i = -1;
 	while (arr[++i])

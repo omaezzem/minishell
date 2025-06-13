@@ -12,27 +12,24 @@
 
 #include "../../include/minishell.h"
 
-void ft_lstadd_back_env(t_env **lst, t_env *new)
+void	ft_lstadd_back_env(t_env **lst, t_env *new)
 {
-    t_env *crnt;
+	t_env	*crnt;
 
-    if (lst == NULL || new == NULL)
-        return;
-    
-    if (*lst == NULL)
-    {
-        *lst = new;
-    }
-    else
-    {
-        crnt = *lst;
-        while (crnt != NULL && crnt->next != NULL)
-        {
-            crnt = crnt->next;
-        }
-        if (crnt != NULL)
-            crnt->next = new;
-    }
+	if (lst == NULL || new == NULL)
+		return ;
+	if (*lst == NULL)
+		*lst = new;
+	else
+	{
+		crnt = *lst;
+		while (crnt != NULL && crnt->next != NULL)
+		{
+			crnt = crnt->next;
+		}
+		if (crnt != NULL)
+			crnt->next = new;
+	}
 }
 
 void	ft_lstadd_back_exp(t_exp **lst, t_exp *new)

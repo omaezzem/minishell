@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 11:23:25 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/06/09 23:10:22 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/12 10:43:41 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,19 +46,19 @@ void	handle_equal_case(t_exp *exp, t_env *env, char *arg, char *avzero)
 
 int	process_export_args(t_exp *exp, t_env *env, char **args)
 {
-	int		i;
+	int	i;
 
 	i = 1;
-	while (args[i])
+	while (args[i] != NULL)
 	{
 		if (!process_single_arg(exp, env, args[i]))
 		{
-			return 0;
-			break ;
+			if (len_arg(args) == 2)
+				return (0);
 		}
 		i++;
 	}
-	return 1;
+	return (1);
 }
 
 void	print_export_list(t_exp *exp)
@@ -80,19 +80,18 @@ void	print_export_list(t_exp *exp)
 	}
 }
 
-int		ft_export(t_exp *exp, t_env *env, char **args)
+int	ft_export(t_exp *exp, t_env *env, char **args)
 {
-	int		len;
+	int	len;
 
 	len = len_arg(args);
-	if (len > 1)
-		if(!process_export_args(exp, env, args))
-			return (1);
+	if (len > 1 && !process_export_args(exp, env, args))
+		return (0);
 	if (!if_double_var(&exp))
-		return (1);
+		return (0);
 	if (!sort_exp_list(&exp))
-		return (1);
+		return (0);
 	if ((len_arg(args) == 1) && !ft_strcmp(args[0], "export"))
 		print_export_list(exp);
-	return (0);
+	return (1);
 }

@@ -6,37 +6,40 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 19:51:16 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/06/10 23:12:39 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/13 18:31:08 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-void update_exit_status(int status, t_cmd *data)
+int	update_exit_status(int status, t_cmd *data)
 {
-    if (WIFEXITED(status))
-        data->ex_status = WEXITSTATUS(status);
-    else if (WIFSIGNALED(status))
-        data->ex_status = 128 + WTERMSIG(status);
-    else
-        data->ex_status = 1;
+	if (data->flg == 1)
+		data->ex_status = 1;
+	else if (WIFEXITED(status))
+		data->ex_status = WEXITSTATUS(status);
+	else if (WIFSIGNALED(status))
+		data->ex_status = 128 + WTERMSIG(status);
+	else
+		data->ex_status = 1;
+	return (data->ex_status);
 }
 
-int notpipe(t_cmd *data)
+int	notpipe(t_cmd *data)
 {
 	if (!data || !data->cmd)
-		return 0;
+		return (0);
 	if (!data->next)
-		return 1;
-	return 0;
+		return (1);
+	return (0);
 }
 
-int ft_builtins(t_env **env, t_exp **exp, t_cmd *data, int herdcfd)
+int	ft_builtins(t_env **env, t_exp **exp, t_cmd *data, int herdcfd)
 {
 	if (data->files && data->redirection && notpipe(data))
-		ft_do_redirections(data->files, data->redirection,  herdcfd, data);
+		ft_do_redirections(data->files, data->redirection, herdcfd, data);
 	if (ft_strcmp(data->cmd[0], "echo") == 0)
-		return((data->ex_status = ft_echo(&data->cmd[0])), 1);
+		return ((data->ex_status = ft_echo(&data->cmd[0])), 1);
 	else if (ft_strcmp(data->cmd[0], "cd") == 0)
 		return ((data->ex_status = ft_cd(*env, data->cmd, *exp)), 1);
 	else if (ft_strcmp(data->cmd[0], "pwd") == 0)
@@ -53,7 +56,7 @@ int ft_builtins(t_env **env, t_exp **exp, t_cmd *data, int herdcfd)
 		return (0);
 }
 
-int is_builtin(char *args)
+int	is_builtin(char *args)
 {
 	if (args)
 	{
@@ -64,7 +67,7 @@ int is_builtin(char *args)
 			|| !ft_strcmp(args, "exit")
 			|| !ft_strcmp(args, "pwd")
 			|| !ft_strcmp(args, "cd"))
-			return 1;
+			return (1);
 	}
-	return 0;
+	return (0);
 }

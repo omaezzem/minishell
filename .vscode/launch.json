@@ -6,8 +6,8 @@
       "type": "lldb",
       "request": "launch",
       "args": [],
-      "cwd": "/mnt/homes/omaezzem/Desktop/minishell42",
-      "program": "/mnt/homes/omaezzem/Desktop/minishell42/build/Debug/outDebug"
+      "cwd": "/mnt/homes/omaezzem/Desktop/mmmm,",
+      "program": "/mnt/homes/omaezzem/Desktop/mmmm,/build/Release/outRelease"
     }
   ]
 }

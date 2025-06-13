@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/07 20:06:10 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/06/07 20:07:06 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/12 21:18:23 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,7 @@ void	ft_exp_clear(t_exp **lst)
 	t_exp	*next;
 
 	if (!lst || !*lst)
-		return;
-	
+		return ;
 	current = *lst;
 	while (current)
 	{

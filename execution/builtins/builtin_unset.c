@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 13:59:21 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/06/09 23:43:09 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/12 11:10:25 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,8 @@ static void	remove_env_var(t_env **env, char *var_name)
 	t_env	*prev;
 	t_env	*to_free;
 
-    if (!env || !*env || !var_name)
-        return ;
+	if (!env || !*env || !var_name)
+		return ;
 	prev = NULL;
 	curr = *env;
 	while (curr != NULL)
@@ -67,7 +67,7 @@ static void	remove_exp_var(t_exp **exp, char *var_name)
 	t_exp	*to_free;
 
 	if (!exp || !*exp || !var_name)
-        return;
+		return ;
 	prev = NULL;
 	curr = *exp;
 	while (curr != NULL)
@@ -92,15 +92,15 @@ int	ft_unset(t_exp **exp, t_env **env, char **args)
 	int	k;
 
 	if (!args || len_arg(args) < 2)
-		return 1;
+		return (1);
 	k = 1;
 	while (args[k])
 	{
 		if (!args[k])
 		{
-            k++;
-            continue;
-        }
+			k++;
+			continue ;
+		}
 		if (!check_args(args[k]))
 			unset_invalid(args[k]);
 		else
@@ -112,5 +112,5 @@ int	ft_unset(t_exp **exp, t_env **env, char **args)
 		}
 		k++;
 	}
-	return 0;
+	return (0);
 }

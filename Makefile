@@ -5,12 +5,11 @@
 #                                                     +:+ +:+         +:+      #
 #    By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2025/03/14 02:29:51 by omaezzem          #+#    #+#              #
-#    Updated: 2025/06/10 15:14:30 by omaezzem         ###   ########.fr        #
+#    Created: 2025/06/13 18:57:52 by omaezzem          #+#    #+#              #
+#    Updated: 2025/06/13 18:57:55 by omaezzem         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-#------------------------------Source Files------------------------------------#
 
 SRC = 	execution/builtins/cd/builtin_cd.c \
 		execution/builtins/cd/utils_cd.c\
@@ -29,6 +28,7 @@ SRC = 	execution/builtins/cd/builtin_cd.c \
 		execution/builtins/ft_export/sort_exp.c\
 		execution/builtins/ft_export/utils_export.c\
 		execution/builtins/ft_export/parset_exp.c\
+		execution/utils_exe.c/invalid_msgt.c\
 		execution/builtins/ft_export/exptwo.c\
 		execution/env/env.c \
 		execution/utils_exe.c/free_ptr.c \
@@ -54,10 +54,22 @@ SRC = 	execution/builtins/cd/builtin_cd.c \
 		execution/utils_exe.c/ft_lstclear_exp.c\
 		parssing/utils_prs/append_token.c \
 		parssing/utils_prs/create_token.c \
-		parssing/src_prs/expand.c \
-		parssing/src_prs/joining.c \
-		parssing/src_prs/syntax_error.c \
-		parssing/src_prs/tokenization.c \
+		parssing/utils_prs/quotes.c \
+		parssing/utils_prs/spice.c \
+		parssing/src_prs/joining/joining.c \
+		parssing/src_prs/tokens/tokenization2.c \
+		parssing/src_prs/joining/joining2.c \
+		parssing/src_prs/syntax/syntax_error.c \
+		parssing/src_prs/expand/expand.c \
+		parssing/src_prs/tokens/tokens3.c \
+		parssing/src_prs/tokens/tokenization.c \
+		parssing/src_prs/syntax/syntax_er.c \
+		parssing/src_prs/syntax/syntax_er2.c \
+		parssing/src_prs/syntax/syntax_er3.c \
+		parssing/src_prs/syntax/syntax_er4.c \
+		parssing/src_prs/expand/expand_heredoc.c \
+		parssing/src_prs/expand/expand2.c \
+		parssing/src_prs/expand/expand3.c \
 		utils/atoi_mini.c \
 		utils/ft_bezero.c \
 		utils/ft_isspace.c \
@@ -84,7 +96,7 @@ OBJ = $(SRC:.c=.o)
 
 #------------------------------Compiler and Flags------------------------------#
 CC = cc
-CFLAGS = -Wall -Wextra -Werror #-g -fsanitize=address
+CFLAGS = -Wall -Wextra -Werror -g -fsanitize=address
 
 #------------------------------Includes and Executables------------------------#
 NAME = minishell

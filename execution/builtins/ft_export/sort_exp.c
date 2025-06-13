@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 10:40:40 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/06/09 23:11:51 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/12 10:41:20 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ int	sort_exp_list(t_exp **exp)
 	t_exp	*next_node;
 
 	if (!exp || !*exp)
-		return 0;
+		return (0);
 	current = *exp;
 	while (current != NULL)
 	{
@@ -44,5 +44,5 @@ int	sort_exp_list(t_exp **exp)
 		}
 		current = current->next;
 	}
-	return 1;
+	return (1);
 }

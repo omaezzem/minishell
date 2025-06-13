@@ -6,15 +6,15 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 09:46:18 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/05/26 09:46:28 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/12 21:19:54 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-int len_args(char **args)
+int	len_args(char **args)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (args[i])

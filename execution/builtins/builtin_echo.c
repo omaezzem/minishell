@@ -6,7 +6,7 @@
 /*   By: omaezzem <omaezzem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 23:14:24 by omaezzem          #+#    #+#             */
-/*   Updated: 2025/06/09 22:38:03 by omaezzem         ###   ########.fr       */
+/*   Updated: 2025/06/12 11:00:23 by omaezzem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,6 @@ void	print_echo(int k, char **args)
 
 	if (k == 0)
 	{
-		
 		i = k + 1;
 		while (args[i])
 		{
@@ -70,7 +69,6 @@ int	ft_echo(char **args)
 		return (1);
 	j = 1;
 	k = 0;
-
 	while (args[j])
 	{
 		if (len_argsone(args[j]) != ft_strlen(args[j]))
